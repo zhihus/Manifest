@@ -1,0 +1,24 @@
+# LLM Navigation Map
+
+## Project
+
+**{{PROJECT_NAME}}** — {{PROJECT_PURPOSE}}
+{% if ENTRY_POINT %}Entry point: `{{ENTRY_POINT}}`{% else %}Entry point: not established.{% endif %}
+
+## Directories
+
+{{PROJECT_DIRECTORIES}}
+
+## Build
+
+{% if BUILD_METHOD %}{{BUILD_METHOD}}{% else %}No build step; runs from source.{% endif %}
+
+## Rules
+
+* Workflow: `AGENTS.md`
+* Code: `CODE_RULES.md`
+* Tests: `TEST_RULES.md`
+* Logging: `LOG_RULES.md`
+* Commits: `COMMIT_RULES.md`
+* Versioning: `VERSIONING.md`
+* Releases: `RELEASES.md`
