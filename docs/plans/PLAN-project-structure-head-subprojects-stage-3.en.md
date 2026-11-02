@@ -8,7 +8,7 @@ The head project `Manifest` and its sub-projects (skills) are documentation proj
 
 ## What will be done
 
-### B1. `content-rules.template.md`
+### B1. `doc-content-rules.template.md`
 Rules template for **documentation** projects (projects that produce documentation, not code). Content:
 - Rules for documentation projects (analog of `code-rules.template.md`, but for documentation): Clarity, Accuracy, Completeness, Consistency, Structure, Change Discipline, Verification.
 - **Context-files protection block** (TEMPORARY): when modifying agent/rules files — show the changes + review + explicit user consent before commit (until a Git Hook exists).
@@ -50,14 +50,14 @@ Templates in `docs/templates/` are source material, not real documents; nothing 
 2. **Separate project-context file** for documentation projects: possibly an agent file. Unresolved.
 
 ## Files
-- `docs/templates/content-rules.template.md` — new (documentation projects + context protection)
+- `docs/templates/doc-content-rules.template.md` — new (documentation projects + context protection)
 - `docs/templates/SETTINGS.template.md` — new (settings rules)
 - `docs/templates/open-spec-rules.template.md` — new (OpenSpec task naming)
 - `docs/templates/RELEASES.template.md` — updated (develop/master, OpenSpec branches)
 - `AGENTS.md` — updated (rule about templates: source material, not real documents; nothing references them)
 
 ## Verification
-- `content-rules.template.md` — rules for documentation projects + context-protection block.
+- `doc-content-rules.template.md` — rules for documentation projects + context-protection block.
 - `SETTINGS.template.md` — placeholders for settings.
 - `open-spec-rules.template.md` — FR, N.M, kebab-case, wave.
 - `RELEASES.template.md` — branches `develop`/`master`; OpenSpec branches mentioned.
