@@ -30,6 +30,9 @@ General OpenSpec task-naming rules (from `compress-context/open-spec-rules.md`):
 ### B5. Cross-references
 Mutual links between the RU and EN files of each stage (RU→EN, EN→RU).
 
+### B6. Rule for the head project (Manifest)
+Templates in `docs/templates/` are source material, not real documents; nothing references them. Manifest-specific; goes into the live `AGENTS.md`.
+
 ## Unresolved questions
 1. **Git workflow for documentation projects** (branch per task, merge into develop, stop-and-report): where to add it — unresolved. Possibly a separate agent file.
 2. **Separate project-context file** for documentation projects: possibly an agent file. Unresolved.
@@ -39,10 +42,12 @@ Mutual links between the RU and EN files of each stage (RU→EN, EN→RU).
 - `docs/templates/SETTINGS.template.md` — new (settings rules)
 - `docs/templates/open-spec-rules.template.md` — new (OpenSpec task naming)
 - `docs/templates/RELEASES.template.md` — updated (develop/master, OpenSpec branches)
+- `AGENTS.md` — updated (rule about templates: source material, not real documents; nothing references them)
 
 ## Verification
 - `content-rules.template.md` — rules for documentation projects + context-protection block.
 - `SETTINGS.template.md` — placeholders for settings.
 - `open-spec-rules.template.md` — FR, N.M, kebab-case, wave.
 - `RELEASES.template.md` — branches `develop`/`master`; OpenSpec branches mentioned.
+- `AGENTS.md` contains the template rule; `docs/templates/` does not appear in `llms.txt` / `AGENTS.md`.
 - All links in `llms.txt` and `AGENTS.md` resolve to files that actually exist.
