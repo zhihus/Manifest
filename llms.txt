@@ -28,6 +28,7 @@ No build step; runs from source.
 * Versioning: `VERSIONING.md`
 * Releases: `releases.md`
 * Commits: `commit-rules.md`
+* OpenSpec tasks: `openspec-rules.md`
 * Access boundaries: `.llmignore` (read first)
 
 ## Sub-projects (skills)

@@ -35,6 +35,7 @@ in any language. English takes priority.
 * Versioning: `VERSIONING.md`
 * Releases: `releases.md`
 * Commits: `commit-rules.md`
+* OpenSpec tasks: `openspec-rules.md`
 * Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
 * Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
 
