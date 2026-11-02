@@ -1,0 +1,38 @@
+# LLM Navigation Map
+
+## Project
+
+**Manifest** — head (meta) project: defines the architecture of LLM
+instruction files and ships reusable skills.
+Entry point: `AGENTS.md`
+
+## Directories
+
+* `docs/` — management manifest, context-guard spec.
+* `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
+* `docs/templates/` — file-architecture templates.
+* `skills/` — subordinate projects (skills).
+* `temp/` — scratch space (gitignored).
+
+## Build
+
+No build step; runs from source.
+
+## Rules
+
+* Workflow: `AGENTS.md`
+* Frozen decisions (project manifest): `project-manifest.md`
+* Management manifest: `docs/MANIFEST.md` (compressed: `docs/MANIFEST.compact.md`)
+* Context guard: `docs/context-files-guard.md`
+* File-architecture templates: `docs/templates/AGENTS.template.md`,
+  `docs/templates/code-rules.template.md`, `docs/templates/commit-rules.template.md`,
+  `docs/templates/log-rules.template.md`, `docs/templates/test-rules.template.md`,
+  `docs/templates/RELEASES.template.md`, `docs/templates/versioning.template.md`,
+  `docs/templates/VERSION.template`, `docs/templates/llmignore.template`
+
+## Sub-projects (skills)
+
+* `skills/compress-context/` — context-compression skill.
+  Agent file: `skills/compress-context/AGENTS.md`.
+* `skills/compress-context-benchmark/` — benchmark for the compression skill.
+  Agent file: `skills/compress-context-benchmark/AGENTS.md`.
