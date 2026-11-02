@@ -6,6 +6,11 @@
 instruction files and ships reusable skills.
 Entry point: `AGENTS.md`
 
+## Reference projects
+
+* Manifest — this project (documentation-based). Entry: `AGENTS.md`.
+* InvestPlan — code-based reference project (`C:\WorkProjects\InvestPlan`). Entry: `C:\WorkProjects\InvestPlan\AGENTS.md`.
+
 ## Directories
 
 * `docs/` — project documentation.
