@@ -19,8 +19,8 @@ Sub-projects:
 - `skills/compress-context-benchmark/` — benchmark for the compression skill.
   Agent file: `skills/compress-context-benchmark/AGENTS.md`.
 
-**Reference projects.** Manifest (this project) and InvestPlan are the two
-experimental reference projects — Manifest is documentation-based, InvestPlan
+**Two experimental reference projects.**
+Manifest (this project) is documentation-based, InvestPlan
 is code-based. Their context files are the source for the final manifest:
 requirements for these files (checks, auxiliary skills, applications).
 
