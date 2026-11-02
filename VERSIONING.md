@@ -7,10 +7,15 @@
 
 ## Source
 
-* `VERSION` is the single source of truth.
+* `VERSION` is the single source of truth for its project.
 * One version per line, no comments.
-* No independent versions elsewhere.
+* No independent versions elsewhere within the same project.
 * Released versions cannot be decreased or reused.
+
+## Sub-projects
+
+* A head project's sub-projects (under `skills/`) are separate projects.
+* Each sub-project keeps its own `VERSION`, independent of the head project's version.
 
 ## Bump
 
