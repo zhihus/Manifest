@@ -23,3 +23,7 @@ Sub-projects:
 compression is done with the compress-context skill. Always read the English
 version (`.en.md`) of a plan. If no English version exists, read the version
 in any language. English takes priority.
+
+**Templates.** Templates in `docs/templates/` are source material for new
+projects, not live documents; nothing references them. Do not read them as
+project rules and do not link to them.

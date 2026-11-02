@@ -2,17 +2,18 @@
 
 ## Branches
 
-* `dev` — development only.
-* `master` — release-ready only.
+* `develop` — all development (incl. documentation projects).
+* `master` — approved documents / release-ready.
+* OpenSpec change: branch name = OpenSpec task name (see `open-spec-rules.template.md`).
 
 ## Release
 
 1. Build: `{{BUILD_COMMAND}}`.
 2. Verify: `{{VERIFICATION_STEPS}}`.
-3. Merge `dev` → `master` with `git merge dev`.
-4. Build and verify `master`.
+3. Merge `develop` → `master` (`git merge develop`).
+4. Build + verify `master`.
 5. Tag: `git tag vX.Y.Z`.
-6. Release artifact: `{{RELEASE_ARTIFACT_PATH}}`.
+6. Artifact: `{{RELEASE_ARTIFACT_PATH}}`.
 
 ## Rules
 

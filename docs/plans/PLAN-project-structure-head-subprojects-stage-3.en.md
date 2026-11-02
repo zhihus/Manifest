@@ -14,25 +14,31 @@ Rules template for **documentation** projects (projects that produce documentati
 - **Context-files protection block** (TEMPORARY): when modifying agent/rules files — show the changes + review + explicit user consent before commit (until a Git Hook exists).
 - **Git workflow: UNRESOLVED** (see "Unresolved questions").
 
-### B2. `SETTINGS.template.md`
-Settings-rules template (modeled on `SETTINGS.md` from VoiceCaptureEngine, but as a template with placeholders).
+**Not implemented** — partial = not implemented. Done only when all points, including the git workflow, are complete.
 
-### B3. `RELEASES.template.md` (update)
+### B2. `SETTINGS.template.md` ✅
+Settings-rules template (modeled on `SETTINGS.md` from VoiceCaptureEngine, but as a template with placeholders).
+**Done** — created as a placeholder template (no local source; VoiceCaptureEngine is external).
+
+### B3. `RELEASES.template.md` (update) ✅
 - Branches: `dev`/`master` → `develop`/`master`.
 - `develop` — all development (including documentation projects).
 - `master` — approved documents / release-ready.
 - Same scheme for code projects.
 - Branch for OpenSpec changes: branch name tied to OpenSpec task naming (see `open-spec-rules.template.md`).
+**Done** — full file updated; compressed twin regenerated via the compress-context skill.
 
-### B4. `open-spec-rules.template.md`
+### B4. `open-spec-rules.template.md` ✅
 General OpenSpec task-naming rules (from `compress-context/open-spec-rules.md`): FR prefix, N.M numbering, kebab-case, wave. These are **general** rules (not skill-specific).
+**Done** — copied from the local source as a template.
 
 ### B5. Cross-references ✅
 Mutual links between the RU and EN files of each stage (RU→EN, EN→RU).
 **Done** — all plan files carry mutual RU/EN references.
 
-### B6. Rule for the head project (Manifest)
+### B6. Rule for the head project (Manifest) ✅
 Templates in `docs/templates/` are source material, not real documents; nothing references them. Manifest-specific; goes into the live `AGENTS.md`.
+**Done** — stop-sign rule added to the live `AGENTS.md`.
 
 ## Done in this session (not part of this plan)
 
