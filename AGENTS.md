@@ -35,6 +35,7 @@ in any language. English takes priority.
 * Releases: `RELEASES.md`
 * Commits: `COMMIT_RULES.md`
 * Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
+* Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
 
 **Templates.** Templates in `docs/templates/` are source material for new
 projects, not live documents. They are listed in `.llmignore` — do not read

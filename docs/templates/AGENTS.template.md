@@ -24,6 +24,7 @@ Name: **{{PROJECT_NAME}}**.
 * Before code → write a test reproducing the issue or verifying expected behavior.
 * No test, no code.
 * No implementation TODO list without user approval.
+* Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
 * Code → `CODE_RULES.md`.
 * Logging → `LOG_RULES.md`.
 
