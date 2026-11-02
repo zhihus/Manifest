@@ -20,6 +20,10 @@ No build step; runs from source.
 ## Rules
 
 * Workflow: `AGENTS.md`
+* Versioning: `VERSIONING.md`
+* Releases: `RELEASES.md`
+* Commits: `COMMIT_RULES.md`
+* Access boundaries: `.llmignore` (read first)
 
 ## Sub-projects (skills)
 

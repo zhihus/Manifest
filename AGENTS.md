@@ -24,6 +24,13 @@ compression is done with the compress-context skill. Always read the English
 version (`.en.md`) of a plan. If no English version exists, read the version
 in any language. English takes priority.
 
+**Rules.**
+
+* Versioning: `VERSIONING.md`
+* Releases: `RELEASES.md`
+* Commits: `COMMIT_RULES.md`
+* Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
+
 **Templates.** Templates in `docs/templates/` are source material for new
-projects, not live documents; nothing references them. Do not read them as
-project rules and do not link to them.
+projects, not live documents. They are listed in `.llmignore` — do not read
+them as project rules and do not link to them.
