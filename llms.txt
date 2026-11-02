@@ -8,7 +8,7 @@ Entry point: `AGENTS.md`
 
 ## Directories
 
-* `docs/` — management manifest, context-guard spec.
+* `docs/` — project documentation (manifests, plans, templates).
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `skills/` — subordinate projects (skills).
 * `temp/` — scratch space (gitignored).
@@ -20,9 +20,6 @@ No build step; runs from source.
 ## Rules
 
 * Workflow: `AGENTS.md`
-* Frozen decisions (project manifest): `project-manifest.md`
-* Management manifest: `docs/MANIFEST.md` (compressed: `docs/MANIFEST.compact.md`)
-* Context guard: `docs/context-files-guard.md`
 
 ## Sub-projects (skills)
 

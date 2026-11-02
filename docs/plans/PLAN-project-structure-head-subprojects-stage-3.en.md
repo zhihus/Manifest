@@ -1,7 +1,7 @@
 # PLAN-project-structure-head-subprojects — Stage 3
 
 > Russian version: PLAN-project-structure-head-subprojects-stage-3.ru.md
-> Status: not implemented
+> Status: partially implemented
 
 ## Context
 The head project `Manifest` and its sub-projects (skills) are documentation projects (no code). Templates fall into 2 categories: for **code** projects (like VoiceCaptureEngine) and for **documentation** projects; some files are common (currently `AGENTS.template.md` does not differ). Stage 3: templates for documentation projects, updates to RELEASES, SETTINGS, OpenSpec rules.
@@ -27,11 +27,17 @@ Settings-rules template (modeled on `SETTINGS.md` from VoiceCaptureEngine, but a
 ### B4. `open-spec-rules.template.md`
 General OpenSpec task-naming rules (from `compress-context/open-spec-rules.md`): FR prefix, N.M numbering, kebab-case, wave. These are **general** rules (not skill-specific).
 
-### B5. Cross-references
+### B5. Cross-references ✅
 Mutual links between the RU and EN files of each stage (RU→EN, EN→RU).
+**Done** — all plan files carry mutual RU/EN references.
 
 ### B6. Rule for the head project (Manifest)
 Templates in `docs/templates/` are source material, not real documents; nothing references them. Manifest-specific; goes into the live `AGENTS.md`.
+
+## Done in this session (not part of this plan)
+
+- Moved `project-manifest.md` from project root to `docs/` (alongside other manifest files).
+- Removed all links to manifest files (`project-manifest.md`, `docs/MANIFEST.md`, `docs/MANIFEST.compact.md`) and to the non-existent `docs/context-files-guard.md` from `llms.txt`. The manifest is a human-facing document the model should not read; it is not referenced in any navigation file.
 
 ## Unresolved questions
 1. **Git workflow for documentation projects** (branch per task, merge into develop, stop-and-report): where to add it — unresolved. Possibly a separate agent file.
