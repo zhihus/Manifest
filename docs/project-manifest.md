@@ -35,7 +35,7 @@
 pre-release, потребители версии и платформенные метаданные. Не определяет релизы,
 коммиты или тестирование.
 
-**`RELEASES.md`** — процесс выпуска: ветки, build, verification, merge, tag и ограничения
+**`releases.md`** — процесс выпуска: ветки, build, verification, merge, tag и ограничения
 релиза. Не определяет версионирование, коммиты или тестирование.
 
 **`LOG_RULES.md`** — правила логирования: формат записи, диагностическая ценность,
@@ -51,7 +51,7 @@ pre-release, потребители версии и платформенные �
 coverage, regression tests, проверка поведения, структура и именование тестов, а также
 требования перед commit. Не определяет общие правила разработки или commit-процесс.
 
-**`COMMIT_RULES.md`** — формат и правила commit: тип, scope, subject, body, footer,
+**`commit-rules.md`** — формат и правила commit: тип, scope, subject, body, footer,
 breaking changes, проверки перед commit и ограничения Git. Не определяет версионирование,
 релизы или тестирование.
 
@@ -106,8 +106,8 @@ DeepS Harnes и определить, в какой точке Protected Governa
 ## Текущее состояние
 
 Определены и согласованы состав и ответственность `AGENTS.md`, `LLM.txt`,
-`VERSIONING.md`, `RELEASES.md`, `LOG_RULES.md`, `CODE_RULES.md`, `TEST_RULES.md`,
-`COMMIT_RULES.md`, `VERSION` и `.llmignore`. Их утверждённое содержимое не пересматривается
+`VERSIONING.md`, `releases.md`, `LOG_RULES.md`, `CODE_RULES.md`, `TEST_RULES.md`,
+`commit-rules.md`, `VERSION` и `.llmignore`. Их утверждённое содержимое не пересматривается
 без отдельного решения владельца.
 
 Дополнительные файлы контекста пока отдельно не определены.

@@ -1,4 +1,4 @@
-# RELEASES.md
+# releases.md
 
 ## Branches
 

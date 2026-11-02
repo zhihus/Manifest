@@ -1,6 +1,6 @@
-# PLAN-project-structure-head-subprojects — Stage 2
+# plan-project-structure-head-subprojects — Stage 2
 
-> Russian version: PLAN-project-structure-head-subprojects-stage-2.ru.md
+> Russian version: plan-project-structure-head-subprojects-stage-2.ru.md
 > Status: implemented
 
 ## Context
@@ -17,8 +17,8 @@ Stage 2: rename the manifest, move templates into `docs/templates/`, update the 
 `МАНИФЕСТ_ПРОЕКТА.md` → `project-manifest.md` (EN, kebab-case, `git mv`). Content unchanged (stays in Russian).
 
 ### A2. Create `docs/templates/` and move all templates from root (`git mv`)
-11 files: `AGENTS.template.md`, `code-rules.template.md`, `commit-rules.template.md`, `log-rules.template.md`, `test-rules.template.md`, `RELEASES.template.md`, `RELEASES.template.compressed.md`, `VERSIONING.template.md`, `VERSION.template`, `llmignore.template`, `LLM.template.txt`.
-- `LLM.template.txt` — rejected variant: moved (per "all templates"), but not included in the navigation map.
+11 files: `agents.template.md`, `code-rules.template.md`, `commit-rules.template.md`, `log-rules.template.md`, `test-rules.template.md`, `releases.template.md`, `RELEASES.template.compressed.md`, `VERSIONING.template.md`, `version.template`, `llmignore.template`, `llm.template.txt`.
+- `llm.template.txt` — rejected variant: moved (per "all templates"), but not included in the navigation map.
 
 ### A3. Rename `llm.txt` → `llms.txt` and update content
 - `git mv llm.txt llms.txt`.
@@ -51,13 +51,13 @@ No build step; runs from source.
 
 * Workflow: `AGENTS.md`
 * Frozen decisions (project manifest): `project-manifest.md`
-* Management manifest: `docs/MANIFEST.md` (compressed: `docs/MANIFEST.compact.md`)
+* Management manifest: `docs/manifest.md` (compressed: `docs/manifest.compact.md`)
 * Context guard: `docs/context-files-guard.md`
-* File-architecture templates: `docs/templates/AGENTS.template.md`,
+* File-architecture templates: `docs/templates/agents.template.md`,
   `docs/templates/code-rules.template.md`, `docs/templates/commit-rules.template.md`,
   `docs/templates/log-rules.template.md`, `docs/templates/test-rules.template.md`,
-  `docs/templates/RELEASES.template.md`, `docs/templates/VERSIONING.template.md`,
-  `docs/templates/VERSION.template`, `docs/templates/llmignore.template`
+  `docs/templates/releases.template.md`, `docs/templates/VERSIONING.template.md`,
+  `docs/templates/version.template`, `docs/templates/llmignore.template`
 
 ## Sub-projects (skills)
 
@@ -78,7 +78,7 @@ No build step; runs from source.
 
 ## Verification
 - `project-manifest.md` exists; `МАНИФЕСТ_ПРОЕКТА.md` is absent from root.
-- `docs/templates/` exists; all 11 templates are in it; no `*.template.*` or `LLM.template.txt` in root.
+- `docs/templates/` exists; all 11 templates are in it; no `*.template.*` or `llm.template.txt` in root.
 - `llms.txt` exists; `llm.txt` is absent from root; section is `## Rules` (not `## Rules & Manifests`).
 - All links in `llms.txt` resolve: `project-manifest.md`, `docs/templates/...`, `skills/.../AGENTS.md`.
 - `AGENTS.md` links to `llms.txt` (not `llm.txt`).

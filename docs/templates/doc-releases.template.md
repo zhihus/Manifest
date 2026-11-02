@@ -1,4 +1,4 @@
-# RELEASES.md
+# releases.md
 
 ## Branches
 
@@ -8,12 +8,12 @@
 
 ## Release
 
-1. Review: documents reviewed for accuracy, completeness, consistency.
-2. Approve: explicit user approval of the document set.
+1. Review: `{{REVIEW_STEPS}}`.
+2. Approve: `{{APPROVAL_STEPS}}`.
 3. Merge `develop` → `master` with `git merge develop`.
 4. Verify `master` documents are consistent.
 5. Tag: `git tag vX.Y.Z`.
-6. Release artifact: approved documents on `master`.
+6. Release artifact: `{{RELEASE_ARTIFACT_PATH}}`.
 
 ## Rules
 

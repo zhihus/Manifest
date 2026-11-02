@@ -33,8 +33,8 @@ in any language. English takes priority.
 **Rules.**
 
 * Versioning: `VERSIONING.md`
-* Releases: `RELEASES.md`
-* Commits: `COMMIT_RULES.md`
+* Releases: `releases.md`
+* Commits: `commit-rules.md`
 * Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
 * Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
 

@@ -1,4 +1,4 @@
-# COMMIT_RULES.md
+# commit-rules.md
 
 **Format:** `<type>(<scope>): <subject>`
 - `type` — one of: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert

@@ -1,6 +1,6 @@
-# PLAN-project-structure-head-subprojects — этап 1
+# plan-project-structure-head-subprojects — этап 1
 
-> English version: PLAN-project-structure-head-subprojects-stage-1.en.md
+> English version: plan-project-structure-head-subprojects-stage-1.en.md
 > Статус: выполнен
 
 ## Контекст
@@ -8,10 +8,10 @@
 
 ## Что будет сделано
 1. Создать папку `docs/plans/`.
-2. Создать два файла плана в `docs/plans/` — сжатыми (скилл compress-context: `skills/compress-context/SKILL.md` + `COMPRESS-CONTEXT-RULES.template.md`):
+2. Создать два файла плана в `docs/plans/` — сжатыми (скилл compress-context: `skills/compress-context/SKILL.md` + `compress-context-rules.template.md`):
    - `PLAN-1.0.0-project-structure-head-subprojects.ru.md` — RU (сжатый).
    - `PLAN-1.0.0-project-structure-head-subprojects.en.md` — EN (сжатый).
-3. Создать `llm.txt` (kebab-case) — навигационная карта со ссылками на все связанные файлы. `LLM.template.txt` в корне — отвергнутая старая вариация, не используется.
+3. Создать `llm.txt` (kebab-case) — навигационная карта со ссылками на все связанные файлы. `llm.template.txt` в корне — отвергнутая старая вариация, не используется.
 4. Переименовать 4 шаблона в kebab-case (в корне нет файлов с такими именами → переименовываются их шаблоны):
    - `CODE_RULES.template.md` → `code-rules.template.md`
    - `COMMIT_RULES.template.md` → `commit-rules.template.md`
@@ -76,11 +76,11 @@ No build step; runs from source.
 
 * Workflow: `AGENTS.md`
 * Frozen decisions (project manifest): `МАНИФЕСТ_ПРОЕКТА.md`
-* Management manifest: `docs/MANIFEST.md` (compressed: `docs/MANIFEST.compact.md`)
+* Management manifest: `docs/manifest.md` (compressed: `docs/manifest.compact.md`)
 * Context guard: `docs/context-files-guard.md`
-* File-architecture templates: `AGENTS.template.md`, `code-rules.template.md`,
+* File-architecture templates: `agents.template.md`, `code-rules.template.md`,
   `commit-rules.template.md`, `log-rules.template.md`, `test-rules.template.md`,
-  `RELEASES.template.md`, `VERSIONING.template.md`, `VERSION.template`,
+  `releases.template.md`, `VERSIONING.template.md`, `version.template`,
   `llmignore.template`
 
 ## Sub-projects (skills)
@@ -99,14 +99,14 @@ No build step; runs from source.
 | `LOG_RULES.template.md` | `log-rules.template.md` |
 | `TEST_RULES.template.md` | `test-rules.template.md` |
 
-> Ссылки на верхнерегистровые целевые имена (`CODE_RULES.md` и т.д.) в `МАНИФЕСТ_ПРОЕКТА.md`, `AGENTS.template.md`, `LLM.template.txt` — на целевые файлы (ещё не созданы), не переименовываются. Если нужно — отдельным шагом.
+> Ссылки на верхнерегистровые целевые имена (`CODE_RULES.md` и т.д.) в `МАНИФЕСТ_ПРОЕКТА.md`, `agents.template.md`, `llm.template.txt` — на целевые файлы (ещё не созданы), не переименовываются. Если нужно — отдельным шагом.
 
 ### 4. skills/compress-context-benchmark/AGENTS.md (новый) — по образцу compress-context/AGENTS.md, ссылки на реально существующие файлы бенчмарка:
 ```markdown
 # Agents
 
 - `SKILL.md` — benchmark protocol (test suite, metrics, release gates).
-- `BENCHMARK-RESULTS.md` — recorded benchmark results per release.
+- `benchmark-results.md` — recorded benchmark results per release.
 ```
 
 ## Файлы
@@ -125,5 +125,5 @@ No build step; runs from source.
 - Ссылки в `AGENTS.md` и `llm.txt` резолвятся: `skills/compress-context/AGENTS.md` существует; `skills/compress-context-benchmark/AGENTS.md` теперь существует.
 - В Project structure — правило регистрации новых под-проектов.
 - В Plans — сжатие через compress-context, приоритет английского, «если англ. нет — любая версия».
-- `AGENTS.md` бенчмарка ссылается только на существующие в его каталоге файлы (`SKILL.md`, `BENCHMARK-RESULTS.md`).
+- `AGENTS.md` бенчмарка ссылается только на существующие в его каталоге файлы (`SKILL.md`, `benchmark-results.md`).
 - Корневой `AGENTS.md` на английском; правила Language и temp/ сохранены.

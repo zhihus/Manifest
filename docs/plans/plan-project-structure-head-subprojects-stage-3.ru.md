@@ -1,10 +1,10 @@
-# PLAN-project-structure-head-subprojects — этап 3
+# plan-project-structure-head-subprojects — этап 3
 
-> English version: PLAN-project-structure-head-subprojects-stage-3.en.md
+> English version: plan-project-structure-head-subprojects-stage-3.en.md
 > Статус: частично выполнен
 
 ## Контекст
-Головной проект `Manifest` и под-проекты (скиллы) — документационные (без кода). Шаблоны — 2 категории: для **кодовых** проектов (типа VoiceCaptureEngine) и для **документационных**; часть файлов общая (сейчас `AGENTS.template.md` не различается). Этап 3: шаблоны для документационных проектов, обновление RELEASES, SETTINGS, OpenSpec-правил.
+Головной проект `Manifest` и под-проекты (скиллы) — документационные (без кода). Шаблоны — 2 категории: для **кодовых** проектов (типа VoiceCaptureEngine) и для **документационных**; часть файлов общая (сейчас `agents.template.md` не различается). Этап 3: шаблоны для документационных проектов, обновление RELEASES, SETTINGS, OpenSpec-правил.
 
 ## Что будет сделано
 
@@ -16,11 +16,11 @@
 
 **Не реализован** — частичная реализация = нереализованная. Готов только когда выполнены все пункты, включая git-воркфлоу.
 
-### B2. `SETTINGS.template.md` ✅
+### B2. `settings.template.md` ✅
 Шаблон правил настроек (по образцу `SETTINGS.md` из VoiceCaptureEngine, но как шаблон с плейсхолдерами).
 **Выполнено** — создан как шаблон-заглушка (локального источника нет; VoiceCaptureEngine — внешний проект).
 
-### B3. `RELEASES.template.md` (обновить) ✅
+### B3. `releases.template.md` (обновить) ✅
 - Ветки: `dev`/`master` → `develop`/`master`.
 - `develop` — вся разработка (включая документационные проекты).
 - `master` — утверждённые документы / release-ready.
@@ -43,7 +43,7 @@
 ## Выполнено в этой сессии (не входит в план)
 
 - Перенесён `project-manifest.md` из корня проекта в `docs/` (рядом с другими манифестами).
-- Удалены все ссылки на файлы манифестов (`project-manifest.md`, `docs/MANIFEST.md`, `docs/MANIFEST.compact.md`) и на несуществующий `docs/context-files-guard.md` из `llms.txt`. Манифест — документ для человека, модель его не читает; в навигационных файлах на него нет ссылок.
+- Удалены все ссылки на файлы манифестов (`project-manifest.md`, `docs/manifest.md`, `docs/manifest.compact.md`) и на несуществующий `docs/context-files-guard.md` из `llms.txt`. Манифест — документ для человека, модель его не читает; в навигационных файлах на него нет ссылок.
 
 ## Нерешённые вопросы
 1. **Git-воркфлоу для документационных проектов** (ветка на задачу, merge into develop, stop-and-report): куда добавить — не решено. Возможно, отдельный файл агента.
@@ -51,15 +51,15 @@
 
 ## Файлы
 - `docs/templates/content-rules.template.md` — новый (документационные проекты + защита контекста)
-- `docs/templates/SETTINGS.template.md` — новый (правила настроек)
+- `docs/templates/settings.template.md` — новый (правила настроек)
 - `docs/templates/open-spec-rules.template.md` — новый (именование OpenSpec-задач)
-- `docs/templates/RELEASES.template.md` — обновлён (develop/master, OpenSpec-ветки)
+- `docs/templates/releases.template.md` — обновлён (develop/master, OpenSpec-ветки)
 - `AGENTS.md` — обновлён (правило о шаблонах: исходный материал, не реальные документы; на них ничего не ссылается)
 
 ## Проверка
 - `content-rules.template.md` — правила для документационных проектов + блок защиты контекста.
-- `SETTINGS.template.md` — плейсхолдеры для настроек.
+- `settings.template.md` — плейсхолдеры для настроек.
 - `open-spec-rules.template.md` — FR, N.M, kebab-case, wave.
-- `RELEASES.template.md` — ветки `develop`/`master`; упоминание OpenSpec-веток.
+- `releases.template.md` — ветки `develop`/`master`; упоминание OpenSpec-веток.
 - `AGENTS.md` содержит правило о шаблонах; `docs/templates/` не появляется в `llms.txt` / `AGENTS.md`.
 - Все ссылки в `llms.txt` и `AGENTS.md` резолвятся на реально существующие файлы.

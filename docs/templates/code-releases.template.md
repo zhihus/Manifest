@@ -1,4 +1,4 @@
-# RELEASES.md
+# releases.md
 
 ## Branches
 
@@ -8,10 +8,10 @@
 
 ## Release
 
-1. Review: `{{REVIEW_STEPS}}`.
-2. Approve: `{{APPROVAL_STEPS}}`.
+1. Build: `{{BUILD_COMMAND}}`.
+2. Verify: `{{VERIFICATION_STEPS}}`.
 3. Merge `develop` → `master` with `git merge develop`.
-4. Verify `master` documents are consistent.
+4. Build and verify `master`.
 5. Tag: `git tag vX.Y.Z`.
 6. Release artifact: `{{RELEASE_ARTIFACT_PATH}}`.
 
@@ -20,6 +20,6 @@
 * One release = one tag = one version.
 * Tags only on `master`.
 * Tags are immutable.
-* Failed review or approval → no merge, no tag.
+* Failed verification → no merge, no tag.
 * No rebase, force-push, or direct commits to `master`.
-* `master` must remain a consistent, approved document set.
+* `master` must remain installable.

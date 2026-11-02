@@ -19,7 +19,7 @@
 * Bugfix/compatible → patch.
 * Mixed → highest.
 * Increment selected component; reset lower components to `0`.
-* Update `VERSION` and follow `COMMIT_RULES.md`.
+* Update `VERSION` and follow `commit-rules.md`.
 
 ## Pre-release
 
