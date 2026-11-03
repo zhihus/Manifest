@@ -19,3 +19,10 @@ Add `!` after the type/scope **and** include `BREAKING CHANGE:` in the footer fo
 2. Run all applicable local checks (tests, build, linters) before committing.
 3. Do not amend, rebase, reset, or force‑push existing commits without explicit permission.
 4. All commit messages must be in English.
+
+## Review & merge
+
+1. Work happens on a task branch from `develop`.
+2. A reviewer verifies the wave diff against the tasks' verify clauses.
+3. After a pass verdict the reviewer merges the branch into `develop` (English merge message).
+4. Merge conflicts are user-level contradictions: stop and escalate, do not resolve.
