@@ -4,7 +4,9 @@ otherwise. Reason in English.
 
 **temp/.** Temporary storage for files needed during work (scripts, intermediate artifacts, anything not part of the app). All temporary files go here — never write them elsewhere. `temp/` is cleaned periodically, never while an agent is working on app functionality; the user may clear it manually or ask the model to.
 
-**Project structure.** Project type: doc-project. This is the head project. It contains subordinate
+Type: **doc**.
+
+**Project structure.** This is the head project. It contains subordinate
 projects (skills) under `skills/`. Navigation map: `llms.txt`.
 
 - When the user asks to work with a sub-project from this (head) folder,
