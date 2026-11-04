@@ -7,12 +7,9 @@ otherwise. Reason in English.
 Type: **doc**.
 
 **Project structure.** This is the head project. It contains subordinate
-projects (skills) under `skills/`. Navigation map: `llms.txt`.
+projects under `skills/` and `handy/`. Navigation map: `llms.txt`.
 
-- When the user asks to work with a sub-project from this (head) folder,
-  read that sub-project's `AGENTS.md` before working on it.
-- Every new sub-project must be registered here with a link to its
-  `AGENTS.md`.
+- Register every new sub-project in `llms.txt` with a brief comment.
 
 Sub-projects:
 
