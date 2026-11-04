@@ -7,7 +7,7 @@ otherwise. Reason in English.
 Type: **doc**.
 
 **Project structure.** This is the head project. It contains subordinate
-projects under `skills/` and `handy/`. Navigation map: `llms.txt`.
+projects under `skills/`. Navigation map: `llms.txt`.
 
 - Register every new sub-project in `llms.txt` with a brief comment.
 
@@ -17,9 +17,9 @@ Sub-projects:
   Agent file: `skills/compress-context/AGENTS.md`.
 - `skills/compress-context-benchmark/` — benchmark for the compression skill.
   Agent file: `skills/compress-context-benchmark/AGENTS.md`.
-- `handy/dictation-scrubber/` — offline Handy dictation cleaning utility
-  (regex fillers + removal logging, transcription-hook integration).
-  Agent file: `handy/dictation-scrubber/AGENTS.md`.
+- `handy/dictation-scrubber/` — **separate project** since 2026-11-05:
+  `C:\WorkProjects\handy-dictation-scrubber\` (history exported from
+  this repo via subtree split). Do not edit it here.
 
 **Two experimental reference projects.**
 Manifest (this project, root) is documentation-based; InvestPlan

@@ -16,7 +16,6 @@ Entry point: `AGENTS.md`
 * `docs/` — project documentation.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `skills/` — subordinate projects (skills).
-* `handy/` — subordinate projects (Handy dictation integration).
 * `temp/` — scratch space (gitignored).
 
 ## Build
@@ -38,5 +37,5 @@ No build step; runs from source.
   Agent file: `skills/compress-context/AGENTS.md`.
 * `skills/compress-context-benchmark/` — benchmark for the compression skill.
   Agent file: `skills/compress-context-benchmark/AGENTS.md`.
-* `handy/dictation-scrubber/` — offline Handy dictation cleaning utility.
-  Agent file: `handy/dictation-scrubber/AGENTS.md`.
+* `handy-dictation-scrubber/` — **separate project**: `C:\WorkProjects\handy-dictation-scrubber\`.
+  Agent file: `C:\WorkProjects\handy-dictation-scrubber\dictation-scrubber\AGENTS.md`.
