@@ -20,6 +20,9 @@ Sub-projects:
   Agent file: `skills/compress-context/AGENTS.md`.
 - `skills/compress-context-benchmark/` — benchmark for the compression skill.
   Agent file: `skills/compress-context-benchmark/AGENTS.md`.
+- `handy/dictation-scrubber/` — offline Handy dictation cleaning utility
+  (regex fillers + removal logging, transcription-hook integration).
+  Agent file: `handy/dictation-scrubber/AGENTS.md`.
 
 **Two experimental reference projects.**
 Manifest (this project, root) is documentation-based; InvestPlan
