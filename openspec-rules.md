@@ -1,27 +1,34 @@
-# OpenSpec Task Naming Rules
+# OpenSpec Rules
 
-Universal rules for OpenSpec `tasks.md` — apply in any project.
+Universal rules for OpenSpec work — apply in any project.
 
-## 1. Prefix
+## Task Naming
 
-Every task: prefix `FR` (Functional Requirement).
+* Prefix: every task starts with `FR`.
+* Numbering: `FR N.M` — `N` group, `M` task within group.
+* Title: a few words stating what the task does.
+* Format: kebab-case, no spaces (`FR 1.1 Define ratio` → `fr-1.1-define-ratio`).
+* File references live in the task body, never in the name.
+* Branch name = task id + kebab-case title: `FR 1.1 Define ratio` → `fr-1.1-define-ratio`; fixed at task creation.
 
-## 2. Numbering
+## Waves
 
-Sequential, per OpenSpec: `FR N.M` — `N` = group, `M` = task within group.
+* A wave = one `## N.` group; groups are ordered by dependency (group `N` depends only on `1…N−1`).
+* A deliverable is not developed until the one it depends on is complete.
+* Finish all tasks of the wave, mark `- [x]`, stop and report before the next wave.
+* One subagent run = one task (FR). Never dispatch a whole wave in one run.
+* Real invariants: one task = one executor run, completable in under 10 minutes, with a mechanical stop criterion.
+* Task size: new/edited text.
+  * Above 6000 chars — split (hard limit); a new-file task estimated above 5000 — split.
+  * Below 2000 — merge with a related task of the same group, but only if the task is not independently verifiable. A coherent, verifiable task below 2000 stays whole. Trivial tasks (< 500) merge.
+  * A single-task change is exempt from the lower bound entirely.
+  * Characters are a hint; the invariants above are the law.
+* Roles: strong model / human — PRD, specs, design, wave breakdown; local model — execution of one task only.
 
-## 3. Title
+## Execution
 
-A short description of a few words stating what the task does.
-
-## 4. Kebab-case
-
-Task names contain no spaces: spaces are replaced by hyphens. Example: `FR 1.1 Define ratio` → `fr-1.1-define-ratio`.
-
-## 5. Wave
-
-A dependency between deliverables: a deliverable is not developed until the one it depends on is complete. A wave = one group (`## N.`); groups are ordered by dependency (group `N` depends only on `1…N−1`). Execution: finish all tasks of a wave, mark `- [x]`, stop and report before the next wave.
-
-## 6. No file references in the name
-
-File references live only in the task body, never in the name.
+* Pending work = unchecked `- [ ]` tasks in tasks.md.
+* Next wave = the first `## N.` group containing unchecked tasks.
+* Active changes = directories in `openspec/changes/` except `archive/`.
+* One active change and no explicit instruction → work in it.
+* Several active changes and no explicit instruction → ask the user, do not guess.
