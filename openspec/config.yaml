@@ -21,6 +21,10 @@ rules:
   - A single-task change is exempt from the lower bound entirely.
   - In the task body state exact file paths, what to insert/change, and a stop criterion (when the task is done).
   - 'Task text is self-contained: no external references (see <doc>); inline all values, lists, commands.'
+  - 'Code task ceiling: 4000 characters (hard). Implementation and its scripted verification scenario are one pair; above the ceiling the verification scenario becomes its own task.'
+  - 'A task body may end with one line "Maps to scenarios: <names>" - not an external reference; all other values stay inlined.'
+  - Implementation language and stack come from design.md Decisions, never inferred.
+  - 'A task may depend on a rule formalized in a later wave: inline the rule itself and note "rule formalized in FR x.y".'
 operations:
   apply:
     guidance:

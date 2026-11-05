@@ -32,3 +32,13 @@ Universal rules for OpenSpec work — apply in any project.
 * Active changes = directories in `openspec/changes/` except `archive/`.
 * One active change and no explicit instruction → work in it.
 * Several active changes and no explicit instruction → ask the user, do not guess.
+
+## Plan Self-Check
+
+Before delivering tasks.md, the planner verifies:
+
+* Every capability from the proposal is covered by at least one task.
+* Every task fits the executor invariant: one run, ≤ 10 minutes per the calibration.
+* No code task above the 4000-character ceiling; heavy verification split into its own task.
+* Implementation language and stack taken from design.md Decisions.
+* Every task body ends with a stop criterion and a `Maps to scenarios:` line.
