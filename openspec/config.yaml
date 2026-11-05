@@ -5,12 +5,13 @@ context: |
   OpenSpec CLI version (`openspec --version`). If it is older than the latest
   published version, update it (`npm install -g @fission-ai/openspec@latest`)
   and re-run `openspec init` to refresh project scaffolding before proceeding.
+  
+  Task-size calibration (measured on the sequential-ratio-compression run, Qwen3.8-27B): a doc-editing task takes the executor about 2-3 minutes; a code task with a scripted verification scenario takes about 5-8 minutes.
+  When unsure about task size, split by deliverable files, not by characters.
+  The executor commits after each completed stage - never accumulate all work until the end of the task (protection against the ZCode 600 s subagent watchdog bug).
+  Heavy verification is split into its own task, not attached to the implementation task.
+  If an executor exceeds the 10-minute limit, the task is too large: split it in the next spec revision and record the fact in tasks.md.
 
-operations:
-  apply:
-    guidance:
-    - 'Feed the executor only the current task: its text, the spec scenarios it maps to, and the relevant project files. Never feed the whole change.'
-    - Verification must be mechanical (wc -m, grep, comparisons), not an opinion.
 rules:
   tasks:
   - 'Name tasks per openspec-rules.md: prefix FR, numbering FR N.M (N = wave group, M = task within group), kebab-case, no spaces, no file references in the name.'
@@ -20,3 +21,8 @@ rules:
   - A single-task change is exempt from the lower bound entirely.
   - In the task body state exact file paths, what to insert/change, and a stop criterion (when the task is done).
   - 'Task text is self-contained: no external references (see <doc>); inline all values, lists, commands.'
+operations:
+  apply:
+    guidance:
+    - 'Feed the executor only the current task: its text, the spec scenarios it maps to, and the relevant project files. Never feed the whole change.'
+    - Verification must be mechanical (wc -m, grep, comparisons), not an opinion.
