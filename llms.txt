@@ -3,7 +3,7 @@
 ## Project
 
 **Manifest** — head (meta) project: defines the architecture of LLM
-instruction files and ships reusable skills.
+instruction files.
 Entry point: `AGENTS.md`
 
 ## Reference projects
@@ -15,7 +15,6 @@ Entry point: `AGENTS.md`
 
 * `docs/` — project documentation.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
-* `skills/` — subordinate projects (skills).
 * `temp/` — scratch space (gitignored).
 
 ## Build
@@ -33,9 +32,13 @@ No build step; runs from source.
 
 ## Sub-projects
 
-* `skills/compress-context/` — context-compression skill.
-  Agent file: `skills/compress-context/AGENTS.md`.
-* `skills/compress-context-benchmark/` — benchmark for the compression skill.
-  Agent file: `skills/compress-context-benchmark/AGENTS.md`.
+* **Skills** — **separate project**: `C:\WorkProjects\skills\`
+  (compress-context, compress-context-benchmark). Do not edit here.
+* **context-files-guard** — **separate project**: `C:\WorkProjects\context-files-guard\`
+  (the add-context-files-guard change). Do not edit here.
 * `handy-dictation-scrubber/` — **separate project**: `C:\WorkProjects\handy-dictation-scrubber\`.
   Agent file: `C:\WorkProjects\handy-dictation-scrubber\dictation-scrubber\AGENTS.md`.
+* Task-size calibration (measured on the sequential-ratio-compression
+  run): doc task ~2-3 min, code task with scripted verification ~5-8 min;
+  split by deliverable files; executor commits after each stage;
+  heavy verification is its own task; >10 min → split in next revision.

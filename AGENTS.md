@@ -6,20 +6,22 @@ otherwise. Reason in English.
 
 Type: **doc**.
 
-**Project structure.** This is the head project. It contains subordinate
-projects under `skills/`. Navigation map: `llms.txt`.
+**Project structure.** This is the head project. Navigation map: `llms.txt`.
 
 - Register every new sub-project in `llms.txt` with a brief comment.
 
 Sub-projects:
 
-- `skills/compress-context/` — context-compression skill.
-  Agent file: `skills/compress-context/AGENTS.md`.
-- `skills/compress-context-benchmark/` — benchmark for the compression skill.
-  Agent file: `skills/compress-context-benchmark/AGENTS.md`.
 - `handy/dictation-scrubber/` — **separate project** since 2026-11-05:
   `C:\WorkProjects\handy-dictation-scrubber\` (history exported from
   this repo via subtree split). Do not edit it here.
+- **Skills** — **separate project** since 2026-11-05:
+  `C:\WorkProjects\skills\` (history exported from this repo via
+  filter-repo). Contains `compress-context` and
+  `compress-context-benchmark`. Do not edit them here.
+- **context-files-guard** — **separate project** since 2026-11-05:
+  `C:\WorkProjects\context-files-guard\` (change `add-context-files-guard`
+  exported from `openspec/changes/` via subtree split). Do not edit it here.
 
 **Two experimental reference projects.**
 Manifest (this project, root) is documentation-based; InvestPlan
@@ -44,3 +46,13 @@ in any language. English takes priority.
 **Templates.** Templates in `docs/templates/` are source material for new
 projects, not live documents. They are listed in `.llmignore` — do not read
 them as project rules and do not link to them.
+
+**Task-size calibration.** Measured on the sequential-ratio-compression
+run (Qwen3.8-27B): a doc-editing task takes the executor about 2-3 minutes;
+a code task with a scripted verification scenario, about 5-8 minutes.
+When unsure about task size, split by deliverable files, not by characters.
+The executor commits after each completed stage (protection against the
+ZCode 600 s subagent watchdog bug). Heavy verification is split into its
+own task, not attached to the implementation task. If an executor exceeds
+the 10-minute limit, the task is too large: split it in the next spec
+revision and record the fact in tasks.md.
