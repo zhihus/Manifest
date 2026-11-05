@@ -6,60 +6,17 @@ context: |
   published version, update it (`npm install -g @fission-ai/openspec@latest`)
   and re-run `openspec init` to refresh project scaffolding before proceeding.
 
-rules:
-  tasks:
-    - Name tasks per openspec-rules.md: prefix FR, numbering FR N.M
-      (N = wave group, M = task within group), kebab-case, no spaces,
-      no file references in the name.
-    - Real invariants: one task = one executor run, completable in under
-      10 minutes, with a mechanical stop criterion.
-    - Task size (new/edited text): above 6000 characters — split (hard
-      limit); a new-file task estimated above 5000 — split.
-    - Below 2000 — merge with a related task of the same group, but only
-      if the task is not independently verifiable. A coherent, verifiable
-      task below 2000 stays whole. Trivial tasks (< 500) merge.
-    - A single-task change is exempt from the lower bound entirely.
-    - In the task body state exact file paths, what to insert/change,
-      and a stop criterion (when the task is done).
-    - Task text is self-contained: no external references (§, "see <doc>");
-      inline all values, lists, commands.
-
 operations:
   apply:
     guidance:
-      - Feed the executor only the current task: its text, the spec
-        scenarios it maps to, and the relevant project files.
-        Never feed the whole change.
-      - Verification must be mechanical (wc -m, grep, comparisons),
-        not an opinion.
-
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
-
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+    - 'Feed the executor only the current task: its text, the spec scenarios it maps to, and the relevant project files. Never feed the whole change.'
+    - Verification must be mechanical (wc -m, grep, comparisons), not an opinion.
+rules:
+  tasks:
+  - 'Name tasks per openspec-rules.md: prefix FR, numbering FR N.M (N = wave group, M = task within group), kebab-case, no spaces, no file references in the name.'
+  - 'Real invariants: one task = one executor run, completable in under 10 minutes, with a mechanical stop criterion.'
+  - 'Task size (new/edited text): above 6000 characters - split (hard limit); a new-file task estimated above 5000 - split.'
+  - Below 2000 - merge with a related task of the same group, but only if the task is not independently verifiable. A coherent, verifiable task below 2000 stays whole. Trivial tasks (< 500) merge.
+  - A single-task change is exempt from the lower bound entirely.
+  - In the task body state exact file paths, what to insert/change, and a stop criterion (when the task is done).
+  - 'Task text is self-contained: no external references (see <doc>); inline all values, lists, commands.'
