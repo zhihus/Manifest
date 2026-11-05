@@ -19,6 +19,9 @@ Sub-projects:
   `C:\WorkProjects\skills\` (history exported from this repo via
   filter-repo). Contains `compress-context` and
   `compress-context-benchmark`. Do not edit them here.
+- **context-files-guard** — **separate project** since 2026-11-05:
+  `C:\WorkProjects\context-files-guard\` (change `add-context-files-guard`
+  exported from `openspec/changes/` via subtree split). Do not edit it here.
 
 **Two experimental reference projects.**
 Manifest (this project, root) is documentation-based; InvestPlan
