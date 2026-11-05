@@ -1,5 +1,7 @@
 # plan-project-structure-head-subprojects — Stage 2
 
+
+> NOTE 2026-11-05: skills moved out of this repo to the standalone project C:\WorkProjects\skills. Paths below are historical.
 > Russian version: plan-project-structure-head-subprojects-stage-2.ru.md
 > Status: implemented
 
