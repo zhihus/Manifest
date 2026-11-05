@@ -46,6 +46,15 @@ All five were accepted as rule changes on 2026-11-05 (see repo commit
 history; rules live in `openspec/config.yaml` and `openspec-rules.md` of
 the three projects: Manifest, context-files-guard, skills/compress-context).
 
+## Verification run (planner run 2, same criteria)
+
+After the rule changes, the same experiment was repeated: 22 tasks / 7
+waves; Plan Self-Check — all items pass; code ceiling respected; heavy
+verification split (FR 3.5, 5.4, 7.1); `Maps to scenarios:` on every task;
+cross-wave rule noted per the new rule. Two spec defects surfaced by run 2
+were fixed in context-files-guard commit `ff6e3b5`: policy-file path
+aligned with proposal; implementation stack added to design.md Decisions.
+
 ## Note
 
 Report-1 measured a planner working under the old rules; report-2 measures
