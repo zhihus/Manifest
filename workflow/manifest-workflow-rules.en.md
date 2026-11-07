@@ -14,7 +14,7 @@ and the verification process.
 
 ### 1.1. User actions
 
-#### 1.1.1. The user runs the Manifest initialization directly in a project folder they created themselves.
+#### 1.1.1. The user runs the Manifest initialization with the manifest-init skill in a project folder they created themselves.
 
 #### 1.1.2. The user asks the agent to create a project folder and initialize the Manifest framework in it, providing the path to the folder.
 
