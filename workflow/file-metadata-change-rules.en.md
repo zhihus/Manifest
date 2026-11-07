@@ -20,25 +20,31 @@ The metadata block of a document file consists of four fields:
 
 ## 2. Version
 
-2.1. The version is a three-component number: `X.Y.Z`.
+### 2.1. Format
 
-2.2. The version is located in the document, in the header, in the metadata: > **Version: X.Y.Z**.
+2.1.1. The version is a three-component number: `X.Y.Z`.
 
-2.3. X (major) — breaking changes: existing content is removed or changed in meaning.
+2.1.2. The version is located in the document, in the header, in the metadata: > **Version: X.Y.Z**.
 
-2.4. Y (minor) — new content added, existing content extended.
+### 2.2. Bumps
 
-2.5. Z (patch) — clarifications, wording fixes, typos.
+2.2.1. X (major) — breaking changes: existing content is removed or changed in meaning.
 
-2.6. A new document with status `draft` gets version `1.0.0`.
+2.2.2. Y (minor) — new content added, existing content extended.
 
-2.7. A document with status `draft` does not change its version upon modification.
+2.2.3. Z (patch) — clarifications, wording fixes, typos.
 
-2.8. The version changes only for documents with status `approved`.
+### 2.3. Status
 
-2.9. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
+2.3.1. A new document with status `draft` gets version `1.0.0`.
 
-2.10. With status `archived` any version change is forbidden.
+2.3.2. A document with status `draft` does not change its version upon modification.
+
+2.3.3. The version changes only for documents with status `approved`.
+
+2.3.4. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
+
+2.3.5. With status `archived` any version change is forbidden.
 
 ## 3. Date
 
