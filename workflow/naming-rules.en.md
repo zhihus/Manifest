@@ -1,6 +1,6 @@
 # File and Directory Naming Rules
 
-> **Status: draft**
+> **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
