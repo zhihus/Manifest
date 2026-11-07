@@ -60,3 +60,5 @@ framework.
   * `draft` — in development;
   * `approved` — approved;
   * `archived` — archived.
+* Sections and subsections are numbered hierarchically, dot-separated, by
+  depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
