@@ -22,12 +22,18 @@ Manifest framework.
 
 ### 2.3. Z (patch) — clarifications, wording fixes, typos.
 
-## 3. Date
+## 3. Version and status
 
-### 3.1. The date in the body, in the metadata block: `> **Updated: YYYY-MM-DD**`, is the date of the last change.
+### 3.1. `draft` — in development: no version bump required.
 
-### 3.2. The date is updated on every version bump.
+### 3.2. The version is bumped only for documents with status `approved`.
 
-## 4. Initial version
+## 4. Date
 
-### 4.1. A new document starts at `1.0.0`.
+### 4.1. The date in the body, in the metadata block: `> **Updated: YYYY-MM-DD**`, is the date of the last change.
+
+### 4.2. The date is updated on every change.
+
+## 5. Initial version
+
+### 5.1. A new document starts at `1.0.0`.

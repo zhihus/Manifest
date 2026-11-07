@@ -10,7 +10,7 @@ framework.
 
 ## 1. Rules
 
-### 1.1. Names in English
+### 1.1. Names in English only
 
 ### 1.2. kebab-case, lowercase, hyphen-separated, no spaces
 
