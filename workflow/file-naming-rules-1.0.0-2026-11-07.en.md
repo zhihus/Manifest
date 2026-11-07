@@ -56,20 +56,3 @@ framework.
   kebab-case: `check-compression.sh`.
 * Temporary files live only in `temp/` (gitignored) and are never named
   as if they were project artifacts.
-
-## 5. Requirements to move to the document structure file
-
-> Requirements below were dictated by the user. They are parked here until
-> a dedicated document-structure file exists in `workflow/`; that file will
-> own this section, and it must be moved there verbatim.
-
-* Every Markdown file has a structure. Minimum: a title — a heading that
-  starts with `#` — followed by a status line.
-* The status line uses exactly one word: `**Status: draft**`. Nothing else
-  is added to it.
-* The fixed status set (three base statuses):
-  * `draft` — in development;
-  * `approved` — approved;
-  * `archived` — archived.
-* Sections and subsections are numbered hierarchically, dot-separated, by
-  depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
