@@ -5,21 +5,24 @@
 Universal file naming rules for any project connected to the Manifest
 framework.
 
-## 1 General rules
+## 1. General rules
 
-* Names in English.
-* kebab-case, lowercase, no spaces.
-* Document files carry version and date in the name (version `X.Y.Z`, date
-  ISO `YYYY-MM-DD`).
-* File names always carry a language suffix: `en`, or any other at the
-  user's request.
+### 1.1. Names in English
 
-### Correct
+### 1.2. kebab-case, lowercase, hyphen-separated, no spaces
+
+### 1.3. Document files carry version and date in the name (version `X.Y.Z`, date ISO `YYYY-MM-DD`)
+
+### 1.4. File names always carry a language suffix: `en`, or any other at the user's request
+
+## 2. Examples
+
+### 2.1. Correct
 
 ✅ `file-naming-rules-1.0.0-2026-11-07.en.md`
 ✅ `file-naming-rules-1.0.0-2026-11-07.ru.md`
 
-### Incorrect
+### 2.2. Incorrect
 
 ❌ `File Naming Rules-1.0.0-2026-11-07.en.md`
 ❌ `fileNamingRules-1.0.0-2026-11-07.en.md`
