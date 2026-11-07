@@ -1,5 +1,6 @@
 # File and Directory Naming Rules
 
+# Metadata
 > **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**

@@ -1,5 +1,6 @@
 # File Structure Rules
 
+# Metadata
 > **Status: draft**
 > **Type: document**
 > **Version: 1.0.0**
