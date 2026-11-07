@@ -15,8 +15,8 @@ to the Manifest framework.
 
 ### 1.2. kebab-case, lowercase, hyphen-separated, no spaces
 
-### 1.3. File names always carry a language suffix: `en`, or any other at
-the user's request. Directories do not carry a language suffix.
+### 1.3. A file name (not a directory name) always carries a language
+suffix: `en`, or any other at the user's request.
 
 ## 2. Examples
 
