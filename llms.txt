@@ -19,8 +19,10 @@ Entry point: `AGENTS.md`
   (roles, 7 steps, gates) — DRAFT, in development. Entry:
   `workflow/README.en.md`. Naming rules:
   `workflow/naming-rules.en.md`. File structure rules:
-  `workflow/file-structure-rules.en.md`. File versioning rules:
-  `workflow/file-versioning-rules.en.md`. Manifest workflow rules:
+  `workflow/file-structure-rules.en.md`. File versioning and date
+  change rules:
+  `workflow/file-versioning-and-date-change-rules.en.md`. Manifest
+  workflow rules:
   `workflow/manifest-workflow-rules.en.md`. Roadmap (planned
   work, not yet implemented): `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
