@@ -1,7 +1,6 @@
 # File Naming Rules
 
-> **Status: draft — under development.** These rules are preliminary and
-> may change; they are not yet a standing rule of the project.
+> **Status: draft**
 
 Universal rules for naming files in this project (and a template for other
 projects). Docs language: English; the user-facing copy may exist as a
@@ -47,3 +46,18 @@ Russian twin (see Language suffixes).
   kebab-case: `check-compression.sh`.
 * Temporary files live only in `temp/` (gitignored) and are never named
   as if they were project artifacts.
+
+## 5. Document status line (requirements, dictated verbatim)
+
+> Requirements below were dictated by the user. They are parked here until
+> a dedicated document-structure file exists in `workflow/`; that file will
+> own this section, and it must be moved there verbatim.
+
+* Every Markdown file has a structure. Minimum: a title — a heading that
+  starts with `#` — followed by a status line.
+* The status line uses exactly one word: `**Status: draft**`. Nothing else
+  is added to it.
+* The fixed status set (three base statuses):
+  * `draft` — in development;
+  * `approved` — approved;
+  * `archived` — archived.
