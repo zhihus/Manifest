@@ -18,7 +18,7 @@ and the verification process.
 
 #### 1.1.2. The user asks the agent to create a project folder and initialize the Manifest framework in it, providing the path to the folder.
 
-### 1.2. What is created
+### 1.2. Project initialization artifacts
 
 #### 1.2.1. `.manifest/` — the folder, the marker of connection to the Manifest.
 
