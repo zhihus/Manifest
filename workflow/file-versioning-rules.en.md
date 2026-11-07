@@ -33,7 +33,7 @@ Manifest framework.
 
 3.4. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
 
-3.5. With status `archived` — any version change is forbidden.
+3.5. With status `archived` any version change is forbidden.
 
 ## 4. Date
 
