@@ -2,9 +2,8 @@
 
 > **Status: draft**
 
-Universal rules for naming files in this project (and a template for other
-projects). Docs language: English; the user-facing copy may exist as a
-Russian twin (see Language suffixes).
+Universal file naming rules for any project connected to the Manifest
+framework.
 
 ## 1. General rules
 
