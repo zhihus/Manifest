@@ -55,6 +55,10 @@ document header.
 
 4.1. The file type: `> **Type: document**`.
 
+4.2. Rules for changing the type are not provided.
+
 ## 5. Status
 
-5.1. The document status: `> **Status: draft**`, `> **Status: approved**`, or `> **Status: archived**`.
+5.1. The document status changes at the user's request.
+
+5.2. Automatic status change is not provided.
