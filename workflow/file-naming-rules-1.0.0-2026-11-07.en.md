@@ -11,10 +11,13 @@ framework.
 * kebab-case, lowercase, no spaces.
 * Document files carry version and date in the name (version `X.Y.Z`, date
   ISO `YYYY-MM-DD`).
+* File names always carry a language suffix: `en`, or any other at the
+  user's request.
 
 ### Correct
 
 ✅ `file-naming-rules-1.0.0-2026-11-07.en.md`
+✅ `file-naming-rules-1.0.0-2026-11-07.ru.md`
 
 ### Incorrect
 
@@ -23,6 +26,9 @@ framework.
 ❌ `file-naming-rules.en.md` — no version and date
 ❌ `file-naming-rules-1.0.0-07.11.2026.en.md` — date not ISO
 ❌ `файл-именования-1.0.0-2026-11-07.en.md` — not English
+❌ `file-naming-rules-1.0.0-2026-11-07.md` — no language suffix
+❌ `file-naming-rules-1.0.0-2026-11-07.EN.md` — uppercase suffix
+❌ `file-naming-rules-en-1.0.0-2026-11-07.md` — suffix in the middle of the name
 
 ## 2. Language suffixes
 
