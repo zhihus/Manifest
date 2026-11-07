@@ -22,6 +22,7 @@ Entry point: `AGENTS.md`
   `workflow/file-structure-rules.en.md`. File versioning rules:
   `workflow/file-versioning-rules.en.md`.
 * `temp/` — scratch space (gitignored).
+* `roadmap.en.md` — planned workflow work (not yet implemented).
 
 ## Build
 
