@@ -22,7 +22,7 @@ and the verification process.
 
 #### 1.2.1. `.manifest/` — the folder, the marker of connection to the Manifest.
 
-#### 1.2.2. `.manifest/hooks/` — contains the active Manifest git hooks.
+#### 1.2.2. `.manifest/hooks/` — a folder, contains the active Manifest git hooks.
 
 #### 1.2.3. `.manifest/validate.sh` — the verification script: checks files for compliance with the Manifest rules — presence of metadata fields, headings, section numbering, `Version` and `Updated` formats.
 
