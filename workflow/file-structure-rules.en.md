@@ -1,42 +1,21 @@
-# File Structure Rules
+1.# File Structure Rules
+Description: heading reflecting the file content, located on line 1
+2.# Metadata
+Description: metadata block heading, located on line 3
+3.> **Status: draft**
+Description: metadata — status, located on line 5
+4.> **Type: document**
+Description: metadata — file type, located on line 6
+5.> **Version: 1.0.0**
+Description: metadata — version, located on line 7
+6.> **Updated: 2026-11-07**
+Description: metadata — date of last change, located on line 8
+7.# Description
+Description: description section heading, located on line 10
+8.A short paragraph describing the document
+Description: description text, located on line 11
 
-# Metadata
-> **Status: draft**
-> **Type: document**
-> **Version: 1.0.0**
-> **Updated: 2026-11-07**
-
-# Description
-Universal rules for the structure of Markdown documents in a project
-connected to the Manifest framework.
-
-## 1. Minimum structure
-
-Every Markdown file has a structure. The minimum structure is a sequence of
-four elements: the main heading, the metadata heading, the metadata block,
-and the Description section.
-
-### 1.1. Main heading
-
-* Placement: the first line of the file, a `#` heading.
-* Purpose: the title of the document.
-
-### 1.2. Metadata heading
-
-* Placement: immediately after the main heading.
-* Purpose: marks the metadata block.
-
-### 1.3. Metadata block
-
-* Placement: under the metadata heading.
-* Purpose: the document metadata — status, type, version, date.
-
-### 1.4. Description
-
-* Placement: after the metadata block.
-* Purpose: a short paragraph describing the document.
-
-## 2. Metadata block
+## 1. Metadata block
 
 * The metadata block is located in the header of the document, under the
   title. It is a group of blockquote lines:
@@ -60,7 +39,7 @@ the location of the metadata block. The metadata change document defines
 how each metadata field changes. Statuses and versions are described here,
 not in the versioning rules.
 
-## 3. Type
+## 2. Type
 
 * `Type` selects the set of rules applied to the file.
 * There are several types; the known value is `document`. The set is
@@ -69,12 +48,12 @@ not in the versioning rules.
   (metadata block, Description section, section numbering, versioning,
   language suffix).
 
-## 4. Section numbering
+## 3. Section numbering
 
 * Sections and subsections are numbered hierarchically, dot-separated, by
   depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
 
-## 5. Labeled parts
+## 4. Labeled parts
 
 * When a section contains multiple labeled parts (e.g. correct / incorrect
   examples), the labels are standalone text lines under a single section
