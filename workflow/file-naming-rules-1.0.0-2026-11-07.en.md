@@ -7,15 +7,22 @@ framework.
 
 ## 1. General rules
 
-* Names are strictly in English.
-* **kebab-case, lowercase, no spaces**:
-  ✅ `file-naming-rules.md`
-  ❌ `File Naming Rules.md`, `fileNamingRules.md`
-* Document files carry version and date in the name:
-  `file-naming-rules-1.0.0-2026-11-07.en.md` (version `X.Y.Z`, date ISO
-  `YYYY-MM-DD`).
-* One logical document per file; do not embed sequence numbers
-  (`report-2.md`) — name by content, not by order of creation.
+* Names in English.
+* kebab-case, lowercase, no spaces.
+* Document files carry version and date in the name (version `X.Y.Z`, date
+  ISO `YYYY-MM-DD`).
+
+### Correct
+
+✅ `file-naming-rules-1.0.0-2026-11-07.en.md`
+
+### Incorrect
+
+❌ `File Naming Rules-1.0.0-2026-11-07.en.md` — spaces
+❌ `fileNamingRules-1.0.0-2026-11-07.en.md` — camelCase
+❌ `file-naming-rules.en.md` — no version and date
+❌ `file-naming-rules-1.0.0-07.11.2026.en.md` — date not ISO
+❌ `файл-именования-1.0.0-2026-11-07.en.md` — not English
 
 ## 2. Language suffixes
 
