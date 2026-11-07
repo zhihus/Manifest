@@ -37,9 +37,9 @@ document header.
 
 2.3.1. A new document with status `draft` gets version `1.0.0`.
 
-2.3.2. A document with status `draft` does not change its version upon modification.
+2.3.2. A document with status `draft` does not bump its version upon modification.
 
-2.3.3. The version changes only for documents with status `approved`.
+2.3.3. The version is changed only for a document with status `approved`.
 
 2.3.4. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
 
