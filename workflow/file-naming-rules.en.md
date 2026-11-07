@@ -1,6 +1,7 @@
 # File Naming Rules
 
 > **Status: draft**
+> **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
 

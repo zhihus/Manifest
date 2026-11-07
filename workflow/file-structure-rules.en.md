@@ -1,6 +1,7 @@
 # File Structure Rules
 
 > **Status: draft**
+> **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
 
@@ -19,6 +20,7 @@ connected to the Manifest framework.
 
 * The metadata block is a group of blockquote lines under the title:
   * `> **Status: draft**`
+  * `> **Type: document**`
   * `> **Version: 1.0.0**`
   * `> **Updated: 2026-11-07**`
 * The status line uses exactly one word: `**Status: draft**`. Nothing else
@@ -30,7 +32,16 @@ connected to the Manifest framework.
 * `Version` is a three-component number `X.Y.Z`.
 * `Updated` is the date of the last change, ISO `YYYY-MM-DD`.
 
-## 3. Section numbering
+## 3. Type
+
+* `Type` selects the set of rules applied to the file.
+* There are several types; the known value is `document`. The set is
+  extensible.
+* `document` — a Markdown document, subject to the full document structure
+  (metadata block, Description section, section numbering, versioning,
+  language suffix).
+
+## 4. Section numbering
 
 * Sections and subsections are numbered hierarchically, dot-separated, by
   depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
