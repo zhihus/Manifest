@@ -5,7 +5,7 @@
 Universal file naming rules for any project connected to the Manifest
 framework.
 
-## 1. General rules
+## 1. Rules
 
 ### 1.1. Names in English
 
