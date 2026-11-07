@@ -11,7 +11,6 @@
 * **kebab-case, нижний регистр, без пробелов**:
   ✅ `file-naming-rules.md`
   ❌ `File Naming Rules.md`, `fileNamingRules.md`
-* Слова разделяются дефисами; точки используются только для расширения.
 * Файлы-документы несут в имени версию и дату:
   `file-naming-rules-1.0.0-2026-11-07.en.md` (версия `X.Y.Z`, дата ISO
   `YYYY-MM-DD`).

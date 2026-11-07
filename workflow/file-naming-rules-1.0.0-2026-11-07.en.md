@@ -11,7 +11,6 @@ framework.
 * **kebab-case, lowercase, no spaces**:
   ✅ `file-naming-rules.md`
   ❌ `File Naming Rules.md`, `fileNamingRules.md`
-* Hyphens separate words; dots are used only for the extension.
 * Document files carry version and date in the name:
   `file-naming-rules-1.0.0-2026-11-07.en.md` (version `X.Y.Z`, date ISO
   `YYYY-MM-DD`).
