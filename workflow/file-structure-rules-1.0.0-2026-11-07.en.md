@@ -22,4 +22,4 @@ connected to the Manifest framework.
 ## 3. Section numbering
 
 * Sections and subsections are numbered hierarchically, dot-separated, by
-  depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
+  depth: `1` → `1.1`, `1.2` → `1.2.1` (each level adds one component).
