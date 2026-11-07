@@ -17,7 +17,7 @@ Entry point: `AGENTS.md`
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates) — DRAFT, in development. Entry:
-  `workflow/README.en.md`.
+  `workflow/README.en.md`. File naming rules: `workflow/file-naming-rules.md`.
 * `temp/` — scratch space (gitignored).
 
 ## Build
