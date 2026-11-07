@@ -15,9 +15,9 @@ Entry point: `AGENTS.md`
 
 * `docs/` — project documentation.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
-* `docs/openspec-workflow/` — OpenSpec user–agent interaction process
+* `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates) — DRAFT, in development. Entry:
-  `docs/openspec-workflow/README.en.md`.
+  `workflow/README.en.md`.
 * `temp/` — scratch space (gitignored).
 
 ## Build
