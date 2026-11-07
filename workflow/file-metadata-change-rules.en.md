@@ -70,10 +70,8 @@ The correct metadata block is in the header of this document.
 
 ### 6.2. Incorrect
 
-❌ Status line with extra text: `> **Status: draft — in development**`
+❌ Status with extra text: `> **Status: draft — in development**`
 
-❌ Status with a non-listed value: `> **Status: in-development**`
+❌ Version not in format: `> **Version: 1.0**`
 
-❌ Version with two components: `> **Version: 1.0**`
-
-❌ Date in a non-ISO format: `> **Updated: 07.11.2026**`
+❌ Date not in format: `> **Updated: 07.11.2026**`
