@@ -6,5 +6,6 @@
 > **Updated: 2026-11-07**
 
 # Description
-Rules of the Manifest workflow: how a project is connected to the
-Manifest framework and how the verification process works.
+The root document of the Manifest framework. It contains all the Manifest
+rules: project connection, file naming, file structure, file versioning,
+and the verification process.
