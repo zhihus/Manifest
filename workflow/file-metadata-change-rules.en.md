@@ -72,6 +72,8 @@ The correct metadata block is in the header of this document.
 
 ❌ Status with extra text: `> **Status: draft — in development**`
 
+❌ Status with a value outside the list: `> **Status: in-development**`
+
 ❌ Version not in format: `> **Version: 1.0**`
 
 ❌ Date not in format: `> **Updated: 07.11.2026**`
