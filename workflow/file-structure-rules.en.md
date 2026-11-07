@@ -7,6 +7,7 @@ Description: metadata, document status, line 5, starts with >
 Status list: draft — in development, approved — approved, archived — archived
 4.> **Type: document**
 Description: metadata, file type, line 6, starts with >
+Type list: document — Markdown document
 5.> **Version: 1.0.0**
 Description: metadata, version, line 7, starts with >
 6.> **Updated: 2026-11-07**
