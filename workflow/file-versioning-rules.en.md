@@ -13,7 +13,7 @@ Manifest framework.
 
 1.1. The version is a three-component number: `X.Y.Z`.
 
-1.2. The version lives in the body, in the metadata block: `> **Version: X.Y.Z**`.
+1.2. The version is located in the document, in the header, in the metadata: > **Version: X.Y.Z**.
 
 ## 2. Version bumps
 
