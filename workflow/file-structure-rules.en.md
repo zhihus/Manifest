@@ -12,10 +12,29 @@ connected to the Manifest framework.
 
 ## 1. Minimum structure
 
-* Every Markdown file has a structure. Minimum: a title — a heading that
-  starts with `#` — followed by a metadata block and a Description section.
-* The Description section is a `# Description` heading followed by a short
-  paragraph describing the document.
+Every Markdown file has a structure. The minimum structure is a sequence of
+four elements: the main heading, the metadata heading, the metadata block,
+and the Description section.
+
+### 1.1. Main heading
+
+* Placement: the first line of the file, a `#` heading.
+* Purpose: the title of the document.
+
+### 1.2. Metadata heading
+
+* Placement: immediately after the main heading.
+* Purpose: marks the metadata block.
+
+### 1.3. Metadata block
+
+* Placement: under the metadata heading.
+* Purpose: the document metadata — status, type, version, date.
+
+### 1.4. Description
+
+* Placement: after the metadata block.
+* Purpose: a short paragraph describing the document.
 
 ## 2. Metadata block
 
@@ -35,11 +54,6 @@ connected to the Manifest framework.
 * `Updated` is the date of the last change, ISO `YYYY-MM-DD`.
 * `Status` is the primary field. Versioning depends on the status and on
   the structure. The status list is defined here and is extensible.
-
-Note: the structure document (this file) defines the list of statuses and
-the location of the metadata block. The metadata change document defines
-how each metadata field changes. Statuses and versions are described here,
-not in the versioning rules.
 
 Note: the structure document (this file) defines the list of statuses and
 the location of the metadata block. The metadata change document defines
