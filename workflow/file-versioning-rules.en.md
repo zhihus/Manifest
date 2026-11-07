@@ -31,9 +31,9 @@ Manifest framework.
 
 3.3. The version changes only for documents with status `approved`.
 
-3.4. The `draft` → `approved` transition does not change the version.
+3.4. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
 
-3.5. With status `archived` — the version is frozen; version bump is forbidden.
+3.5. With status `archived` — any version change is forbidden.
 
 ## 4. Date
 
