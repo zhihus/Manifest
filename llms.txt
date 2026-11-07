@@ -16,14 +16,16 @@ Entry point: `AGENTS.md`
 * `docs/` — project documentation.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
-  (roles, 7 steps, gates) — DRAFT, in development. Entry:
-  `workflow/README.en.md`. Naming rules:
-  `workflow/naming-rules.en.md`. File structure rules:
-  `workflow/file-structure-rules.en.md`. File metadata change rules:
+  (roles, 7 steps, gates). Entry: `workflow/README.en.md`.
+  Naming rules for files and directories:
+  `workflow/naming-rules.en.md`. Structure of Markdown documents
+  (metadata block, status list, section numbering):
+  `workflow/file-structure-rules.en.md`. Rules for changing the
+  metadata block (version, date, type, status):
   `workflow/file-metadata-change-rules.en.md`. Manifest
-  workflow rules:
-  `workflow/manifest-workflow-rules.en.md`. Roadmap (planned
-  work, not yet implemented): `workflow/roadmap.en.md`.
+  workflow rules: `workflow/manifest-workflow-rules.en.md`.
+  Roadmap (planned work, not yet implemented):
+  `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
 
 ## Build
