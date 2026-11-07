@@ -34,13 +34,9 @@ connected to the Manifest framework.
 
 2.3.1. A new document with status `draft` gets version `1.0.0`.
 
-2.3.2. A document with status `draft` does not bump its version upon modification.
+2.3.2. The version is changed ONLY for a document with status `approved`.
 
-2.3.3. The version is changed only for a document with status `approved`.
-
-2.3.4. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
-
-2.3.5. With status `archived` any version change is forbidden.
+2.3.3. The `draft` → `approved` or `approved` → `archived` status change does not change the version.
 
 ## 3. Date
 
@@ -59,8 +55,6 @@ connected to the Manifest framework.
 5.1. The document status changes at the user's request.
 
 5.2. Automatic status change is not provided.
-
-5.3. The document status may be changed by the agent in certain Manifest processes; the list of these processes is not defined.
 
 ## 6. Examples
 
