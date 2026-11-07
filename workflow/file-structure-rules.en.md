@@ -18,19 +18,22 @@ connected to the Manifest framework.
 
 ## 2. Metadata block
 
-* The metadata block is a group of blockquote lines under the title:
+* The metadata block is located in the header of the document, under the
+  title. It is a group of blockquote lines:
   * `> **Status: draft**`
   * `> **Type: document**`
   * `> **Version: 1.0.0**`
   * `> **Updated: 2026-11-07**`
 * The status line uses exactly one word: `**Status: draft**`. Nothing else
   is added to it.
-* The fixed status set (three base statuses):
+* The status set (three base statuses, extensible):
   * `draft` — in development;
   * `approved` — approved;
   * `archived` — archived.
 * `Version` is a three-component number `X.Y.Z`.
 * `Updated` is the date of the last change, ISO `YYYY-MM-DD`.
+* `Status` is the primary field. Versioning depends on the status and on
+  the structure. The status list is defined here and is extensible.
 
 ## 3. Type
 
