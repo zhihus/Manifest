@@ -21,14 +21,14 @@
 
 ### Неправильно
 
-❌ `File Naming Rules-1.0.0-2026-11-07.en.md` — пробелы
-❌ `fileNamingRules-1.0.0-2026-11-07.en.md` — camelCase
-❌ `file-naming-rules.en.md` — нет версии и даты
-❌ `file-naming-rules-1.0.0-07.11.2026.en.md` — дата не ISO
-❌ `файл-именования-1.0.0-2026-11-07.en.md` — не английский
-❌ `file-naming-rules-1.0.0-2026-11-07.md` — нет суффикса языка
-❌ `file-naming-rules-1.0.0-2026-11-07.EN.md` — суффикс в верхнем регистре
-❌ `file-naming-rules-en-1.0.0-2026-11-07.md` — суффикс в середине имени
+❌ `File Naming Rules-1.0.0-2026-11-07.en.md`
+❌ `fileNamingRules-1.0.0-2026-11-07.en.md`
+❌ `file-naming-rules.en.md`
+❌ `file-naming-rules-1.0.0-07.11.2026.en.md`
+❌ `файл-именования-1.0.0-2026-11-07.en.md`
+❌ `file-naming-rules-1.0.0-2026-11-07.md`
+❌ `file-naming-rules-1.0.0-2026-11-07.EN.md`
+❌ `file-naming-rules-en-1.0.0-2026-11-07.md`
 
 ## 2. Языковые суффиксы
 

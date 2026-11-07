@@ -21,14 +21,14 @@ framework.
 
 ### Incorrect
 
-❌ `File Naming Rules-1.0.0-2026-11-07.en.md` — spaces
-❌ `fileNamingRules-1.0.0-2026-11-07.en.md` — camelCase
-❌ `file-naming-rules.en.md` — no version and date
-❌ `file-naming-rules-1.0.0-07.11.2026.en.md` — date not ISO
-❌ `файл-именования-1.0.0-2026-11-07.en.md` — not English
-❌ `file-naming-rules-1.0.0-2026-11-07.md` — no language suffix
-❌ `file-naming-rules-1.0.0-2026-11-07.EN.md` — uppercase suffix
-❌ `file-naming-rules-en-1.0.0-2026-11-07.md` — suffix in the middle of the name
+❌ `File Naming Rules-1.0.0-2026-11-07.en.md`
+❌ `fileNamingRules-1.0.0-2026-11-07.en.md`
+❌ `file-naming-rules.en.md`
+❌ `file-naming-rules-1.0.0-07.11.2026.en.md`
+❌ `файл-именования-1.0.0-2026-11-07.en.md`
+❌ `file-naming-rules-1.0.0-2026-11-07.md`
+❌ `file-naming-rules-1.0.0-2026-11-07.EN.md`
+❌ `file-naming-rules-en-1.0.0-2026-11-07.md`
 
 ## 2. Language suffixes
 
