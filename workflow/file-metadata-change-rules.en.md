@@ -70,7 +70,7 @@ The correct metadata block is in the header of this document.
 
 ### 6.2. Incorrect
 
-❌ Status with extra text: `> **Status: draft — in development**`
+❌ Status with extra text: `> **Status: draft**` (in development)
 
 ❌ Status with a value outside the list: `> **Status: in-development**`
 
