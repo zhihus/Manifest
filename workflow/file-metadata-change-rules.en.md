@@ -11,9 +11,6 @@ connected to the Manifest framework.
 
 ## 1. Metadata
 
-Metadata: version, date, file type, and status are located in the
-document header.
-
 > **Status: draft**
 > **Type: document**
 > **Version: 1.0.0**
