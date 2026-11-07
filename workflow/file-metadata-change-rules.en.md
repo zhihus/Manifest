@@ -19,11 +19,11 @@ connected to the Manifest framework.
 
 ## 2. Version
 
-### 2.1. Format
+### 2.1. Version format
 
 2.1.1. The version is a three-component number: `X.Y.Z`.
 
-### 2.2. Bumps
+### 2.2. Version bumps
 
 2.2.1. X (major) — breaking changes: existing content is removed or changed in meaning.
 
@@ -31,7 +31,7 @@ connected to the Manifest framework.
 
 2.2.3. Z (patch) — clarifications, wording fixes, typos.
 
-### 2.3. Status
+### 2.3. Dependency on status
 
 2.3.1. A new document with status `draft` gets version `1.0.0`.
 
