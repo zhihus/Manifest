@@ -11,7 +11,8 @@ connected to the Manifest framework.
 
 ## 1. Metadata
 
-The metadata block of a document file consists of four fields:
+Metadata: version, date, file type, and status are located in the
+document header.
 
 > **Status: draft**
 > **Type: document**
@@ -23,8 +24,6 @@ The metadata block of a document file consists of four fields:
 ### 2.1. Format
 
 2.1.1. The version is a three-component number: `X.Y.Z`.
-
-2.1.2. The version is located in the document, in the header, in the metadata: > **Version: X.Y.Z**.
 
 ### 2.2. Bumps
 
@@ -48,14 +47,14 @@ The metadata block of a document file consists of four fields:
 
 ## 3. Date
 
-3.1. The date in the metadata block: `> **Updated: YYYY-MM-DD**`, is the date of the last change.
+3.1. The date `> **Updated: YYYY-MM-DD**` is the date of the last change.
 
 3.2. The date is updated on every change.
 
 ## 4. Type
 
-4.1. The file type is indicated in the metadata: `> **Type: document**`.
+4.1. The file type: `> **Type: document**`.
 
 ## 5. Status
 
-5.1. The document status is indicated in the metadata: `> **Status: draft**`, `> **Status: approved**`, or `> **Status: archived**`.
+5.1. The document status: `> **Status: draft**`, `> **Status: approved**`, or `> **Status: archived**`.
