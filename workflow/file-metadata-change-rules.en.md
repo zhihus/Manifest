@@ -1,7 +1,7 @@
 # File Metadata Change Rules
 
 # Metadata
-> **Status: draft**
+> **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
@@ -12,7 +12,7 @@ connected to the Manifest framework.
 
 ## 1. Metadata
 
-> **Status: draft**
+> **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**

@@ -1,7 +1,7 @@
 # Правила изменения метаданных файла
 
 # Метаданные
-> **Status: draft**
+> **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
@@ -12,7 +12,7 @@
 
 ## 1. Метаданные
 
-> **Status: draft**
+> **Status: approved**
 > **Type: document**
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
