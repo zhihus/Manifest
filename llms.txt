@@ -21,9 +21,9 @@ Entry point: `AGENTS.md`
   `workflow/naming-rules.en.md`. File structure rules:
   `workflow/file-structure-rules.en.md`. File versioning rules:
   `workflow/file-versioning-rules.en.md`. Manifest workflow rules:
-  `workflow/manifest-workflow-rules.en.md`.
+  `workflow/manifest-workflow-rules.en.md`. Roadmap (planned
+  work, not yet implemented): `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
-* `roadmap.en.md` — planned workflow work (not yet implemented).
 
 ## Build
 
