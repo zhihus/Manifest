@@ -47,7 +47,7 @@ framework.
 * Temporary files live only in `temp/` (gitignored) and are never named
   as if they were project artifacts.
 
-## 5. Document status line (requirements, dictated verbatim)
+## 5. Requirements to move to the document structure file
 
 > Requirements below were dictated by the user. They are parked here until
 > a dedicated document-structure file exists in `workflow/`; that file will
