@@ -12,11 +12,9 @@ framework.
   ✅ `file-naming-rules.md`
   ❌ `File Naming Rules.md`, `fileNamingRules.md`
 * Hyphens separate words; dots are used only for the extension.
-* No dates in names unless the file is an immutable snapshot — then
-  `YYYY-MM-DD` goes **last** as a suffix: `report-name-2026-11-07.md`.
-* No version numbers in names for versioned content (git carries the
-  history). A version suffix is allowed only for released immutable
-  artifacts: `report-name-1.0.0.md`.
+* Document files carry version and date in the name:
+  `file-naming-rules-1.0.0-2026-11-07.en.md` (version `X.Y.Z`, date ISO
+  `YYYY-MM-DD`).
 * One logical document per file; do not embed sequence numbers
   (`report-2.md`) — name by content, not by order of creation.
 
