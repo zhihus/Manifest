@@ -4,13 +4,16 @@
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
 
+# Description
 Universal rules for the structure of Markdown documents in any project
 connected to the Manifest framework.
 
 ## 1. Minimum structure
 
 * Every Markdown file has a structure. Minimum: a title — a heading that
-  starts with `#` — followed by a metadata block.
+  starts with `#` — followed by a metadata block and a Description section.
+* The Description section is a `# Description` heading followed by a short
+  paragraph describing the document.
 
 ## 2. Metadata block
 

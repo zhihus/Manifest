@@ -4,6 +4,7 @@
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
 
+# Description
 Rules for versioning document files in any project connected to the
 Manifest framework.
 

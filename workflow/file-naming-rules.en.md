@@ -4,6 +4,7 @@
 > **Version: 1.0.0**
 > **Updated: 2026-11-07**
 
+# Description
 Universal file naming rules for any project connected to the Manifest
 framework.
 
