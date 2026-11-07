@@ -3,15 +3,19 @@ Description: heading, reflecting the file content, level 1, line 1, starts with 
 2.# Metadata
 Description: heading, of the metadata block, level 1, line 3, starts with #
 3.> **Status: draft**
-Description: metadata, document status, line 5, starts with >
+Description: metadata, status, line 5, template: > **<name>: <value>**
+Value: one of the list
 Status list: draft — in development, approved — approved, archived — archived
 4.> **Type: document**
-Description: metadata, file type, line 6, starts with >
+Description: metadata, file type, line 6, template: > **<name>: <value>**
+Value: one of the list
 Type list: document — Markdown document
 5.> **Version: 1.0.0**
-Description: metadata, version, line 7, starts with >
+Description: metadata, version, line 7, template: > **<name>: <value>**
+Value: three-component number X.Y.Z, where X — major, Y — minor, Z — patch
 6.> **Updated: 2026-11-07**
-Description: metadata, date of last change, line 8, starts with >
+Description: metadata, date, line 8, template: > **<name>: <value>**
+Value: date in ISO format YYYY-MM-DD
 7.# Description
 Description: heading, of the description section, level 1, line 10, starts with #
 8.A short paragraph describing the document
