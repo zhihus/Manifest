@@ -20,12 +20,14 @@ suffix: `en`, or any other at the user's request.
 
 ## 2. Examples
 
-### 2.1. Files — correct
+### 2.1. Files
+
+Correct
 
 ✅ `naming-rules.en.md`
 ✅ `naming-rules.ru.md`
 
-### 2.2. Files — incorrect
+Incorrect
 
 ❌ `File Naming Rules.en.md`
 ❌ `fileNamingRules.en.md`
@@ -33,13 +35,15 @@ suffix: `en`, or any other at the user's request.
 ❌ `naming-rules.md`
 ❌ `naming-rules.EN.md`
 
-### 2.3. Directories — correct
+### 2.2. Directories
+
+Correct
 
 ✅ `workflow`
 ✅ `docs`
 ✅ `my-project`
 
-### 2.4. Directories — incorrect
+Incorrect
 
 ❌ `MyFolder`
 ❌ `my_folder`

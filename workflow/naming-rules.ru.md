@@ -19,12 +19,14 @@
 
 ## 2. Примеры
 
-### 2.1. Файлы — правильно
+### 2.1. Файлы
+
+Правильно
 
 ✅ `naming-rules.en.md`
 ✅ `naming-rules.ru.md`
 
-### 2.2. Файлы — неправильно
+Неправильно
 
 ❌ `File Naming Rules.en.md`
 ❌ `fileNamingRules.en.md`
@@ -32,13 +34,15 @@
 ❌ `naming-rules.md`
 ❌ `naming-rules.EN.md`
 
-### 2.3. Папки — правильно
+### 2.2. Папки
+
+Правильно
 
 ✅ `workflow`
 ✅ `docs`
 ✅ `my-project`
 
-### 2.4. Папки — неправильно
+Неправильно
 
 ❌ `MyFolder`
 ❌ `my_folder`

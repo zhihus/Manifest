@@ -45,3 +45,40 @@ connected to the Manifest framework.
 
 * Sections and subsections are numbered hierarchically, dot-separated, by
   depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
+
+## 5. Labeled parts
+
+* When a section contains multiple labeled parts (e.g. correct / incorrect
+  examples), the labels are standalone text lines under a single section
+  heading — not separate sub-headings with the label embedded in the
+  heading text.
+
+  Correct:
+
+  ```
+  ### 2.1. Files
+
+  Correct
+
+  ✅ `naming-rules.en.md`
+  ✅ `naming-rules.ru.md`
+
+  Incorrect
+
+  ❌ `File Naming Rules.en.md`
+  ❌ `fileNamingRules.en.md`
+  ```
+
+  Incorrect:
+
+  ```
+  ### 2.1. Files — correct
+
+  ✅ `naming-rules.en.md`
+  ✅ `naming-rules.ru.md`
+
+  ### 2.2. Files — incorrect
+
+  ❌ `File Naming Rules.en.md`
+  ❌ `fileNamingRules.en.md`
+  ```
