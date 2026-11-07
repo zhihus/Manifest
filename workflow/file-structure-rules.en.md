@@ -1,7 +1,7 @@
 1.# File Structure Rules
-Description: heading reflecting the file content, located on line 1
+Description: first-level heading, starts with #, reflecting the file content, located on line 1
 2.# Metadata
-Description: metadata block heading, located on line 3
+Description: first-level heading, starts with #, of the metadata block, located on line 3
 3.> **Status: draft**
 Description: metadata — status, located on line 5
 4.> **Type: document**
@@ -11,7 +11,7 @@ Description: metadata — version, located on line 7
 6.> **Updated: 2026-11-07**
 Description: metadata — date of last change, located on line 8
 7.# Description
-Description: description section heading, located on line 10
+Description: first-level heading, starts with #, of the description section, located on line 10
 8.A short paragraph describing the document
 Description: description text, located on line 11
 
