@@ -5,7 +5,7 @@
 > **Updated: 2026-11-07**
 
 # Description
-Universal file naming rules for any project connected to the Manifest
+Universal file naming rules for a project connected to the Manifest
 framework.
 
 ## 1. Rules

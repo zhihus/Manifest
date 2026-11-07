@@ -5,7 +5,7 @@
 > **Updated: 2026-11-07**
 
 # Description
-Rules for versioning document files in any project connected to the
+Rules for versioning document files in a project connected to the
 Manifest framework.
 
 ## 1. Version format

@@ -5,7 +5,7 @@
 > **Updated: 2026-11-07**
 
 # Description
-Universal rules for the structure of Markdown documents in any project
+Universal rules for the structure of Markdown documents in a project
 connected to the Manifest framework.
 
 ## 1. Minimum structure
