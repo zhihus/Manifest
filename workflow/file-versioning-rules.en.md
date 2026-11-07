@@ -1,6 +1,8 @@
 # File Versioning Rules
 
 > **Status: draft**
+> **Version: 1.0.0**
+> **Updated: 2026-11-07**
 
 Rules for versioning document files in any project connected to the
 Manifest framework.
@@ -9,7 +11,7 @@ Manifest framework.
 
 ### 1.1. The version is a three-component number: `X.Y.Z`.
 
-### 1.2. The version lives in the file name: `<name>-<version>-<date>.<lang>.md`.
+### 1.2. The version lives in the body, in the metadata block: `> **Version: X.Y.Z**`.
 
 ## 2. Version bumps
 
@@ -21,7 +23,7 @@ Manifest framework.
 
 ## 3. Date
 
-### 3.1. The date in the file name is the date of the last change, ISO `YYYY-MM-DD`.
+### 3.1. The date in the body, in the metadata block: `> **Updated: YYYY-MM-DD**`, is the date of the last change.
 
 ### 3.2. The date is updated on every version bump.
 

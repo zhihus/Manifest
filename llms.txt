@@ -18,9 +18,9 @@ Entry point: `AGENTS.md`
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates) — DRAFT, in development. Entry:
   `workflow/README.en.md`. File naming rules:
-  `workflow/file-naming-rules-1.0.0-2026-11-07.en.md`. File structure rules:
-  `workflow/file-structure-rules-1.0.0-2026-11-07.en.md`. File versioning rules:
-  `workflow/file-versioning-rules-1.0.0-2026-11-07.en.md`.
+  `workflow/file-naming-rules.en.md`. File structure rules:
+  `workflow/file-structure-rules.en.md`. File versioning rules:
+  `workflow/file-versioning-rules.en.md`.
 * `temp/` — scratch space (gitignored).
 
 ## Build
