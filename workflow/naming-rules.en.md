@@ -11,16 +11,16 @@ to the Manifest framework.
 
 ## 1. Rules
 
-### 1.1. Names in English only
+1.1. Names in English only.
 
-### 1.2. kebab-case, lowercase, hyphen-separated, no spaces
+1.2. kebab-case, lowercase, hyphen-separated, no spaces.
 
-### 1.3. A file name (not a directory name) always carries a language
-suffix: `en`, or any other at the user's request.
+1.3. A file name (not a directory name) always carries a language
+    suffix: `en`, or any other at the user's request.
 
 ## 2. Examples
 
-### 2.1. Files
+2.1. Files
 
 Correct
 
@@ -35,7 +35,7 @@ Incorrect
 ❌ `naming-rules.md`
 ❌ `naming-rules.EN.md`
 
-### 2.2. Directories
+2.2. Directories
 
 Correct
 
