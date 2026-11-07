@@ -60,7 +60,7 @@ connected to the Manifest framework.
 
 5.2. Automatic status change is not provided.
 
-5.3. The document status may be changed by the agent in certain situations; the list of these situations is not defined.
+5.3. The document status may be changed by the agent in certain Manifest processes; the list of these processes is not defined.
 
 ## 6. Examples
 
