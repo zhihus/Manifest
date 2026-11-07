@@ -40,6 +40,11 @@ the location of the metadata block. The metadata change document defines
 how each metadata field changes. Statuses and versions are described here,
 not in the versioning rules.
 
+Note: the structure document (this file) defines the list of statuses and
+the location of the metadata block. The metadata change document defines
+how each metadata field changes. Statuses and versions are described here,
+not in the versioning rules.
+
 ## 3. Type
 
 * `Type` selects the set of rules applied to the file.
