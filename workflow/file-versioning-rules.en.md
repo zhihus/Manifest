@@ -17,9 +17,9 @@ Manifest framework.
 
 ## 2. Version bumps
 
-2.1. X (major) — breaking changes: a rule is removed or changed in meaning.
+2.1. X (major) — breaking changes: existing content is removed or changed in meaning.
 
-2.2. Y (minor) — new rules added, existing rules extended.
+2.2. Y (minor) — new content added, existing content extended.
 
 2.3. Z (patch) — clarifications, wording fixes, typos.
 
