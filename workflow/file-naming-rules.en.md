@@ -7,8 +7,9 @@ framework.
 
 ## 1. General rules
 
-* **kebab-case, lowercase, no spaces**: `file-naming-rules.md`, not
-  `File Naming Rules.md` or `fileNamingRules.md`.
+* **kebab-case, lowercase, no spaces**:
+  ✅ `file-naming-rules.md`
+  ❌ `File Naming Rules.md`, `fileNamingRules.md`
 * Names are in **English**; abbreviations are allowed when unambiguous.
 * Hyphens separate words; dots are used only for the extension.
 * No dates in names unless the file is an immutable snapshot — then
