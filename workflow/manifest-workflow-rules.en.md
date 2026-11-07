@@ -26,8 +26,6 @@ and the verification process.
 
 #### 1.2.3. `.manifest/validate.sh` — the verification script: checks files for compliance with the Manifest rules — presence of metadata fields, headings, section numbering, `Version` and `Updated` formats.
 
-#### 1.2.4. `.manifest/hooks/pre-commit` — fires before a commit: runs `validate.sh` on the files that go into the commit. If a file does not comply — the commit is blocked, the model sees the error and fixes the file.
+#### 1.2.4. `.manifest/hooks/pre-commit` — before a commit, runs the `validate.sh` script to check the files that go into the commit.
 
-#### 1.2.5. `.manifest/hooks/commit-msg` — fires when the commit message is written: checks that the message complies with `commit-rules.md` (format `<type>(<scope>): <subject>`). If the message does not comply — the commit is blocked, the model rewrites the message.
-
-#### 1.2.6. Hook activation: `git config core.hooksPath .manifest/hooks`.
+#### 1.2.5. `.manifest/hooks/commit-msg` — fires when the commit message is written: checks that the message complies with the rules of the `commit-rules.md` file.
