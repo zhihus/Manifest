@@ -59,3 +59,21 @@ connected to the Manifest framework.
 5.1. The document status changes at the user's request.
 
 5.2. Automatic status change is not provided.
+
+5.3. The document status may be changed by the agent in certain situations; the list of these situations is not defined.
+
+## 6. Examples
+
+### 6.1. Correct
+
+The correct metadata block is in the header of this document.
+
+### 6.2. Incorrect
+
+❌ Status line with extra text: `> **Status: draft — in development**`
+
+❌ Status with a non-listed value: `> **Status: in-development**`
+
+❌ Version with two components: `> **Version: 1.0**`
+
+❌ Date in a non-ISO format: `> **Updated: 07.11.2026**`
