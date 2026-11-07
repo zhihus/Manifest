@@ -4,7 +4,7 @@ Description: heading, reflecting the file content, level 1, line 1, starts with 
 Description: heading, of the metadata block, level 1, line 3, starts with #
 3.> **Status: draft**
 Description: metadata, document status, line 5, starts with >
-Status list: draft, approved, archived
+Status list: draft — in development, approved — approved, archived — archived
 4.> **Type: document**
 Description: metadata, file type, line 6, starts with >
 5.> **Version: 1.0.0**
