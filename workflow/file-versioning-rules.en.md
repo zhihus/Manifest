@@ -25,22 +25,18 @@ Manifest framework.
 
 ## 3. Version and status
 
-3.1. `draft` — in development: no version bump required.
+3.1. A new document with status `draft` gets version `1.0.0`.
 
-3.2. The version is bumped only for documents with status `approved`.
+3.2. A document with status `draft` does not change its version upon modification.
 
-3.3. On every change of an `approved` document, the version is bumped by the change type (2.1–2.3).
+3.3. The version changes only for documents with status `approved`.
 
 3.4. The `draft` → `approved` transition does not change the version.
 
-3.5. `archived` — the version is frozen; no further bumps.
+3.5. With status `archived` — the version is frozen; version bump is forbidden.
 
 ## 4. Date
 
 4.1. The date in the body, in the metadata block: `> **Updated: YYYY-MM-DD**`, is the date of the last change.
 
 4.2. The date is updated on every change.
-
-## 5. Initial version
-
-5.1. A new document starts at `1.0.0`.
