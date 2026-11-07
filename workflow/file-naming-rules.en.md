@@ -7,10 +7,10 @@ framework.
 
 ## 1. General rules
 
+* Names are strictly in English.
 * **kebab-case, lowercase, no spaces**:
   ✅ `file-naming-rules.md`
   ❌ `File Naming Rules.md`, `fileNamingRules.md`
-* Names are in **English**; abbreviations are allowed when unambiguous.
 * Hyphens separate words; dots are used only for the extension.
 * No dates in names unless the file is an immutable snapshot — then
   `YYYY-MM-DD` goes **last** as a suffix: `report-name-2026-11-07.md`.
