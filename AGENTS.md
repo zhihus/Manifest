@@ -2,7 +2,9 @@
 (docs, code, identifiers, comments, commits) to English unless told
 otherwise. Reason in English. When starting development of a new
 document file, create the Russian version (`.ru.md`) alongside the
-English one.
+English one. **RU/EN workflow:** `.ru.md` is a working draft for the
+user's review; the user approves RU, then the agent translates it into
+the English (final) file; RU may be deleted later.
 
 **temp/.** Temporary storage for files needed during work (scripts, intermediate artifacts, anything not part of the app). All temporary files go here — never write them elsewhere. `temp/` is cleaned periodically, never while an agent is working on app functionality; the user may clear it manually or ask the model to.
 
