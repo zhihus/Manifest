@@ -71,6 +71,17 @@ Length recommendation: up to N words / up to M chars; otherwise —.
 Skip marker: — (field not applicable to this line).
 ```
 
+### 1.11. Rules for this file only
+
+```
+This file is the root: other files are filled according to its rules.
+The unique rules below apply only to this file.
+
+Transcription format: each line of the target document is shown first,
+followed by an `Description:` annotation line. This format is used only
+in this file.
+```
+
 ## 2. Document header description
 
 ### 2.1. File title
