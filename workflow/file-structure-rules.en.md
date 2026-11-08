@@ -1,3 +1,5 @@
+# File Structure Rules
+
 ```
 1.# <heading name>
 Description: heading, file title, level 1, line 1,
