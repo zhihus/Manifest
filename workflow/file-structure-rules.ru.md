@@ -1,9 +1,9 @@
 # Правила структуры файлов
 
 # Метаданные
-> **Status: draft**
-> **Type: document**
-> **Version: 1.0.0**
+> **Status: draft**  
+> **Type: document**  
+> **Version: 1.0.0**  
 > **Updated: 2026-11-08**
 
 # Описание
