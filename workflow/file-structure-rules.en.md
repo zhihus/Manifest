@@ -1,5 +1,7 @@
 # File Structure Rules
 
+Each line of a file is at most 100 characters long.
+
 ```
 1.# <heading name>
 Description: heading, file title, level 1, line 1,
