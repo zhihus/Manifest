@@ -59,6 +59,8 @@ connected to the Manifest framework.
 
 5.3. The document status may be changed by the agent in certain Manifest processes; the list of these processes is not defined.
 
+5.4. The status line uses exactly one word: `**Status: draft**`. Nothing else is added to it.
+
 ## 6. Examples
 
 ### 6.1. Correct

@@ -2,6 +2,7 @@
 Description: heading, reflecting the file content, level 1, line 1, value: <title>
 2.# Metadata
 Description: heading, of the metadata block, level 1, line 3, value: Metadata
+Metadata value changes are described in the `file-metadata-change-rules.en.md` document.
 3.> **Status: draft**
 Description: metadata, status, line 5, template: > **<name>: <value>**, value: one of the list
 Status list: draft — in development, approved — approved, archived — archived
@@ -20,31 +21,7 @@ Description: text, description, line 11
 # Description
 Structure rules for Markdown documents in a project connected to the Manifest framework.
 
-## 1. Metadata block
-
-* The metadata block is located in the header of the document, under the
-  title. It is a group of blockquote lines:
-  * `> **Status: draft**`
-  * `> **Type: document**`
-  * `> **Version: 1.0.0**`
-  * `> **Updated: 2026-11-07**`
-* The status line uses exactly one word: `**Status: draft**`. Nothing else
-  is added to it.
-* The status set (three base statuses, extensible):
-  * `draft` — in development;
-  * `approved` — approved;
-  * `archived` — archived.
-* `Version` is a three-component number `X.Y.Z`.
-* `Updated` is the date of the last change, ISO `YYYY-MM-DD`.
-* `Status` is the primary field. Versioning depends on the status and on
-  the structure. The status list is defined here and is extensible.
-
-Note: the structure document (this file) defines the list of statuses and
-the location of the metadata block. The metadata change document defines
-how each metadata field changes. Statuses and versions are described here,
-not in the versioning rules.
-
-## 2. Type
+## 1. Type
 
 * `Type` selects the set of rules applied to the file.
 * There are several types; the known value is `document`. The set is
@@ -53,12 +30,12 @@ not in the versioning rules.
   (metadata block, Description section, section numbering, versioning,
   language suffix).
 
-## 3. Section numbering
+## 2. Section numbering
 
 * Sections and subsections are numbered hierarchically, dot-separated, by
   depth: `1.` → `1.1.`, `1.2.` → `1.2.1.` (each level adds one component).
 
-## 4. Labeled parts
+## 3. Labeled parts
 
 * When a section contains multiple labeled parts (e.g. correct / incorrect
   examples), the labels are standalone text lines under a single section
