@@ -23,29 +23,53 @@ Description: type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
 ```
 
 ### 1.3. Type
+
+```
 The line kind: heading, metadata, text.
+```
 
 ### 1.4. Purpose
+
+```
 What the line represents (file title, status, version).
+```
 
 ### 1.5. Line
+
+```
 Line number in the real document.
+```
 
 ### 1.6. Required
+
+```
 Whether the line is required in the document: yes / no.
+```
 
 ### 1.7. Level
+
+```
 Hierarchy level (headings only; otherwise —).
+```
 
 ### 1.8. Template
+
+```
 Line pattern; <...> — placeholder value; otherwise —.
+```
 
 ### 1.9. Value
+
+```
 Allowed value: free, one of the list, fixed; otherwise —.
+```
 
 ### 1.10. Length
+
+```
 Length recommendation: up to N words / up to M chars; otherwise —.
 Skip marker: — (field not applicable to this line).
+```
 
 ## 2. Document header description
 
