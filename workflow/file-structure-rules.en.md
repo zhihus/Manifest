@@ -1,6 +1,19 @@
 # File Structure Rules
 
-Each line of a file is at most 100 characters long.
+# Metadata
+> **Status: draft**
+> **Type: document**
+> **Version: 1.0.0**
+> **Updated: 2026-11-08**
+
+# Description
+Universal structure rules for Markdown documents in a project
+connected to the Manifest framework.
+
+## 1. General file structure rules
+1.1. Each line of a file must not be longer than 100 characters.
+
+## 2. Document header description
 
 ```
 1.# <heading name>
@@ -24,7 +37,8 @@ Value list (extensible): draft — in development, approved — approved, archiv
 
 ```
 4.> **Type: document**
-Description: metadata, file type, line 6, template: > **<name>: <value>** ; value: one of the list
+Description: metadata, file type, line 6,
+  template: > **<name>: <value>** ; value: one of the list
 Value list (extensible): document — Markdown document
 ```
 
@@ -103,3 +117,11 @@ Description: heading, section, level 2, line 13,
   ❌ `File Naming Rules.en.md`
   ❌ `fileNamingRules.en.md`
   ```
+
+# 3. Examples
+
+3.1. Files
+
+Correct
+
+Incorrect
