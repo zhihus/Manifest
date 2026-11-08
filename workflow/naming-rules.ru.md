@@ -30,13 +30,7 @@
 ✅ `naming-rules.en.md`
 ✅ `naming-rules.ru.md`
 
-Неправильно
-
-❌ `File Naming Rules.en.md`
-❌ `fileNamingRules.en.md`
-❌ `файл-именования.en.md`
-❌ `naming-rules.md`
-❌ `naming-rules.EN.md`
+Неправильные примеры не приведены: вариантов нарушения слишком много.
 
 ### 2.2. Папки
 
@@ -46,8 +40,4 @@
 ✅ `docs`
 ✅ `my-project`
 
-Неправильно
-
-❌ `MyFolder`
-❌ `my_folder`
-❌ `папка`
+Неправильные примеры не приведены: вариантов нарушения слишком много.
