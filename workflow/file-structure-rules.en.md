@@ -11,24 +11,40 @@ Universal structure rules for Markdown documents in a project
 connected to the Manifest framework.
 
 ## 1. General file structure rules
-1.1. Each line of a file must not be longer than 100 characters.
 
-1.2. Line description format (universal template):
+### 1.1. Line length
+Each line of a file must not be longer than 100 characters.
+
+### 1.2. Line description format
 
 ```
 Description: type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
   level=<...|—>, template=<...|—>, value=<...|—>, length=<...|—>
 ```
 
-Template fields:
-- `type` — line kind: heading, metadata, text.
-- `purpose` — what the line represents (file title, status, version).
-- `line` — line number in the real document.
-- `required` — whether the line is required in the document: yes / no.
-- `level` — hierarchy level (headings only; otherwise —).
-- `template` — line pattern; <...> — placeholder value; otherwise —.
-- `value` — allowed value: free, one of the list, fixed; otherwise —.
-- `length` — length recommendation: up to N words / up to M chars; otherwise —.
+### 1.3. Type
+The line kind: heading, metadata, text.
+
+### 1.4. Purpose
+What the line represents (file title, status, version).
+
+### 1.5. Line
+Line number in the real document.
+
+### 1.6. Required
+Whether the line is required in the document: yes / no.
+
+### 1.7. Level
+Hierarchy level (headings only; otherwise —).
+
+### 1.8. Template
+Line pattern; <...> — placeholder value; otherwise —.
+
+### 1.9. Value
+Allowed value: free, one of the list, fixed; otherwise —.
+
+### 1.10. Length
+Length recommendation: up to N words / up to M chars; otherwise —.
 Skip marker: — (field not applicable to this line).
 
 ## 2. Document header description
