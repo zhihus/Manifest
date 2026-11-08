@@ -21,12 +21,14 @@ Under each line, a line description is required according to the template.
 ## 2. General file structure rules
 
 ### 2.1. Line length
+```text title="Description"
 Each line of a file must not be longer than 100 characters.
+```
 
 ### 2.2. Universal line description format
 
-```
-Description: type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
+```text title="Description"
+type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
   level=<...|—>, template=<...|—>, value=<...|—>, length=<...|—>
 Fields marked with "—" are skipped: the field does not apply to this line.
 ```
@@ -84,77 +86,75 @@ Length recommendation: up to N words / up to M chars; otherwise —.
 
 ### 3.1. File title
 
-```
-# <heading name>
-Description: type=heading, purpose=file title, line=1, required=yes,
-  level=1, template=# <heading name>, value=free, length=up to 5 words / up to 35 chars.
+```text title="Description"
+type=heading, purpose=file title, line=1, required=yes,
+  level=1, template=<# <heading name>>, value=free, length=up to 5 words / up to 35 chars.
 ```
 
 ### 3.2. Metadata block
 
-```
-# Metadata
-Description: type=heading, purpose=metadata block, line=3, required=yes,
-  level=1, template=# <metadata name>, value=Metadata, length=—
+```text title="Description"
+type=heading, purpose=metadata block, line=3, required=yes,
+  level=1, template=<# <metadata name>>, value=Metadata, length=—
 Metadata value changes are described in the `file-metadata-change-rules.en.md` document.
 ```
 
 ### 3.3. Status
 
-```
+```text title="Description"
 > **Status: draft**
-Description: type=metadata, purpose=status, line=5, required=yes,
+type=metadata, purpose=status, line=5, required=yes,
   level=—, template=> **<name>: <value>**, value=one of the list, length=—
 Value list (extensible): draft — in development, approved — approved, archived — archived
 ```
 
 ### 3.4. Type
 
-```
+```text title="Description"
 > **Type: document**
-Description: type=metadata, purpose=file type, line=6, required=yes,
+type=metadata, purpose=file type, line=6, required=yes,
   level=—, template=> **<name>: <value>**, value=one of the list, length=—
 Value list (extensible): document — Markdown document
 ```
 
 ### 3.5. Version
 
-```
+```text title="Description"
 > **Version: 1.0.0**
-Description: type=metadata, purpose=version, line=7, required=yes,
+type=metadata, purpose=version, line=7, required=yes,
   level=—, template=> **<name>: <value>**, value=X.Y.Z, length=—
 ```
 
 ### 3.6. Date
 
-```
+```text title="Description"
 > **Updated: 2026-11-07**
-Description: type=metadata, purpose=date, line=8, required=yes,
+type=metadata, purpose=date, line=8, required=yes,
   level=—, template=> **<name>: <value>**, value=ISO YYYY-MM-DD, length=—
 ```
 
 ### 3.7. Description section
 
-```
+```text title="Description"
 # Description
-Description: type=heading, purpose=description section, line=10, required=yes,
+type=heading, purpose=description section, line=10, required=yes,
   level=1, template=# <description name>, value=Description, length=—
 Structure rules for Markdown documents in a project connected to the Manifest framework.
 ```
 
 ### 3.8. Description text
 
-```
+```text title="Description"
 A short paragraph describing the essence of the document
-Description: type=text, purpose=description, line=11, required=no,
+type=text, purpose=description, line=11, required=no,
   level=—, template=—, value=free, length=up to 20 words / up to 100 chars.
 ```
 
 ### 3.9. Section heading
 
-```
+```text title="Description"
 ## 1. <section title>
-Description: type=heading, purpose=section, line=13, required=yes,
+type=heading, purpose=section, line=13, required=yes,
   level=2, template=## <section title>, value=free, length=up to 5 words / up to 35 chars.
 ```
 
