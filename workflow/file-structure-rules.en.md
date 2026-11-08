@@ -18,6 +18,8 @@ Description: heading, of the description section, level 1, line 10; value: Descr
 Structure rules for Markdown documents in a project connected to the Manifest framework.
 8.A short paragraph describing the essence of the document
 Description: text, description, line 11, length recommendation: up to 20 words, up to 100 characters
+9.## 1. <section title>
+Description: heading, section, level 2, line 13, length recommendation: up to 5 words, up to 35 characters; value: <section title>
 
 ## 1. Section numbering
 
