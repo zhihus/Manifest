@@ -16,7 +16,7 @@ Description: metadata, date, line 8, template: > **<name>: <value>** ; value: da
 7.# Description
 Description: heading, of the description section, level 1, line 10; value: Description
 Structure rules for Markdown documents in a project connected to the Manifest framework.
-8.A short paragraph describing the document
+8.A short paragraph describing the essence of the document
 Description: text, description, line 11, length recommendation: up to 20 words, up to 100 characters
 
 ## 1. Type
