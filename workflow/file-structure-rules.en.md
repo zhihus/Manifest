@@ -1,7 +1,7 @@
 1.# File Structure Rules
-Description: heading, reflecting the file content, level 1, line 1, starts with #
+Description: heading, reflecting the file content, level 1, line 1, value: <title>
 2.# Metadata
-Description: heading, of the metadata block, level 1, line 3, starts with #
+Description: heading, of the metadata block, level 1, line 3, value: Metadata
 3.> **Status: draft**
 Description: metadata, status, line 5, template: > **<name>: <value>**
 Value: one of the list
@@ -17,7 +17,7 @@ Value: three-component number X.Y.Z, where X — major, Y — minor, Z — patch
 Description: metadata, date, line 8, template: > **<name>: <value>**
 Value: date in ISO format YYYY-MM-DD
 7.# Description
-Description: heading, of the description section, level 1, line 10, starts with #
+Description: heading, of the description section, level 1, line 10, value: Description
 8.A short paragraph describing the document
 Description: text, description, line 11
 
