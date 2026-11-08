@@ -28,7 +28,7 @@ Each line of a file must not be longer than 100 characters.
 ```
 Description: type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
   level=<...|—>, template=<...|—>, value=<...|—>, length=<...|—>
-Fields marked with — are skipped: the field does not apply to this line.
+Fields marked with "—" are skipped: the field does not apply to this line.
 ```
 
 ### 2.3. Type
