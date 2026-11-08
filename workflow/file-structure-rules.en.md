@@ -10,73 +10,79 @@
 Universal structure rules for Markdown documents in a project
 connected to the Manifest framework.
 
-## 1. General file structure rules
+## 1. Rules for this file only
 
-### 1.1. Rules for this file only
+### 1.1. Line description rule
 
-### 1.1. Line length
+```
+Under each line, a line description is required according to the template.
+```
+
+## 2. General file structure rules
+
+### 2.1. Line length
 Each line of a file must not be longer than 100 characters.
 
-### 1.2. Line description format
+### 2.2. Universal line description format
 
 ```
 Description: type=<...>, purpose=<...>, line=<N>, required=<yes|no>,
   level=<...|—>, template=<...|—>, value=<...|—>, length=<...|—>
+Fields marked with — are skipped: the field does not apply to this line.
 ```
 
-### 1.3. Type
+### 2.3. Type
 
 ```
 The line kind: heading, metadata, text.
 ```
 
-### 1.4. Purpose
+### 2.4. Purpose
 
 ```
 What the line represents (file title, status, version).
 ```
 
-### 1.5. Line
+### 2.5. Line
 
 ```
 Line number in the real document.
 ```
 
-### 1.6. Required
+### 2.6. Required
 
 ```
 Whether the line is required in the document: yes / no.
 ```
 
-### 1.7. Level
+### 2.7. Level
 
 ```
 Hierarchy level (headings only; otherwise —).
 ```
 
-### 1.8. Template
+### 2.8. Template
 
 ```
 Line pattern; <...> — placeholder value; otherwise —.
 ```
 
-### 1.9. Value
+### 2.9. Value
 
 ```
 Allowed value: free, one of the list, fixed; otherwise —.
 ```
 
-### 1.10. Length
+### 2.10. Length
 
 ```
 Length recommendation: up to N words / up to M chars; otherwise —.
-Skip marker: — (field not applicable to this line).
 ```
 
 
-## 2. Document header description
+## 3. Document header description
 
-### 2.1. File title
+### 3.1. File title
 
 ```
 # <heading name>
@@ -84,7 +90,7 @@ Description: type=heading, purpose=file title, line=1, required=yes,
   level=1, template=# <heading name>, value=free, length=up to 5 words / up to 35 chars.
 ```
 
-### 2.2. Metadata block
+### 3.2. Metadata block
 
 ```
 # Metadata
@@ -93,7 +99,7 @@ Description: type=heading, purpose=metadata block, line=3, required=yes,
 Metadata value changes are described in the `file-metadata-change-rules.en.md` document.
 ```
 
-### 2.3. Status
+### 3.3. Status
 
 ```
 > **Status: draft**
@@ -102,7 +108,7 @@ Description: type=metadata, purpose=status, line=5, required=yes,
 Value list (extensible): draft — in development, approved — approved, archived — archived
 ```
 
-### 2.4. Type
+### 3.4. Type
 
 ```
 > **Type: document**
@@ -111,7 +117,7 @@ Description: type=metadata, purpose=file type, line=6, required=yes,
 Value list (extensible): document — Markdown document
 ```
 
-### 2.5. Version
+### 3.5. Version
 
 ```
 > **Version: 1.0.0**
@@ -119,7 +125,7 @@ Description: type=metadata, purpose=version, line=7, required=yes,
   level=—, template=> **<name>: <value>**, value=X.Y.Z, length=—
 ```
 
-### 2.6. Date
+### 3.6. Date
 
 ```
 > **Updated: 2026-11-07**
@@ -127,7 +133,7 @@ Description: type=metadata, purpose=date, line=8, required=yes,
   level=—, template=> **<name>: <value>**, value=ISO YYYY-MM-DD, length=—
 ```
 
-### 2.7. Description section
+### 3.7. Description section
 
 ```
 # Description
@@ -136,7 +142,7 @@ Description: type=heading, purpose=description section, line=10, required=yes,
 Structure rules for Markdown documents in a project connected to the Manifest framework.
 ```
 
-### 2.8. Description text
+### 3.8. Description text
 
 ```
 A short paragraph describing the essence of the document
@@ -144,7 +150,7 @@ Description: type=text, purpose=description, line=11, required=no,
   level=—, template=—, value=free, length=up to 20 words / up to 100 chars.
 ```
 
-### 2.9. Section heading
+### 3.9. Section heading
 
 ```
 ## 1. <section title>
