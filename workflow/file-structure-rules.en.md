@@ -1,11 +1,14 @@
 ```
 1.# <heading name>
-Description: heading, file title, level 1, line 1, length recommendation: up to 5 words, up to 35 characters; template: <# <heading name>>
+Description: heading, file title, level 1, line 1,
+  length recommendation: up to 5 words, up to 35 characters;
+  template: <# <heading name>>
 ```
 
 ```
 2.# Metadata
-Description: heading, of the metadata block, level 1, line 3; template: <# <metadata name>>; <metadata name> = "Metadata".
+Description: heading, of the metadata block, level 1, line 3;
+  template: <# <metadata name>>; <metadata name> = "Metadata".
 Metadata value changes are described in the `file-metadata-change-rules.en.md` document.
 ```
 
@@ -23,17 +26,23 @@ Value list (extensible): document — Markdown document
 
 ```
 5.> **Version: 1.0.0**
-Description: metadata, version, line 7, template: > **<name>: <value>** ; value: three-component number X.Y.Z, where X — major, Y — minor, Z — patch
+Description: metadata, version, line 7,
+  template: > **<name>: <value>** ;
+  value: three-component number X.Y.Z, where X — major,
+  Y — minor, Z — patch
 ```
 
 ```
 6.> **Updated: 2026-11-07**
-Description: metadata, date, line 8, template: > **<name>: <value>** ; value: date in ISO format YYYY-MM-DD
+Description: metadata, date, line 8,
+  template: > **<name>: <value>** ;
+  value: date in ISO format YYYY-MM-DD
 ```
 
 ```
 7.# Description
-Description: heading, of the description section, level 1, line 10; template: <# <description name>>; <description name> = "Description".
+Description: heading, of the description section, level 1, line 10;
+  template: <# <description name>>; <description name> = "Description".
 Structure rules for Markdown documents in a project connected to the Manifest framework.
 ```
 
@@ -44,7 +53,9 @@ Description: text, description, line 11, length recommendation: up to 20 words, 
 
 ```
 9.## 1. <section title>
-Description: heading, section, level 2, line 13, length recommendation: up to 5 words, up to 35 characters; value: <section title>
+Description: heading, section, level 2, line 13,
+  length recommendation: up to 5 words, up to 35 characters;
+  value: <section title>
 ```
 
 ## 1. Section numbering
