@@ -41,3 +41,19 @@
 ✅ `my-project`
 
 Неправильные примеры не приведены: вариантов нарушения слишком много.
+
+### 2.3. Структура целиком
+
+```
+my-project/
+  workflow/
+    naming-rules.en.md
+    naming-rules.ru.md
+    file-structure-rules.en.md
+    file-structure-rules.ru.md
+  docs/
+    plans/
+      project-plan.en.md
+```
+
+Правила в примере: папки в kebab-case, файлы с суффиксом языка.
