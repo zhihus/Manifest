@@ -17,6 +17,9 @@ Description: heading, of the description section, level 1, line 10, value: Descr
 8.A short paragraph describing the document
 Description: text, description, line 11
 
+# Description
+Structure rules for Markdown documents in a project connected to the Manifest framework.
+
 ## 1. Metadata block
 
 * The metadata block is located in the header of the document, under the
