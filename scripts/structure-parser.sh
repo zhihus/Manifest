@@ -32,7 +32,8 @@ classify_line() {
       CLASS+=("heading"); continue
     fi
     if [[ "$line" == '>'*' '** ]]; then CLASS+=("metadata"); continue; fi
-    if [[ "$line" == 'Правильно' || "$line" == 'Неправильно' ]]; then
+    if [[ "$line" == 'Правильно' || "$line" == 'Неправильно' \
+          || "$line" == 'Correct' || "$line" == 'Incorrect' ]]; then
       CLASS+=("label"); continue
     fi
     if [[ "$line" == '✅'* || "$line" == '❌'* ]]; then
@@ -46,27 +47,36 @@ classify_line() {
 check_regions() {
   local i n=${#ORIG[@]} inbody=0 infooter=0
   if (( n < 10 )); then
-    VIOL+=("$FILE:$n: regions: document must have at least 10 header lines")
+    VIOL+=("$FILE:$n: regions: в документе меньше 10 строк шапки / document must have at least 10 header lines")
     return
   fi
   # header region: structural landmarks on fixed lines (1-based)
-  [[ "${ORIG[0]%$'\r'}" == '#'*' '* ]] || VIOL+=("$FILE:1: regions: line 1 must be a level-1 title heading")
-  [[ "${ORIG[2]%$'\r'}" == '# Метаданные' ]] || VIOL+=("$FILE:3: regions: line 3 must be '# Метаданные'")
+  [[ "${ORIG[0]%$'\r'}" == '#'*' '* ]] || \
+    VIOL+=("$FILE:1: regions: строка 1 должна быть заголовком уровня 1 / line 1 must be a level-1 title heading")
+  case "${ORIG[2]%$'\r'}" in
+    '# Метаданные'|'# Metadata') : ;;
+    *) VIOL+=("$FILE:3: regions: строка 3 должна быть '# Метаданные' / line 3 must be '# Метаданные' / '# Metadata'") ;;
+  esac
   for i in 3 4 5 6; do
-    [[ "${CLASS[i]}" == "metadata" ]] || VIOL+=("$FILE:$((i+1)): regions: line $((i+1)) must be a metadata line")
+    [[ "${CLASS[i]}" == "metadata" ]] || \
+      VIOL+=("$FILE:$((i+1)): regions: строка $((i+1)) должна быть строкой метаданных / line $((i+1)) must be a metadata line")
   done
-  [[ "${ORIG[8]%$'\r'}" == '# Описание' ]] || VIOL+=("$FILE:9: regions: line 9 must be '# Описание'")
-  [[ "${CLASS[9]}" != "blank" ]] || VIOL+=("$FILE:10: regions: line 10 must be non-empty description text")
+  case "${ORIG[8]%$'\r'}" in
+    '# Описание'|'# Description') : ;;
+    *) VIOL+=("$FILE:9: regions: строка 9 должна быть '# Описание' / line 9 must be '# Описание' / '# Description'") ;;
+  esac
+  [[ "${CLASS[9]}" != "blank" ]] || \
+    VIOL+=("$FILE:10: regions: строка 10 должна быть непустым текстом описания / line 10 must be non-empty description text")
   # numbered ## sections after the header: body, then Примеры = footer
   for ((i=10; i<n; i++)); do
     [[ "${CLASS[i]}" == "fence" ]] && continue
     local line="${ORIG[i]%$'\r'}"
     [[ "$line" == '## '* ]] || continue
-    if [[ "$line" == '## '*Примеры* ]]; then
+    if [[ "$line" == '## '*Примеры* || "$line" == '## '*Examples* ]]; then
       infooter=1; continue
     fi
     if (( infooter )); then
-      VIOL+=("$FILE:$((i+1)): regions: numbered section inside the footer region")
+      VIOL+=("$FILE:$((i+1)): regions: нумерованный раздел внутри подвала / numbered section inside the footer region")
     else
       inbody=1
     fi
@@ -76,12 +86,12 @@ check_regions() {
 # --- parse_args: exactly one file argument ---
 parse_args() {
   if [[ $# -lt 1 ]]; then
-    echo "Usage: structure-parser.sh <file.md>" >&2
+    echo "Использование / Usage: structure-parser.sh <file.md>" >&2
     exit 2
   fi
   FILE="$1"
   if [[ ! -f "$FILE" ]]; then
-    echo "ERROR: file does not exist: $FILE" >&2
+    echo "ОШИБКА: файл не существует / ERROR: file does not exist: $FILE" >&2
     exit 2
   fi
 }
@@ -101,7 +111,7 @@ check_line_length() {
   local i
   for i in "${!LEN[@]}"; do
     if (( LEN[i] > 100 )); then
-      VIOL+=("$FILE:$((i+1)): line-length: line is ${LEN[i]} characters (limit 100)")
+      VIOL+=("$FILE:$((i+1)): line-length: строка содержит ${LEN[i]} символов (лимит 100) / line is ${LEN[i]} characters (limit 100)")
     fi
   done
 }
@@ -123,7 +133,7 @@ check_labels() {
     fi
     if [[ "$c" == "example" ]]; then
       if [[ -z "$lastlabel" ]]; then
-        VIOL+=("$FILE:$((i+1)): labels: example line has no preceding Правильно/Неправильно label")
+        VIOL+=("$FILE:$((i+1)): labels: строка примера без метки Правильно/Неправильно (Correct/Incorrect) / example line has no preceding Правильно/Неправильно label")
       fi
       continue
     fi
@@ -133,7 +143,7 @@ check_labels() {
     local line="${ORIG[i]%$'\r'}"
     [[ "${CLASS[i]}" == "heading" ]] || continue
     if [[ "$line" == *'Неправильные'* || "$line" == *'Правильные'* ]]; then
-      VIOL+=("$FILE:$((i+1)): labels: label must be plain text, not a heading: $line")
+      VIOL+=("$FILE:$((i+1)): labels: метка должна быть текстом, не заголовком / label must be plain text, not a heading: $line")
     fi
   done
 }
@@ -148,7 +158,7 @@ check_examples() {
     local line="${ORIG[i]%$'\r'}"
     if [[ "${CLASS[i]}" == "example" ]]; then
       if [[ "$line" != '✅'* && "$line" != '❌'* ]]; then
-        VIOL+=("$FILE:$((i+1)): examples: example line must start with ✅ or ❌")
+        VIOL+=("$FILE:$((i+1)): examples: строка примера должна начинаться с ✅ или ❌ / example line must start with ✅ or ❌")
       fi
     fi
   done
@@ -161,7 +171,7 @@ check_logical_lines() {
   for i in 3 4 5 6; do
     (( i < n )) || return
     [[ "${CLASS[i]}" == "blank" ]] && \
-      VIOL+=("$FILE:$((i+1)): logical-lines: blank line inside the metadata block (rule 2.4)")
+      VIOL+=("$FILE:$((i+1)): logical-lines: пустая строка внутри блока метаданных (правило 2.4) / blank line inside the metadata block (rule 2.4)")
   done
   # a heading continued on the next physical line is a violation
   for ((i=0; i<n; i++)); do
@@ -171,7 +181,7 @@ check_logical_lines() {
     if [[ "${CLASS[i]}" == "heading" ]] && (( i+1 < n )) \
        && [[ "${CLASS[i+1]}" == "other" ]] \
        && [[ "${ORIG[i]%$'\r'}" =~ ^#{2,6}[[:space:]] ]]; then
-      VIOL+=("$FILE:$((i+2)): logical-lines: heading continues on the next line (rule 2.4)")
+      VIOL+=("$FILE:$((i+2)): logical-lines: заголовок продолжается на следующей строке (правило 2.4) / heading continues on the next line (rule 2.4)")
     fi
   done
   # wrapped description (lines 10+) and wrapped body text are one
@@ -187,16 +197,17 @@ check_header() {
   local words
   words=$(wc -w <<< "$title")
   if (( ${#title} > 35 || words > 5 )); then
-    VIOL+=("$FILE:1: header: title exceeds 5 words / 35 characters (rule 3.1)")
+    VIOL+=("$FILE:1: header: заголовок длиннее 5 слов или 35 символов / title exceeds 5 words or 35 characters (rule 3.1)")
   fi
   for i in 3 4 5 6; do
     local line="${ORIG[i]%$'\r'}"
     if [[ "$line" == '>'*' '** ]]; then
-      [[ "$line" == *'  ' ]] || VIOL+=("$FILE:$((i+1)): header: metadata line lacks two trailing spaces (template 3.3-3.6)")
+      [[ "$line" == *'  ' ]] || \
+        VIOL+=("$FILE:$((i+1)): header: нет двух завершающих пробелов / metadata line lacks two trailing spaces (template 3.3-3.6)")
     fi
   done
   [[ -n "${ORIG[9]%$'\r'}" ]] || \
-    VIOL+=("$FILE:10: header: description text is empty (rule 3.8)")
+    VIOL+=("$FILE:10: header: текст описания пуст / description text is empty (rule 3.8)")
 }
 
 # --- check_metadata_values: values per 3.3-3.6 ---
@@ -205,16 +216,16 @@ check_metadata_values() {
   (( n >= 7 )) || return
   line="${ORIG[3]%$'\r'}"
   [[ "$line" =~ ^\>\ \*\*Status:\ (draft|approved|archived)\*\*[[:space:]]{2}$ ]] || \
-    VIOL+=("$FILE:4: metadata-values: Status must be draft, approved or archived (rule 3.3)")
+    VIOL+=("$FILE:4: metadata-values: Status должен быть draft, approved или archived / Status must be draft, approved or archived (rule 3.3)")
   line="${ORIG[4]%$'\r'}"
   [[ "$line" =~ ^\>\ \*\*Type:\ document\*\*[[:space:]]{2}$ ]] || \
-    VIOL+=("$FILE:5: metadata-values: Type must be document (rule 3.4)")
+    VIOL+=("$FILE:5: metadata-values: Type должен быть document / Type must be document (rule 3.4)")
   line="${ORIG[5]%$'\r'}"
   [[ "$line" =~ ^\>\ \*\*Version:\ [0-9]+\.[0-9]+\.[0-9]+\*\*[[:space:]]{2}$ ]] || \
-    VIOL+=("$FILE:6: metadata-values: Version must match X.Y.Z (rule 3.5)")
+    VIOL+=("$FILE:6: metadata-values: Version должна соответствовать X.Y.Z / Version must match X.Y.Z (rule 3.5)")
   line="${ORIG[6]%$'\r'}"
   [[ "$line" =~ ^\>\ \*\*Updated:\ [0-9]{4}-[0-9]{2}-[0-9]{2}\*\*[[:space:]]{2}$ ]] || \
-    VIOL+=("$FILE:7: metadata-values: Updated must match ISO YYYY-MM-DD (rule 3.6)")
+    VIOL+=("$FILE:7: metadata-values: Updated должна соответствовать ISO YYYY-MM-DD / Updated must match ISO YYYY-MM-DD (rule 3.6)")
 }
 
 # --- check_heading_numbering: hierarchy and continuity per 2.3 ---
@@ -231,7 +242,7 @@ check_heading_numbering() {
     if (( inheader )) && [[ ! "$line" =~ ^##[[:space:]] ]]; then
       # level-1 headings are allowed only in the header (lines 1-10)
       if (( i+1 > 10 )) && [[ "$line" =~ ^#[[:space:]] ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: level-1 heading outside the header region (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: заголовок уровня 1 вне региона шапки / level-1 heading outside the header region (rule 2.3)")
       fi
       continue
     fi
@@ -246,14 +257,14 @@ check_heading_numbering() {
     if (( lvl == 2 )); then
       num="${num%%.*}"
       if [[ ! "$num" =~ ^[0-9]+$ ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: heading number missing or malformed (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.3)")
         continue
       fi
       if [[ -n "${SECT[$num]:-}" ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: duplicate section number $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер раздела $num / duplicate section number $num (rule 2.3)")
       fi
       if (( SECT_LAST > 0 && num != SECT_LAST + 1 )); then
-        VIOL+=("$FILE:$((i+1)): numbering: section numbering gap: expected $((SECT_LAST+1)), got $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации разделов: ожидался $((SECT_LAST+1)), получен $num / section numbering gap: expected $((SECT_LAST+1)), got $num (rule 2.3)")
       fi
       SECT[$num]=1; SECT_LAST=$num; SUB_LAST=0
     else
@@ -262,17 +273,17 @@ check_heading_numbering() {
       local m="${num#*.}"                # strip N.
       m="${m%%.*}"                       # take M (drop .K if present)
       if [[ ! "$s" =~ ^[0-9]+$ || ! "$m" =~ ^[0-9]+$ ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: heading number missing or malformed (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.3)")
         continue
       fi
       if (( lvl == 4 )); then
         continue
       fi
       if [[ -n "${SUB[$num]:-}" ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: duplicate subsection number $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер подраздела $num / duplicate subsection number $num (rule 2.3)")
       fi
       if (( s == SECT_LAST && SUB_LAST > 0 && m != SUB_LAST + 1 )); then
-        VIOL+=("$FILE:$((i+1)): numbering: subsection numbering gap: expected $s.$((SUB_LAST+1)), got $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации подразделов: ожидался $s.$((SUB_LAST+1)), получен $num / subsection numbering gap: expected $s.$((SUB_LAST+1)), got $num (rule 2.3)")
       fi
       SUB[$num]=1; SUB_LAST=$m
     fi
@@ -285,7 +296,7 @@ check_heading_length() {
   for ((i=0; i<n; i++)); do
     [[ "${CLASS[i]}" == "heading" ]] || continue
     if (( LEN[i] > 100 )); then
-      VIOL+=("$FILE:$((i+1)): heading-length: heading is ${LEN[i]} characters (rule 4.1)")
+      VIOL+=("$FILE:$((i+1)): heading-length: заголовок содержит ${LEN[i]} символов / heading is ${LEN[i]} characters (rule 4.1)")
     fi
     if (( i+1 < n )) && [[ "${CLASS[i+1]}" == "other" ]] \
        && [[ "${ORIG[i]%$'\r'}" =~ ^#{2,6}[[:space:]] ]]; then
