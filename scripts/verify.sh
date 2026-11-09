@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 # Manifest framework — verify script.
+# DEVELOPMENT INFRASTRUCTURE OF THE MANIFEST PROJECT ITSELF.
+# NOT part of the framework distribution: do NOT ship this file (or
+# scripts/hooks/) in manifest-init dist/ — connected projects get
+# their own verification setup.
 # Keeps the structure parser in sync with the structure rules source.
 # The parser is a derivative of the rules file: it changes only when
 # the source changes (a parser bug fix is allowed, but must pass the

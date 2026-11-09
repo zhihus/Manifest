@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Manifest pre-commit: runs scripts/verify.sh and passes its result on.
 # All checks live in verify.sh; this file only triggers it.
+# DEVELOPMENT INFRASTRUCTURE OF THE MANIFEST PROJECT ITSELF — NOT part
+# of the framework distribution; do NOT ship in manifest-init dist/.
 ROOT="$(git rev-parse --show-toplevel)"
 bash "$ROOT/scripts/verify.sh"

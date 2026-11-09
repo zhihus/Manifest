@@ -23,8 +23,12 @@ needed because memory cannot be relied upon.
   fix, allowed) → parser tests; only rules changed → FAIL "update
   the parser and commit both together"; rules + parser → parser
   tests.
-- Out of scope: delivery of verify.sh/parsser into connected
-  projects (manifest-init `dist/`) — a separate change.
+- Out of scope: delivery of verify.sh/parser into connected projects
+  (manifest-init `dist/`) — a separate change. Moreover, verify.sh
+  and `scripts/hooks/` are development infrastructure of the
+  Manifest project itself and MUST be excluded from any framework
+  distribution build; connected projects do not share this
+  rules/structure setup.
 
 ## Capabilities
 

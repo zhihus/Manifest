@@ -28,6 +28,10 @@ Entry point: `AGENTS.md`
   Roadmap (planned work, not yet implemented):
   `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
+* `scripts/` — development infrastructure of the Manifest project
+  itself (structure parser, verify script, pre-commit hook). NOT
+  part of the framework distribution: never ship it in
+  manifest-init `dist/`; connected projects do not use these files.
 
 ## Build
 
