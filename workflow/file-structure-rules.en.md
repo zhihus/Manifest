@@ -77,7 +77,26 @@ Level 2 (##) — body sections; cannot be a subsection.
 Levels 3+ (###, ####) — subsections of a section (body or footer).
 ```
 
-### 2.4. Universal line description format
+### 2.4. Logical line
+
+```
+Description:
+A logical line may span several physical lines: the wrap is part of
+the same line, not a separate line.
+Headings do not wrap: a heading is always one physical line.
+Lines allowed to wrap: description text (3.8), text under a heading
+(4.2), example lines (5.5).
+```
+
+### 2.5. Blank lines
+
+```
+Description:
+Blank lines are visual separators; they do not participate in line
+descriptions and are ignored by algorithms.
+```
+
+### 2.6. Universal line description format
 
 ```
 Description:
@@ -92,21 +111,21 @@ Fields marked with "—" are skipped: the field does not apply to this line.
 Unicode symbol: ✅ — correct, ❌ — incorrect.
 ```
 
-### 2.5. Purpose
+### 2.7. Purpose
 
 ```
 Description:
 What the line represents (file title, status, version).
 ```
 
-### 2.6. Number
+### 2.8. Number
 
 ```
 Description:
 Line number in the document.
 ```
 
-### 2.7. Required
+### 2.9. Required
 
 ```
 Description:
@@ -116,49 +135,49 @@ subsections are also optional. A required section may contain
 optional subsections.
 ```
 
-### 2.8. Hierarchy level
+### 2.10. Hierarchy level
 
 ```
 Description:
 Headings only.
 ```
 
-### 2.9. Template
+### 2.11. Template
 
 ```
 Description:
 Line pattern; <...> — placeholder value.
 ```
 
-### 2.10. Format
+### 2.12. Format
 
 ```
 Description:
 Line format: ISO YYYY-MM-DD, X.Y.Z, —.
 ```
 
-### 2.11. Value kind
+### 2.13. Value kind
 
 ```
 Description:
 Value kind: free, one of the list, fixed.
 ```
 
-### 2.12. Length
+### 2.14. Length
 
 ```
 Description:
 Length recommendation: up to N words / up to M chars.
 ```
 
-### 2.13. Count
+### 2.15. Count
 
 ```
 Description:
 How many such lines are allowed: 1, unlimited.
 ```
 
-### 2.14. Unicode symbol
+### 2.16. Unicode symbol
 
 ```
 Description:
@@ -166,7 +185,7 @@ Unicode symbol in the line: ✅ — correct, ❌ — incorrect.
 — — no symbol in the line.
 ```
 
-### 2.15. Note
+### 2.17. Note
 
 ```
 Description:
@@ -174,7 +193,7 @@ Additional context of the line that is not expressed by other
 fields; — — no note.
 ```
 
-### 2.16. Region
+### 2.18. Region
 
 ```
 Description:
@@ -184,7 +203,6 @@ Body — numbered sections.
 Footer — the "Examples" section.
 — — region not applicable.
 ```
-
 
 ## 3. Document header description
 
@@ -273,8 +291,9 @@ Description:
 purpose=description, line=10, required=yes,
   level=—, template=—, format=—,
   value kind=free, values=—,
-  length=up to 20 words / up to 100 chars., count=1, unicode symbol=—,
-  list=—, note=—, region=header
+  length=up to 20 words / up to 100 chars., count=1 logical line,
+  unicode symbol=—, list=—,
+  note=wraps, see 2.4, region=header
 ```
 
 ## 4. Document body description
@@ -302,7 +321,8 @@ purpose=text under a heading, line=<N>, required=yes,
   length=up to 50 words / up to 300 chars., count=unlimited,
   unicode symbol=—, list=—,
   note=the rule does not fit in one line;
-  heading is short (2–3 words) with a number, region=body
+  heading is short (2–3 words) with a number;
+  wraps, see 2.4, region=body
 ```
 
 ## 5. Examples description
@@ -362,7 +382,7 @@ purpose=example, line=<N>, required=no,
   level=—, template=<✅ | ❌ <example>>, format=—,
   value kind=free, values=—, length=—,
   count=unlimited, unicode symbol=✅ | ❌,
-  list=—, note=—, region=footer
+  list=—, note=a long example wraps, see 2.4, region=footer
 Example lines are bound to the nearest preceding label.
 ```
 
@@ -374,3 +394,59 @@ The correct example — the whole file `workflow/naming-rules.en.md`
 in full, enclosed in a code block. The insertion is performed
 when the structure file is approved (Status → approved).
 No incorrect examples are provided.
+
+```
+# File and Directory Naming Rules
+
+# Metadata
+> **Status: approved**  
+> **Type: document**  
+> **Version: 1.0.0**  
+> **Updated: 2026-11-07**  
+
+# Description
+Universal naming rules for files and directories in a project connected
+to the Manifest framework.
+
+## 1. Rules
+
+### 1.1. Names in English only.
+
+### 1.2. kebab-case, lowercase, hyphen-separated, no spaces.
+
+### 1.3. Language suffix
+
+A file name (not a directory) always carries a language suffix — an
+ISO 639-1 code in lowercase: `en`, `ru`.
+
+## 2. Examples
+
+### 2.1. Files
+
+Correct
+
+✅ `naming-rules.en.md`
+✅ `naming-rules.ru.md`
+
+Incorrect
+
+❌ `File Naming Rules.en.md`
+❌ `fileNamingRules.en.md`
+❌ `файл-именования.en.md`
+❌ `naming-rules.md`
+❌ `naming-rules.EN.md`
+
+### 2.2. Directories
+
+Correct
+
+✅ `workflow`
+✅ `docs`
+✅ `my-project`
+
+Incorrect
+
+❌ `MyFolder`
+❌ `my_folder`
+❌ `папка`
+```

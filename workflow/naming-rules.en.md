@@ -1,10 +1,10 @@
 # File and Directory Naming Rules
 
 # Metadata
-> **Status: approved**
-> **Type: document**
-> **Version: 1.0.0**
-> **Updated: 2026-11-07**
+> **Status: approved**  
+> **Type: document**  
+> **Version: 1.0.0**  
+> **Updated: 2026-11-07**  
 
 # Description
 Universal naming rules for files and directories in a project connected
@@ -12,16 +12,18 @@ to the Manifest framework.
 
 ## 1. Rules
 
-1.1. Names in English only.
+### 1.1. Names in English only.
 
-1.2. kebab-case, lowercase, hyphen-separated, no spaces.
+### 1.2. kebab-case, lowercase, hyphen-separated, no spaces.
 
-1.3. A file name (not a directory name) always carries a language
-    suffix: `en`, or any other at the user's request.
+### 1.3. Language suffix
+
+A file name (not a directory) always carries a language suffix — an
+ISO 639-1 code in lowercase: `en`, `ru`.
 
 ## 2. Examples
 
-2.1. Files
+### 2.1. Files
 
 Correct
 
@@ -36,7 +38,7 @@ Incorrect
 ❌ `naming-rules.md`
 ❌ `naming-rules.EN.md`
 
-2.2. Directories
+### 2.2. Directories
 
 Correct
 
