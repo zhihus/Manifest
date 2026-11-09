@@ -2,7 +2,7 @@
 
 ## 1. Structure rules cleanup
 
-- [ ] FR 1.1 Cleanup structure rules file
+- [x] FR 1.1 Cleanup structure rules file
 
   Edit `workflow/file-structure-rules.ru.md`:
   1. Remove the double blank line before `## 3. Описание шапки
