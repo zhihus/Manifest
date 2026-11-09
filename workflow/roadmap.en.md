@@ -45,3 +45,11 @@ Validates the commit message per `commit-rules.md`.
   blockquotes);
 * where to record the model's obligations (commit, verification) —
   in `AGENTS.md` or in the rule files.
+
+### 1.6. Distribution build — exclusions
+
+manifest-init `dist/` must not contain the Manifest's
+`scripts/verify.sh` and `scripts/hooks/`: they are the project's own
+dev infrastructure, not the framework. The future change that fills
+`dist/` must include an acceptance scenario: `dist/` contains none
+of these files.
