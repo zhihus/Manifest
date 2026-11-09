@@ -129,7 +129,7 @@
 
 ## 5. Heavy verification
 
-- [ ] FR 5.1 Run reference and negative verification
+- [x] FR 5.1 Run reference and negative verification
 
   Create fixture `temp/parser-fixture-negative.md` seeded with five
   violations: 101-char line, `## 1.` then `## 3.` gap,
