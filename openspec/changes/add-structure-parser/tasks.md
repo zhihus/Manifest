@@ -22,7 +22,7 @@
 
 ## 2. Parser skeleton and line basics
 
-- [ ] FR 2.1 Add parser skeleton with CLI and report
+- [x] FR 2.1 Add parser skeleton with CLI and report
 
   Create `scripts/structure-parser.sh` with `#!/usr/bin/env bash`,
   `set -euo pipefail`, header comment modeled on manifest-init's
@@ -41,7 +41,7 @@
   Maps to scenarios: missing argument, non-existent file, clean
   reference file.
 
-- [ ] FR 2.2 Add line length check
+- [x] FR 2.2 Add line length check
 
   In `scripts/structure-parser.sh` add `check_line_length`: for each
   loaded line with length >100 (after `\r` strip) buffer violation
