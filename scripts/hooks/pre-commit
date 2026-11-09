@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Manifest pre-commit: runs scripts/verify.sh and passes its result on.
+# All checks live in verify.sh; this file only triggers it.
+ROOT="$(git rev-parse --show-toplevel)"
+bash "$ROOT/scripts/verify.sh"

@@ -27,7 +27,7 @@
   Maps to scenarios: clean tree, missing parser, rules changed
   without parser, rules and parser changed together.
 
-- [ ] FR 1.2 Add pre-commit hook and activate it
+- [x] FR 1.2 Add pre-commit hook and activate it
 
   Create `scripts/hooks/pre-commit` (~5 lines with a comment: resolve
   root via `git rev-parse --show-toplevel`, run
