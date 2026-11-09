@@ -24,6 +24,7 @@ Entry point: `AGENTS.md`
   metadata block (version, date, type, status):
   `workflow/file-metadata-change-rules.en.md`. Manifest
   workflow rules: `workflow/manifest-workflow-rules.en.md`.
+  Commit message rules: `workflow/commit-rules.en.md`.
   Roadmap (planned work, not yet implemented):
   `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
