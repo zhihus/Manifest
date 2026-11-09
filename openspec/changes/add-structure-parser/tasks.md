@@ -54,7 +54,7 @@
 
 ## 3. Classification-dependent checks
 
-- [ ] FR 3.1 Add line classification and region check
+- [x] FR 3.1 Add line classification and region check
 
   Add `classify_line`: assign each line one class — blank, heading
   (level = count of leading `#`), metadata (starts `> **`), code-fence
@@ -70,7 +70,7 @@
   missing exits 1 citing the region rule.
   Maps to scenarios: clean reference file, negative fixture.
 
-- [ ] FR 3.2 Add label and example checks
+- [x] FR 3.2 Add label and example checks
 
   Add `check_labels` (a label must be a plain text line, not a
   heading; any example line requires a preceding Правильно/Неправильно
@@ -83,7 +83,7 @@
   both violations (label format, example without label).
   Maps to scenarios: label as heading, example without label.
 
-- [ ] FR 3.3 Add logical line check
+- [x] FR 3.3 Add logical line check
 
   Add `check_logical_lines`: a run of non-blank lines under a heading
   is one logical line until a blank line; a blank line inside
@@ -97,7 +97,7 @@
 
 ## 4. Header and numbering checks
 
-- [ ] FR 4.1 Add header and metadata value checks
+- [x] FR 4.1 Add header and metadata value checks
 
   Add `check_header`: line 1 is a title up to 5 words / 35 chars;
   line 3 is `# Метаданные`; lines 4-7 are Status/Type/Version/Updated
@@ -113,7 +113,7 @@
   Maps to scenarios: status outside the list, version not X.Y.Z,
   metadata line without hard break.
 
-- [ ] FR 4.2 Add heading numbering and length checks
+- [x] FR 4.2 Add heading numbering and length checks
 
   Add `check_heading_numbering` (hierarchy N. → N.M. → N.M.K.; numbers
   continuous across body and footer; `#` headings only in header
