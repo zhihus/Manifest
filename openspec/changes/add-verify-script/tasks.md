@@ -37,7 +37,7 @@
   exits 0; `git config core.hooksPath` prints `scripts/hooks`.
   Maps to scenarios: blocked commit, passing commit.
 
-- [ ] FR 1.3 Verify hook end-to-end
+- [x] FR 1.3 Verify hook end-to-end
 
   Mechanical verification, one run:
   1. `git commit` attempt with a temporary rules-only edit staged →
