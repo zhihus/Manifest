@@ -24,10 +24,11 @@ Sub-projects:
 - `handy/dictation-scrubber/` — **separate project** since 2026-11-05:
   `C:\WorkProjects\handy-dictation-scrubber\` (history exported from
   this repo via subtree split). Do not edit it here.
-- **Skills** — **separate project** since 2026-11-05:
-  `C:\WorkProjects\skills\` (history exported from this repo via
-  filter-repo). Contains `compress-context` and
-  `compress-context-benchmark`. Do not edit them here.
+- **Skills** — `C:\WorkProjects\skills\` is a plain shared folder
+  (no git of its own) since 2026-11-10. Each subfolder is an
+  independent project with its own repository (`compress-context`,
+  `compress-context-benchmark`, `eval-analyze`, …). Do not edit them
+  here; work inside the respective project folder.
 - **context-files-guard** — **separate project** since 2026-11-05:
   `C:\WorkProjects\context-files-guard\` (change `add-context-files-guard`
   exported from `openspec/changes/` via subtree split). Do not edit it here.

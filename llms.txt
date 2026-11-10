@@ -48,8 +48,10 @@ No build step; runs from source.
 
 ## Sub-projects
 
-* **Skills** — **separate project**: `C:\WorkProjects\skills\`
-  (compress-context, compress-context-benchmark). Do not edit here.
+* **Skills** — shared folder (no git of its own): `C:\WorkProjects\skills\`.
+  Each subfolder is an independent project with its own repository
+  (compress-context, compress-context-benchmark, eval-analyze, …).
+  Do not edit here.
 * **context-files-guard** — **separate project**: `C:\WorkProjects\context-files-guard\`
   (the add-context-files-guard change). Do not edit here.
 * `handy-dictation-scrubber/` — **separate project**: `C:\WorkProjects\handy-dictation-scrubber\`.
