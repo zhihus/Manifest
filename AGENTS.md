@@ -51,6 +51,8 @@ in any language. English takes priority.
 * OpenSpec tasks: `openspec-rules.md`
 * Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
 * Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
+* Line length: in final English documents, keep every line ≤ 100
+  characters; Russian working drafts have no length limit.
 
 **Templates.** Templates in `docs/templates/` are source material for new
 projects, not live documents. They are listed in `.llmignore` — do not read

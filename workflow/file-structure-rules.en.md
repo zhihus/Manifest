@@ -4,7 +4,7 @@
 > **Status: draft**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-09**  
+> **Updated: 2026-11-10**  
 
 # Description
 Universal structure rules for Markdown documents in a project
@@ -54,15 +54,7 @@ Description:
 File structure is built on the Markdown standard.
 ```
 
-### 2.2. Line length
-```
-Description:
-Each line of a file must not be longer than 100 characters.
-The limit is controlled in the English (final) file; the Russian
-file is a working reference, where length limits are not controlled.
-```
-
-### 2.3. Section numbering
+### 2.2. Section numbering
 
 ```
 Description:
@@ -77,7 +69,7 @@ Level 2 (##) — body sections; cannot be a subsection.
 Levels 3+ (###, ####) — subsections of a section (body or footer).
 ```
 
-### 2.4. Logical line
+### 2.3. Logical line
 
 ```
 Description:
@@ -88,7 +80,7 @@ Lines allowed to wrap: description text (3.8), text under a heading
 (4.2), example lines (5.5).
 ```
 
-### 2.5. Blank lines
+### 2.4. Blank lines
 
 ```
 Description:
@@ -96,7 +88,7 @@ Blank lines are visual separators; they do not participate in line
 descriptions and are ignored by algorithms.
 ```
 
-### 2.6. Universal line description format
+### 2.5. Universal line description format
 
 ```
 Description:
@@ -111,21 +103,21 @@ Fields marked with "—" are skipped: the field does not apply to this line.
 Unicode symbol: ✅ — correct, ❌ — incorrect.
 ```
 
-### 2.7. Purpose
+### 2.6. Purpose
 
 ```
 Description:
 What the line represents (file title, status, version).
 ```
 
-### 2.8. Number
+### 2.7. Number
 
 ```
 Description:
 Line number in the document.
 ```
 
-### 2.9. Required
+### 2.8. Required
 
 ```
 Description:
@@ -135,49 +127,49 @@ subsections are also optional. A required section may contain
 optional subsections.
 ```
 
-### 2.10. Hierarchy level
+### 2.9. Hierarchy level
 
 ```
 Description:
 Headings only.
 ```
 
-### 2.11. Template
+### 2.10. Template
 
 ```
 Description:
 Line pattern; <...> — placeholder value.
 ```
 
-### 2.12. Format
+### 2.11. Format
 
 ```
 Description:
 Line format: ISO YYYY-MM-DD, X.Y.Z, —.
 ```
 
-### 2.13. Value kind
+### 2.12. Value kind
 
 ```
 Description:
 Value kind: free, one of the list, fixed.
 ```
 
-### 2.14. Length
+### 2.13. Length
 
 ```
 Description:
 Length recommendation: up to N words / up to M chars.
 ```
 
-### 2.15. Count
+### 2.14. Count
 
 ```
 Description:
 How many such lines are allowed: 1, unlimited.
 ```
 
-### 2.16. Unicode symbol
+### 2.15. Unicode symbol
 
 ```
 Description:
@@ -185,7 +177,7 @@ Unicode symbol in the line: ✅ — correct, ❌ — incorrect.
 — — no symbol in the line.
 ```
 
-### 2.17. Note
+### 2.16. Note
 
 ```
 Description:
@@ -193,7 +185,7 @@ Additional context of the line that is not expressed by other
 fields; — — no note.
 ```
 
-### 2.18. Region
+### 2.17. Region
 
 ```
 Description:
@@ -293,7 +285,7 @@ purpose=description, line=10, required=yes,
   value kind=free, values=—,
   length=up to 20 words / up to 100 chars., count=1 logical line,
   unicode symbol=—, list=—,
-  note=wraps, see 2.4, region=header
+  note=wraps, see 2.3, region=header
 ```
 
 ## 4. Document body description
@@ -322,7 +314,7 @@ purpose=text under a heading, line=<N>, required=yes,
   unicode symbol=—, list=—,
   note=the rule does not fit in one line;
   heading is short (2–3 words) with a number;
-  wraps, see 2.4, region=body
+  wraps, see 2.3, region=body
 ```
 
 ## 5. Examples description
@@ -382,18 +374,13 @@ purpose=example, line=<N>, required=no,
   level=—, template=<✅ | ❌ <example>>, format=—,
   value kind=free, values=—, length=—,
   count=unlimited, unicode symbol=✅ | ❌,
-  list=—, note=a long example wraps, see 2.4, region=footer
+  list=—, note=a long example wraps, see 2.3, region=footer
 Example lines are bound to the nearest preceding label.
 ```
 
 ## 6. Examples
 
 ### 6.1. Correct
-
-The correct example — the whole file `workflow/naming-rules.en.md`
-in full, enclosed in a code block. The insertion is performed
-when the structure file is approved (Status → approved).
-No incorrect examples are provided.
 
 ```
 # File and Directory Naming Rules

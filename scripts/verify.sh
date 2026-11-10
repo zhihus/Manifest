@@ -48,10 +48,11 @@ run_parser_tests() {
       awk 'NR<=10 {print "  " $0}' /tmp/verify-ref-out.txt
     fi
   done
-  local tmp
-  tmp=$(mktemp -d)
-  trap 'rm -rf "$tmp"' EXIT
-  python - "$tmp" > /dev/null <<'EOF'
+  # tmp must survive until the EXIT trap fires, so a script-global
+  # variable is used; a function-local one is out of scope by then.
+  VERIFY_TMP=$(mktemp -d)
+  trap 'rm -rf "$VERIFY_TMP"' EXIT
+  python - "$VERIFY_TMP" > /dev/null <<'EOF'
 import sys
 fixture = (
     "# T" + "e" * 140 + "\n"
@@ -75,7 +76,7 @@ fixture = (
 )
 open(sys.argv[1] + "/fixture.md", "w", encoding="utf-8", newline="\n").write(fixture)
 EOF
-  if bash "$ROOT/$PARSER" "$tmp/fixture.md" > /dev/null 2>&1; then
+  if bash "$ROOT/$PARSER" "$VERIFY_TMP/fixture.md" > /dev/null 2>&1; then
     rc=1
     fail "парсер не нашёл заложенные нарушения / parser missed the seeded violations"
   fi

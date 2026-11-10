@@ -106,16 +106,6 @@ load_lines() {
   done < "$FILE"
 }
 
-# --- check_line_length: 100-char limit per line ---
-check_line_length() {
-  local i
-  for i in "${!LEN[@]}"; do
-    if (( LEN[i] > 100 )); then
-      VIOL+=("$FILE:$((i+1)): line-length: строка содержит ${LEN[i]} символов (лимит 100) / line is ${LEN[i]} characters (limit 100)")
-    fi
-  done
-}
-
 # --- check_labels: labels are text, examples need a preceding label ---
 check_labels() {
   local i n=${#ORIG[@]} infence=0 lastlabel="" lastlabelhead=0
@@ -164,14 +154,14 @@ check_examples() {
   done
 }
 
-# --- check_logical_lines: multi-line logical strings per rule 2.4 ---
+# --- check_logical_lines: multi-line logical strings per rule 2.3 ---
 check_logical_lines() {
   local i n=${#ORIG[@]} infence=0
   # blank line inside metadata lines 4-7 (1-based) is a violation
   for i in 3 4 5 6; do
     (( i < n )) || return
     [[ "${CLASS[i]}" == "blank" ]] && \
-      VIOL+=("$FILE:$((i+1)): logical-lines: пустая строка внутри блока метаданных (правило 2.4) / blank line inside the metadata block (rule 2.4)")
+      VIOL+=("$FILE:$((i+1)): logical-lines: пустая строка внутри блока метаданных (правило 2.3) / blank line inside the metadata block (rule 2.3)")
   done
   # a heading continued on the next physical line is a violation
   for ((i=0; i<n; i++)); do
@@ -181,7 +171,7 @@ check_logical_lines() {
     if [[ "${CLASS[i]}" == "heading" ]] && (( i+1 < n )) \
        && [[ "${CLASS[i+1]}" == "other" ]] \
        && [[ "${ORIG[i]%$'\r'}" =~ ^#{2,6}[[:space:]] ]]; then
-      VIOL+=("$FILE:$((i+2)): logical-lines: заголовок продолжается на следующей строке (правило 2.4) / heading continues on the next line (rule 2.4)")
+       VIOL+=("$FILE:$((i+2)): logical-lines: заголовок продолжается на следующей строке (правило 2.3) / heading continues on the next line (rule 2.3)")
     fi
   done
   # wrapped description (lines 10+) and wrapped body text are one
@@ -242,7 +232,7 @@ check_heading_numbering() {
     if (( inheader )) && [[ ! "$line" =~ ^##[[:space:]] ]]; then
       # level-1 headings are allowed only in the header (lines 1-10)
       if (( i+1 > 10 )) && [[ "$line" =~ ^#[[:space:]] ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: заголовок уровня 1 вне региона шапки / level-1 heading outside the header region (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: заголовок уровня 1 вне региона шапки / level-1 heading outside the header region (rule 2.2)")
       fi
       continue
     fi
@@ -257,14 +247,14 @@ check_heading_numbering() {
     if (( lvl == 2 )); then
       num="${num%%.*}"
       if [[ ! "$num" =~ ^[0-9]+$ ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.2)")
         continue
       fi
       if [[ -n "${SECT[$num]:-}" ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер раздела $num / duplicate section number $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер раздела $num / duplicate section number $num (rule 2.2)")
       fi
       if (( SECT_LAST > 0 && num != SECT_LAST + 1 )); then
-        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации разделов: ожидался $((SECT_LAST+1)), получен $num / section numbering gap: expected $((SECT_LAST+1)), got $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации разделов: ожидался $((SECT_LAST+1)), получен $num / section numbering gap: expected $((SECT_LAST+1)), got $num (rule 2.2)")
       fi
       SECT[$num]=1; SECT_LAST=$num; SUB_LAST=0
     else
@@ -273,17 +263,17 @@ check_heading_numbering() {
       local m="${num#*.}"                # strip N.
       m="${m%%.*}"                       # take M (drop .K if present)
       if [[ ! "$s" =~ ^[0-9]+$ || ! "$m" =~ ^[0-9]+$ ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: номер заголовка отсутствует или неверен / heading number missing or malformed (rule 2.2)")
         continue
       fi
       if (( lvl == 4 )); then
         continue
       fi
       if [[ -n "${SUB[$num]:-}" ]]; then
-        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер подраздела $num / duplicate subsection number $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: дублирующийся номер подраздела $num / duplicate subsection number $num (rule 2.2)")
       fi
       if (( s == SECT_LAST && SUB_LAST > 0 && m != SUB_LAST + 1 )); then
-        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации подразделов: ожидался $s.$((SUB_LAST+1)), получен $num / subsection numbering gap: expected $s.$((SUB_LAST+1)), got $num (rule 2.3)")
+        VIOL+=("$FILE:$((i+1)): numbering: пропуск нумерации подразделов: ожидался $s.$((SUB_LAST+1)), получен $num / subsection numbering gap: expected $s.$((SUB_LAST+1)), got $num (rule 2.2)")
       fi
       SUB[$num]=1; SUB_LAST=$m
     fi
@@ -319,7 +309,6 @@ main() {
   parse_args "$@"
   load_lines
   classify_line
-  check_line_length
   check_regions
   check_labels
   check_examples

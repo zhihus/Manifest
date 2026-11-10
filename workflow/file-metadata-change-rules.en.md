@@ -45,17 +45,13 @@ not change the version.
 
 ### 3.1. The file type: `> **Type: document**`.
 
-### 3.2. Rules for changing the type are not provided.
-
 ## 4. Status
 
-### 4.1. The document status changes at the user's request.
+### 4.1. The document status changes only at the user's request.
 
-### 4.2. Automatic status change is not provided.
+### 4.2. The agent changes the status only where a process explicitly allows it.
 
-### 4.3. The agent changes the status only where a process explicitly allows it.
-
-### 4.4. The status value is one word from the list in `file-structure-rules.en.md`, sec. 3.3.
+### 4.3. The status value is one word from the list in `file-structure-rules.en.md`, sec. 3.3.
 
 ## 5. Examples
 
