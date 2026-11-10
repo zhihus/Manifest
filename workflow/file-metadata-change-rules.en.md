@@ -3,8 +3,8 @@
 # Metadata
 > **Status: approved**  
 > **Type: document**  
-> **Version: 1.0.1**  
-> **Updated: 2026-11-09**  
+> **Version: 1.0.2**  
+> **Updated: 2026-11-10**  
 
 # Description
 Rules for changing the metadata block of a document file in a project
@@ -55,7 +55,7 @@ not change the version.
 
 ### 4.3. The agent changes the status only where a process explicitly allows it.
 
-### 4.4. The status value is exactly one word. Nothing else is added to the status line.
+### 4.4. The status value is one word from the list in `file-structure-rules.en.md`, sec. 3.3.
 
 ## 5. Examples
 
