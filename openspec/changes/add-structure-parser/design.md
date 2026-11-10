@@ -74,4 +74,4 @@ planned section 6). Rollback: delete `scripts/structure-parser.sh`.
 ## Open Questions
 
 None — MVP scope, language, and verification fixtures are agreed in
-`docs/plans/structure-parser-plan.en.md`.
+`docs/plans/archive/structure-parser-plan.en.md`.

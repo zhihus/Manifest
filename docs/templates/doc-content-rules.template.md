@@ -1,7 +1,8 @@
 # CONTENT_RULES.md
 
 > **In development since 2026-11-02.**
-> Git workflow for documentation projects is unresolved (stage-3, Unresolved question #1).
+> Git workflow for documentation projects is unresolved (see
+> `docs/plans/archive/plan-project-structure-head-subprojects-stage-3.en.md`, Unresolved question #1).
 > This template is a stub until all points are complete.
 
 ## Rules
