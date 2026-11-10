@@ -4,7 +4,7 @@
 > **Status: draft**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-09**  
+> **Updated: 2026-11-10**  
 
 # Description
 Universal commit message rules for a project connected to the Manifest
@@ -17,7 +17,7 @@ framework.
 ### 1.2. Subject
 
 English, imperative mood, lowercase, singular, no trailing period;
-target length up to 50 characters, not a hard limit.
+not a hard limit — up to 50 characters.
 
 ### 1.3. Type list
 
