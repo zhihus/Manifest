@@ -95,7 +95,12 @@ main() {
       exit 0
       ;;
     rules)
-      fail "правила структуры изменены, но $PARSER не обновлён — обнови парсер и коммить оба файла вместе / the structure rules changed but $PARSER was not updated — update the parser and commit both files together"
+      fail "структурные правила изменены, парсер — нет. Действия агента (хук умеет только печатать текст; решение принимает агент):
+  (a) приведи scripts/structure-parser.sh в соответствие с workflow/file-structure-rules.ru.md и коммить оба файла вместе; ИЛИ
+  (b) если изменение правил не требует правки парсера — запроси у пользователя разрешение на коммит с --no-verify стандартными средствами харнесса (permission request). Без явного разрешения пользователя обход гейта запрещён.
+  / structure rules changed, parser not updated. Agent actions (this hook can only print text; the agent decides):
+  (a) bring scripts/structure-parser.sh in line with workflow/file-structure-rules.ru.md and commit both files together; OR
+  (b) if the rules change requires no parser change, ask the user for permission to commit with --no-verify via the harness's standard permission-request mechanism. Bypassing the gate without explicit user permission is forbidden."
       ;;
     parser|both)
       run_parser_tests || true

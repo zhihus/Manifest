@@ -2,7 +2,7 @@
 
 ## 1. Instruction block in verify.sh
 
-- [ ] FR 1.1 Replace the hard-fail message in the `rules` branch of
+- [x] FR 1.1 Replace the hard-fail message in the `rules` branch of
   `main()` in `scripts/verify.sh` with an action-required instruction
   block that: names both files (`workflow/file-structure-rules.ru.md`,
   `scripts/structure-parser.sh`); lists path (a) update the parser to
@@ -19,7 +19,7 @@
 
 ## 2. Verification
 
-- [ ] FR 2.1 Verify all three gate paths end-to-end and commit:
+- [x] FR 2.1 Verified 2026-11-10: (1) nothing changed → `verify.sh: OK`, exit 0; (2) rules changed, parser untouched → instruction block with both paths and `--no-verify`, exit 1; (3) both changed, parser passes references and fixture → `verify.sh: OK`, exit 0. Original task: Verify all three gate paths end-to-end and commit:
   (1) rules changed, parser untouched → instruction block, exit 1;
   (2) rules and parser changed together, parser passes references and
   fixture → `verify.sh: OK`, exit 0; (3) nothing changed → `verify.sh:
