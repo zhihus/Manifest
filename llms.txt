@@ -25,6 +25,12 @@ Entry point: `AGENTS.md`
   `workflow/file-metadata-change-rules.en.md`. Manifest
   workflow rules: `workflow/manifest-workflow-rules.en.md`.
   Commit message rules: `workflow/commit-rules.en.md`.
+  temp/ folder rules:
+  `workflow/temp-folder-rules.ru.md`. Project agent file
+  (`agent-rules`): `workflow/agent-rules.ru.md`; accumulator draft
+  with the full agent content material:
+  `workflow/agent-rules-draft.ru.md`. Registry of connected
+  projects: `workflow/connected-projects.md`.
   Roadmap (planned work, not yet implemented):
   `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
