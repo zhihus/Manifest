@@ -2,7 +2,7 @@
 
 ## 1. Rules and agent files
 
-- [ ] FR 1.1 Create temp folder rules
+- [x] FR 1.1 Create temp folder rules
 
   Create `workflow/temp-folder-rules.ru.md` per
   `workflow/file-structure-rules.ru.md` (metadata header: Status
@@ -21,7 +21,7 @@
   Maps to scenarios: correct placement, agent must not clean up,
   deletion needed, subagent knows the rule.
 
-- [ ] FR 1.2 Create the agent file
+- [x] FR 1.2 Create the agent file
 
   Create `workflow/agent-rules.ru.md` — plain structure modeled on
   `docs/templates/agents.template.md` (NO metadata header, NO
@@ -40,7 +40,7 @@
   Maps to scenarios: file shape, first release content, empty block
   on fresh init, substance-only transfer, name.
 
-- [ ] FR 1.3 Create the agent file accumulator draft
+- [x] FR 1.3 Create the agent file accumulator draft
 
   Create `workflow/agent-rules-draft.ru.md` — a free-form accumulator
   (no structure-rules header required) collecting everything known
@@ -63,7 +63,7 @@
 
 ## 2. Delivery and registration
 
-- [ ] FR 2.1 Wire the temp block into subagent definitions
+- [x] FR 2.1 Wire the temp block into subagent definitions
 
   Edit the four user-level subagent definitions
   (`C:/Users/<user>/.zcode/agents/coder.md`, `doccer.md`,
@@ -75,7 +75,7 @@
   verbatim block text.
   Maps to scenarios: subagent knows the rule.
 
-- [ ] FR 2.2 Register files and create the registry
+- [x] FR 2.2 Register files and create the registry
 
   1. Add entries for `temp-folder-rules`, `agent-rules` and
      `connected-projects` to `llms.txt` following its existing
@@ -94,7 +94,7 @@
 
 ## 3. Verification
 
-- [ ] FR 3.1 Verify structure and registration
+- [x] FR 3.1 Verify structure and registration
 
   Run `bash scripts/verify.sh` in the Manifest project — must pass;
   run `bash scripts/structure-parser.sh` on
