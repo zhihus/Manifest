@@ -28,3 +28,15 @@ project gets its `path` updated.
 ## 2. Entries
 
 *(none yet)*
+
+- name: vstrecha-raytec
+  path: C:/WorkProjects/vstrecha-raytec
+  connected: 2026-11-12
+  version: 1.0.0
+  status: active
+
+- name: test-unica-project
+  path: C:/WorkProjects/test-unica-project
+  connected: 2026-11-13
+  version: 1.0.0
+  status: active
