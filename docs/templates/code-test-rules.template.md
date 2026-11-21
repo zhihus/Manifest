@@ -6,7 +6,7 @@ Define reliable, isolated and repeatable tests that verify behaviour.
 
 ## Rules
 
-* **TDD** — write a test before implementation. No test → no code.
+* **TDD** — write a test before implementation. No test → no code. Tests are prepared by the **Tester** role before implementation starts (TEST FIRST); the implementer never edits tests prepared by the Tester — a failing test is a bug in the implementation.
 * **Isolation** — one test verifies one behaviour; tests must be isolated and repeatable.
 * **Priority** — cover critical paths first: happy path, edge cases and error conditions.
 * **Coverage** — cover all public APIs and critical business logic; target ≥80% for core modules unless project-specific requirements differ.
