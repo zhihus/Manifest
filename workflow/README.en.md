@@ -3,12 +3,16 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.0.0**  
-> **Updated: 2026-11-09**  
+> **Version: 1.1.0**  
+> **Updated: 2026-11-21**  
 
 # Description
 Process for working with LLM agents on the OpenSpec pipeline; task
 rules live in `openspec-rules.md`.
+
+Sequential execution is a Manifest rule: agents run one at a time,
+no parallel dispatch (analysis, implementation, verification alike);
+one global task per project at a time.
 
 ## 1. Roles
 
@@ -20,7 +24,8 @@ gates the transition to the next step. This preserves the core invariant:
 
 | Step | Artifact | Agent | Input → Output |
 |---|---|---|---|
-| — | pipeline state | Orchestrator | runs steps, gates transitions |
+| — | pipeline state | Orchestrator (always GLM-5.3 Flash) | runs steps, gates transitions |
+| 0 | task in Todoing | Analyst | user's Backlog work → approved task, "To Do" |
 | 1 | proposal.md | Analyst | user's words → "why / what" |
 | 2 | spec.md | Analyst | proposal → scenarios, edge cases, PBT |
 | 3 | design.md | Architect | proposal + spec → solution (optional) |
@@ -30,8 +35,13 @@ gates the transition to the next step. This preserves the core invariant:
 | 6 | verify.md | Reviewer | artifacts + spec → ✅/❌ report |
 | 7 | archive | Orchestrator | verify all ✅ → specs updated |
 
-Each role runs in its own agent session (subagent run). The Orchestrator may
-combine roles across different changes but never within one deliverable.
+Each role runs in its own agent session (subagent run); the same model
+may serve different roles, model-per-role assignment is not fixed. The
+Orchestrator may combine roles across different changes but never within
+one deliverable. Reviewer findings go back to the Orchestrator, which
+re-runs the Implementer until findings are fully resolved; blocking
+errors escalate to the user. The mandatory role list lives in
+`architecture-brief.ru.md` §9 (7 roles, incl. Tester and Analyst).
 
 ## 2. The Seven Steps and Gates
 
