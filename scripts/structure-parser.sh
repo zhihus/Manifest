@@ -320,4 +320,47 @@ main() {
   report
 }
 
+# --- directory mode: validate every regular Markdown file ---
+run_directory() {
+  local directory="$1" file count=0 result=0 rc
+  if [[ ! -d "$directory" || ! -r "$directory" ]]; then
+    echo "ОШИБКА: каталог недоступен / ERROR: directory is not accessible: $directory" >&2
+    return 2
+  fi
+  while IFS= read -r -d '' file; do
+    count=$((count + 1))
+    if "$SCRIPT_PATH" "$file"; then
+      :
+    else
+      rc=$?
+      if (( rc == 2 )); then
+        result=2
+      elif (( rc == 1 && result == 0 )); then
+        result=1
+      fi
+    fi
+  done < <(find "$directory" -type f -name '*.md' -print0)
+  if (( count == 0 )); then
+    echo "ОШИБКА: Markdown-файлы не найдены / ERROR: no Markdown files found: $directory" >&2
+    return 2
+  fi
+  printf 'Проверено Markdown-файлов / Markdown files checked: %s\\n' "$count"
+  return "$result"
+}
+
+SCRIPT_PATH="$0"
+if [[ "$SCRIPT_PATH" != */* ]]; then
+  SCRIPT_PATH="$(command -v "$SCRIPT_PATH")"
+fi
+SCRIPT_PATH="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)/$(basename "$SCRIPT_PATH")"
+
+if [[ "${1:-}" == "--dir" ]]; then
+  if (( $# != 2 )); then
+    echo "Использование / Usage: structure-parser.sh --dir <directory>" >&2
+    exit 2
+  fi
+  run_directory "$2"
+  exit $?
+fi
+
 main "$@"
