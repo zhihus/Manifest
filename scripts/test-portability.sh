@@ -17,13 +17,9 @@ deny() { printf 'FAIL %s\n' "$1"; FAIL+=("$1"); }
 
 # check_autonomy is sourced from verify.sh: it accepts scope-dir and
 # scripts-dir overrides for fixture testing and appends to FAILS.
-# shellcheck disable=SC1090
+# shellcheck source=verify.sh
+source "$ROOT/scripts/verify.sh"
 FAILS=()
-fail() { FAILS+=("verify.sh: FAIL: $1"); }
-VERIFY_FUNCS=$(sed -n '/^# --- autonomy checks/,/^# --- 4\. main/p' \
-  "$ROOT/scripts/verify.sh" | sed '$d')
-eval "$VERIFY_FUNCS"
-
 run_check() { # run_check <label> <scope-dir> <scripts-dir> <expect:0|1> <pattern>
   local label=$1 scope=$2 scripts=$3 expect=$4 pattern=${5:-}
   FAILS=()
