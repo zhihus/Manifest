@@ -19,10 +19,13 @@ Type: **doc**.
 
 - Register every new sub-project in `llms.txt` with a brief comment.
 
-**Plans.** Plan files live in `docs/plans/`. Plan files are stored compressed;
-compression is done with the compress-context skill. Always read the English
-version (`.en.md`) of a plan. If no English version exists, read the version
-in any language. English takes priority.
+**Plans.** Plan files live in `docs/plans/`. Plan files are stored
+compressed; the agent must perform context compression before storing
+or updating a plan, using an available context-compression skill or
+mechanism of its own choice, and the compression must preserve
+invariants, constraints, and technical values. Always read the English
+version (`.en.md`) of a plan. If no English version exists, read the
+version in any language. English takes priority.
 
 **Rules.**
 
