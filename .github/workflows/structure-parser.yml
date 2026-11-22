@@ -3,8 +3,10 @@ name: Structure Parser
 on:
   pull_request:
     branches: [develop]
-  push:
-    branches: [fr-1.7-structure-parser-extensions]
+    paths:
+      - "scripts/structure-parser.sh"
+      - "scripts/test-structure-parser.sh"
+      - ".github/workflows/structure-parser.yml"
 
 permissions:
   contents: read
