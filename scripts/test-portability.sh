@@ -94,7 +94,8 @@ run_check "undeclared-binary-caught" "$TMP/scope" "$TMP/scripts" 1 "${seed_bin:-
 FAILS=()
 check_autonomy >/dev/null 2>&1
 vout=$(bash "$ROOT/scripts/verify.sh" 2>&1 || true)
-if ((${#FAILS[@]} == 0)) && grep -q 'human review' <<<"$vout"; then
+if ((${#FAILS[@]} == 0)) && grep -q 'human review' <<<"$vout" &&
+   grep -q 'shell dependency usage' <<<"$vout"; then
   note "real-repo-passes"
 else
   deny "real-repo-passes: ${FAILS[*]} / output: $vout"
