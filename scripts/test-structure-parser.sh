@@ -86,6 +86,7 @@ set -e
 if [[ "$status" == 1 ]]; then PASS=$((PASS + 1)); else FAIL=$((FAIL + 1)); fi
 assert_contains "$output" "invalid root.md"
 assert_contains "$output" "invalid nested.md"
+assert_contains "$output" "Markdown files checked: 5"
 
 # A single invalid file still returns 1.
 assert_status 1 "$WORK/input/invalid root.md" >/dev/null
