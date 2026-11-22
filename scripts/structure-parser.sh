@@ -5,7 +5,9 @@
 # rules define WHAT is checked, this script grows with them.
 #
 # Usage: structure-parser.sh <file.md>
+#        structure-parser.sh --dir <directory>
 #   <file.md>  Markdown document to validate
+#   --dir      Recursively validate regular *.md files (no symlink traversal)
 # Exit codes: 0 clean, 1 violations found, 2 usage error.
 set -euo pipefail
 
@@ -327,6 +329,10 @@ run_directory() {
     echo "ОШИБКА: каталог недоступен / ERROR: directory is not accessible: $directory" >&2
     return 2
   fi
+  directory="$(cd "$directory" 2>/dev/null && pwd)" || {
+    echo "ОШИБКА: не удалось открыть каталог / ERROR: cannot enter directory: $directory" >&2
+    return 2
+  }
   while IFS= read -r -d '' file; do
     count=$((count + 1))
     if "$SCRIPT_PATH" "$file"; then
