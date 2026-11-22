@@ -26,6 +26,18 @@ check_existence() {
   [[ -f "$ROOT/$PARSER" ]] || fail "парсер отсутствует / parser missing: $PARSER"
 }
 
+# Parse every project script before executing verification logic. This also
+# catches syntax errors in test scripts and extensionless hooks.
+check_shell_syntax() {
+  local f
+  for f in "$ROOT"/scripts/*.sh "$ROOT"/scripts/hooks/*; do
+    [[ -f $f ]] || continue
+    if ! bash -n "$f"; then
+      fail "shell syntax invalid: ${f#"$ROOT"/}"
+    fi
+  done
+}
+
 # --- 2. changed-set analysis: four branches against HEAD ---
 # returns: "none" | "parser" | "rules" | "both"
 changed_set() {
@@ -262,6 +274,7 @@ $bad"
 # --- 4. main: branches per the agreed model ---
 main() {
   check_existence
+  check_shell_syntax
   check_autonomy
   echo "verify.sh: human review required for public-file content (unrelated-project mentions outside closed patterns, RU/EN correspondence) and shell dependencies outside the conservative scanner, including platform-specific commands unavailable in PATH"
   local set
