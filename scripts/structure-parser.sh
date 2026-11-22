@@ -324,7 +324,7 @@ main() {
 
 # --- directory mode: validate every regular Markdown file ---
 run_directory() {
-  local directory="$1" file count=0 result=0 rc
+  local directory="$1" file count=0 result=0 rc file_list
   if [[ ! -d "$directory" || ! -r "$directory" ]]; then
     echo "ОШИБКА: каталог недоступен / ERROR: directory is not accessible: $directory" >&2
     return 2
@@ -333,6 +333,15 @@ run_directory() {
     echo "ОШИБКА: не удалось открыть каталог / ERROR: cannot enter directory: $directory" >&2
     return 2
   }
+  file_list="$(mktemp "${TMPDIR:-/tmp}/manifest-structure-parser.XXXXXX")" || {
+    echo "ОШИБКА: не удалось создать временный файл / ERROR: cannot create temporary file" >&2
+    return 2
+  }
+  if ! find "$directory" -type f -name '*.md' -print0 > "$file_list"; then
+    echo "ОШИБКА: обход каталога завершился с ошибкой / ERROR: directory traversal failed: $directory" >&2
+    rm -f "$file_list"
+    return 2
+  fi
   while IFS= read -r -d '' file; do
     count=$((count + 1))
     if "$SCRIPT_PATH" "$file"; then
@@ -345,7 +354,8 @@ run_directory() {
         result=1
       fi
     fi
-  done < <(find "$directory" -type f -name '*.md' -print0)
+  done < "$file_list"
+  rm -f "$file_list"
   if (( count == 0 )); then
     echo "ОШИБКА: Markdown-файлы не найдены / ERROR: no Markdown files found: $directory" >&2
     return 2
