@@ -105,19 +105,24 @@ for cand in python python3 seq unlink; do
 done
 mkdir -p "$TMP/scripts"
 cp "$ROOT/scripts/structure-parser.sh" "$TMP/scripts/" 2>/dev/null
-printf '%s -c "x"\n' "${seed_bin:-python}" >"$TMP/scripts/seeded.sh"
-run_check "undeclared-binary-caught" "$TMP/scope" "$TMP/scripts" 1 "${seed_bin:-python}"
+if [[ -n $seed_bin ]]; then
+  printf '%s -c "x"\n' "$seed_bin" >"$TMP/scripts/seeded.sh"
+  run_check "undeclared-binary-caught" "$TMP/scope" "$TMP/scripts" 1 "$seed_bin"
+else
+  deny "undeclared-binary-caught: no executable candidate available"
+fi
 
 # 9. Real repo: autonomy passes end to end and the human-review
 # routing line appears in verify.sh output.
 FAILS=()
 check_autonomy >/dev/null 2>&1
-vout=$(bash "$ROOT/scripts/verify.sh" 2>&1 || true)
-if ((${#FAILS[@]} == 0)) && grep -q 'human review' <<<"$vout" &&
+vout=$(bash "$ROOT/scripts/verify.sh" 2>&1) && vrc=0 || vrc=$?
+if (("${#FAILS[@]} == 0)) && ((vrc == 0)) &&
+   grep -q 'human review' <<<"$vout" &&
    grep -q 'shell dependency usage' <<<"$vout"; then
   note "real-repo-passes"
 else
-  deny "real-repo-passes: ${FAILS[*]} / output: $vout"
+  deny "real-repo-passes: exit $vrc / ${FAILS[*]} / output: $vout"
 fi
 
 # 10. Registered binary in a seeded script is not flagged.
