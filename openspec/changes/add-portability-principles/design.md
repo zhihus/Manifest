@@ -47,7 +47,7 @@ user (2026-11-22) and recorded in this change.
   distribution of `workflow/` or parts of it — no new decision
   needed). Currently checked (closed list): `AGENTS.md`, `llms.txt`,
   `docs/templates/` (all files), `openspec/specs/` (all files),
-  `docs/manifest.md`, `docs/manifest.compact.md`,
+  `docs/manifest.md`, `docs/manifest.compact.md`, `VERSION`,
   `docs/project-manifest.md`, root rule files (`VERSIONING.md`,
   `commit-rules.md`, `releases.md`, `RELEASES.md`),
   `openspec-rules.md`. Excluded on purpose: `docs/architecture/`
@@ -93,7 +93,7 @@ user (2026-11-22) and recorded in this change.
   Register entries: tool, purpose, scope (which scripts), detection
   method. Initial entries: `git`, `bash`, a SHA-256 tool
   (`sha256sum`, or `shasum -a 256` on macOS — detected at runtime),
-  `perl` (manifest-init template rendering only — documented, not
+  `perl` (manifest-init template rendering only — documented, checked by preflight, not
   replaced), `mktemp`, `awk`, `cmp` (coreutils), `date`, `grep`,
   `sed`. The initial list is illustrative: the binding requirement is
   that every binary invoked by `scripts/*.sh` or hooks under `scripts/hooks/` has an entry (enforced

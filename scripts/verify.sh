@@ -145,7 +145,7 @@ check_autonomy() {
   if [[ -n $scope_dir ]]; then
     while IFS= read -r f; do files+=("$f"); done < <(find "$scope_dir" -type f)
   else
-    while IFS= read -r f; do files+=("$f"); done < <(autonomy_scope)
+    while IFS= read -r f; do files+=("$f"); done < <(autonomy_scope | sort -u)
   fi
   for f in "${files[@]}"; do
     bad=$(grep -n -v "$allow" "$f" 2>/dev/null | grep -iE "$re_machine|$re_home|$re_local|$re_foreign|$re_email" || true)

@@ -9,6 +9,12 @@ Perl used for template rendering stays declared and documented (its
 replacement is out of scope unless a design shows a clear advantage);
 every other tool invoked during install is registered the same way.
 
+#### Scenario: Perl is unavailable
+
+- **WHEN** Perl is missing or cannot execute a trivial program
+- **THEN** preflight fails with an actionable installation message
+- **AND** no project files are written
+
 #### Scenario: Registered render dependency
 
 - **WHEN** the install renders templates with Perl

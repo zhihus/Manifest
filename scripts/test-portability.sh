@@ -107,6 +107,7 @@ run_check "declared-binary-accepted" "$TMP/scope" "$TMP/scripts" 0
 
 scope_listing=$(autonomy_scope)
 if grep -Fxq "$ROOT/docs/manifest.compact.md" <<<"$scope_listing" &&
+   grep -Fxq "$ROOT/VERSION" <<<"$scope_listing" &&
    ! grep -Fq "$ROOT/workflow/universal-comment-rules.en.md" <<<"$scope_listing"; then
   note "current-scope-is-correct"
 else

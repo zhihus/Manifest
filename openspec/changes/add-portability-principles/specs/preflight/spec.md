@@ -2,6 +2,15 @@
 
 ## ADDED Requirements
 
+### Requirement: Perl rendering capability is verified before installation
+The preflight MUST verify that Perl is available and can execute a trivial program before the installer writes project files, because Perl is required by the template renderer.
+
+#### Scenario: Perl is unavailable
+
+- **WHEN** Perl is missing or cannot execute a trivial program
+- **THEN** preflight fails with an actionable reason
+- **AND** no project files are written
+
 ### Requirement: SHA-256 capability is verified portably
 The preflight MUST verify that a working SHA-256 tool is available, without assuming a specific binary name: `sha256sum` or an equivalent such as `shasum -a 256` is accepted, and the detected tool is used consistently for the checksum guard.
 

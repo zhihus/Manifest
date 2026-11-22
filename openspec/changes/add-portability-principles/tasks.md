@@ -29,10 +29,10 @@ Create `docs/architecture/external-dependencies.ru.md` (authoritative)
 and `external-dependencies.en.md`. Entries (tool, purpose, scope,
 detection): `git` (all scripts; PATH), `bash` (interpreter),
 SHA-256 tool (`sha256sum` or `shasum -a 256`, detected; checksum
-guard), `perl` (manifest-init template rendering only; PATH),
+guard), `perl` (manifest-init template rendering only; preflight checks `perl -e 'exit 0'`),
 `mktemp`, `awk`, `cmp`, `date`, `grep`, `sed` (coreutils/shell
 basics where they carry logic). Mark the initial list illustrative:
-the binding rule is that every binary invoked by `scripts/*.sh` has
+the binding rule is that every binary invoked by `scripts/*.sh` or hooks under `scripts/hooks/` has
 an entry. Explicitly note Python was removed and is not a
 dependency. Link the register from `llms.txt` (Directories section,
 one line). Separate commit.
