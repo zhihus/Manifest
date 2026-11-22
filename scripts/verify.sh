@@ -215,6 +215,7 @@ $bad"
   # Split compound commands at shell operators and inspect command positions.
   # Human review remains mandatory for constructs outside this conservative scan.
   local f2 line segment t idx
+  local double_quoted='"[^"]*"' single_quoted="'[^']*'"
   local -a words=()
   local in_case_pattern=0
   for f2 in "${script_files[@]}"; do
@@ -229,8 +230,15 @@ $bad"
         [[ $line == *")"* ]] && in_case_pattern=0
         continue
       fi
-      line=$(printf '%s\n' "$line" |
-        sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g")
+      # Keep the scanner's conservative normalization in Bash: spawning
+      # printf and two sed processes for every source line dominates runtime.
+      line=${line%%#*}
+      while [[ $line =~ $double_quoted ]]; do
+        line=${line/"${BASH_REMATCH[0]}"/}
+      done
+      while [[ $line =~ $single_quoted ]]; do
+        line=${line/"${BASH_REMATCH[0]}"/}
+      done
       line=${line//&&/$'\n'}
       line=${line//||/$'\n'}
       line=${line//;/ $'\n'}
