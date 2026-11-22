@@ -160,12 +160,12 @@ else
 fi
 
 # 14. Avoid GNU-only utility options in scripts intended for macOS.
-if grep -nE 'find .*-(maxdepth|mindepth|quit)([[:space:]]|$)' "$ROOT"/scripts/*.sh; then
+if grep -nE 'find .*-(maxdepth|mindepth|quit)([[:space:]]|$)' "$ROOT"/scripts/*.sh "$ROOT"/scripts/hooks/*; then
   deny "macos-find-options-portable: GNU-only find option found"
 else
   note "macos-find-options-portable"
 fi
-if grep -nE 'head[[:space:]]+-n[[:space:]]+-[0-9]+' "$ROOT"/scripts/*.sh; then
+if grep -nE 'head[[:space:]]+-n[[:space:]]+-[0-9]+' "$ROOT"/scripts/*.sh "$ROOT"/scripts/hooks/*; then
   deny "macos-head-options-portable: GNU-only head option found"
 else
   note "macos-head-options-portable"
