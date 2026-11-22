@@ -3,6 +3,7 @@ docs/manifest.compact.md
 docs/project-manifest.md
 docs/templates/
 *.ru.md
+!docs/architecture/*.ru.md
 test-run-reports/
 temp/
 logs/
