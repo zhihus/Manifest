@@ -52,7 +52,7 @@ analyze_project() {
     -type f \( -name '*.c' -o -name '*.cpp' -o -name '*.cs' -o \
     -name '*.go' -o -name '*.java' -o -name '*.js' -o -name '*.py' -o \
     -name '*.rs' -o -name '*.sh' -o -name '*.ts' \) -print |
-    grep -q . && has_code=1
+    awk 'NR == 1 { found = 1 } END { exit !found }' && has_code=1
   [[ -d $PROJECT/docs ]] && has_docs=1
   if ((has_code && has_docs)); then echo mixed
   elif ((has_code)); then echo code
