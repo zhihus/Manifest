@@ -107,6 +107,31 @@ grep -q -i 'git' <<<"$out" ||
 [[ -e $TMP/nogit/.manifest ]] && { ok=0; FAIL+=("no-git: .manifest created"); }
 ((ok)) && PASS+=("no-git")
 
+# Fixture 5: partial install followed by an integrity failure
+# (bad version.template with an unresolvable placeholder).
+mkdir -p "$TMP/corrupt" && git -C "$TMP/corrupt" init -q
+mkdir -p "$TMP/badtpl"
+cp "$TEMPLATES"/agents.template.md "$TEMPLATES"/llm.template.txt \
+  "$TEMPLATES"/commit-rules.template.md \
+  "$TEMPLATES"/versioning.template.md "$TMP/badtpl/"
+printf '{{UNKNOWN_VAR}}\n' >"$TMP/badtpl/version.template"
+out=$(bash "$INIT" --templates "$TMP/badtpl" --project "$TMP/corrupt" \
+  --project-name demo --tracks code 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -ne 0 ]] || { ok=0; FAIL+=("corrupt: exit $rc, want non-zero"); }
+grep -q 'INSTALL_CORRUPT VERSION' <<<"$out" ||
+  { ok=0; FAIL+=("corrupt: no INSTALL_CORRUPT VERSION"); }
+[[ ! -f $TMP/corrupt/VERSION ]] || { ok=0; FAIL+=("corrupt: VERSION installed"); }
+for f in AGENTS.md llms.txt COMMIT_RULES.md VERSIONING.md; do
+  [[ ! -f $TMP/corrupt/$f ]] ||
+    { ok=0; FAIL+=("corrupt: $f left behind (rollback failed)"); }
+done
+[[ ! -e $TMP/corrupt/.manifest ]] ||
+  { ok=0; FAIL+=("corrupt: .manifest left behind (rollback failed)"); }
+grep -q '== REPORT\|== INSTALLED\|== CONFLICTS' <<<"$out" ||
+  { ok=0; FAIL+=("corrupt: full report not printed"); }
+((ok)) && PASS+=("corrupt")
+
 echo "== RESULTS (${#PASS[@]} passed, ${#FAIL[@]} failed)"
 printf 'PASS %s\n' "${PASS[@]}"
 if ((${#FAIL[@]})); then printf 'FAIL %s\n' "${FAIL[@]}"; fi

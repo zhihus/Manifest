@@ -101,6 +101,16 @@ Constraints from accepted decisions:
     → "Not established." (single line).
   The install verifies no `{{` remains in any installed file; a
   leftover placeholder aborts with `INSTALL_CORRUPT`.
+  Rollback on `INSTALL_CORRUPT` (audit 2026-11-22): the spec requires
+  the corrupt file not to be installed and the run to exit non-zero,
+  but is silent about files installed earlier in the same run. Since
+  preflight refuses re-initialization, leaving them would block any
+  retry; therefore on `INSTALL_CORRUPT` the tool removes the files
+  created by the current run and the `.manifest/` created by it,
+  prints the full report, and exits non-zero. Files that existed
+  before the run (including recorded conflicts) are never touched.
+  This is an implementation-level clarification of D7, not a change
+  to the spec requirements.
 - **D5. Conflict policy: skip and report.** A target file that exists
   is skipped untouched and listed as a conflict in the final report
   and in the exit status; the install is otherwise completed (no

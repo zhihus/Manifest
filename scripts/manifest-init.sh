@@ -170,6 +170,21 @@ render_template() {
     ' "$src" >"$dst"
 }
 
+# INSTALL_CORRUPT handler (design D7 rollback note): the file is not
+# installed, files created by THIS run are removed, pre-existing files
+# are never touched, the full report is printed before exit.
+install_corrupt() {
+  local msg=$1 tmpdir=$2 f
+  echo "INSTALL_CORRUPT $msg"
+  report
+  for f in "${INSTALLED[@]}"; do
+    rm -f "$PROJECT/$f"
+  done
+  rm -rf "$MK" "$tmpdir"
+  echo "INSTALL CORRUPT: files created by this run were removed; pre-existing files untouched"
+  exit 1
+}
+
 install_templates() {
   local i name src rendered
   local tmpdir
@@ -183,22 +198,15 @@ install_templates() {
     fi
     rendered=$tmpdir/$name
     if ! render_template "$src" "$rendered"; then
-      echo "INSTALL_CORRUPT $name (render failed)"
-      rm -rf "$tmpdir"
-      exit 1
+      install_corrupt "$name (render failed)" "$tmpdir"
     fi
     # A file with a leftover placeholder is never installed.
     if grep -q -e '{{' -e '{%' "$rendered"; then
-      echo "INSTALL_CORRUPT $name (unresolved placeholder)"
-      rm -rf "$tmpdir"
-      exit 1
+      install_corrupt "$name (unresolved placeholder)" "$tmpdir"
     fi
     cp "$rendered" "$PROJECT/$name"
-    cmp -s "$rendered" "$PROJECT/$name" || {
-      echo "INSTALL_CORRUPT $name (installed file differs from render)"
-      rm -rf "$tmpdir"
-      exit 1
-    }
+    cmp -s "$rendered" "$PROJECT/$name" ||
+      install_corrupt "$name (installed file differs from render)" "$tmpdir"
     INSTALLED+=("$name")
   done
   rm -rf "$tmpdir"
