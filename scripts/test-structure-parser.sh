@@ -66,7 +66,11 @@ write_valid "$WORK/input/nested folder/special & name.md"
 assert_status 0 "$WORK/input/valid.md" >/dev/null
 
 # Recursive mode discovers root and nested Markdown files, including spaces.
-output="$(assert_status 0 --dir "$WORK/input")"
+set +e
+output="$("$PARSER" --dir "$WORK/input" 2>&1)"
+status=$?
+set -e
+if [[ "$status" == 0 ]]; then PASS=$((PASS + 1)); else FAIL=$((FAIL + 1)); fi
 assert_contains "$output" "Markdown files checked: 3"
 
 # Two independent violations must both be reported in one directory run.
