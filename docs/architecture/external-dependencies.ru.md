@@ -19,13 +19,19 @@
 | `bash` | интерпретатор всех скриптов инфраструктуры | все `scripts/*.sh` | `#!/usr/bin/env bash` |
 | `git` | работа с репозиторием, определение изменённых файлов | verify.sh, structure-parser.sh (косвенно), manifest-init.sh (проверка work tree) | preflight `command -v git` |
 | SHA-256 (`sha256sum` или `shasum -a 256`) | защита конфигурации от перезаписи; байтовые проверки | manifest-init.sh (checksum guard) | детекция при запуске: `sha256sum`, иначе `shasum -a 256`; выбранная утилита используется согласованно |
-| `perl` | рендеринг шаблонов manifest-init (подстановка placeholder'ов и условных блоков) | manifest-init.sh, функция `render_template` | не детектируется отдельно; входит в состав Git for Windows, macOS, Linux |
+| `perl` | рендеринг шаблонов manifest-init (подстановка placeholder'ов и условных блоков) | manifest-init.sh, функция `render_template` | preflight: `command -v perl` и `perl -e 'exit 0'` |
 | `mktemp` | уникальные временные файлы и каталоги (защита от коллизий) | manifest-init.sh, verify.sh | входит в coreutils / Git for Windows / macOS |
 | `awk` | разбор вывода checksum, генерация fixture в verify.sh | manifest-init.sh, verify.sh | входит в базовый состав систем; BSD/GNU совместимость по используемым конструкциям |
 | `cmp` | байтовое сравнение установленных файлов с рендером | manifest-init.sh | coreutils / Git for Windows / macOS |
 | `date` | дата создания конфигурации `created=` | manifest-init.sh (`date +%F`, локаленезависимо) | базовый состав систем |
 | `grep`, `sed` | проверка остаточных placeholder'ов, фильтрация вывода | manifest-init.sh, verify.sh | используются только в переносимых конструкциях (без GNU-only флагов) |
 | `find` | анализ типа проекта (кодовые файлы, docs/) | manifest-init.sh (`analyze_project`) | переносимые флаги |
+| `basename`, `dirname` | извлечение имени проекта и каталога скрипта | manifest-init.sh, test-manifest-init.sh | переносимые системные утилиты |
+| `head`, `wc` | подсчёт и ограничение строк/слов в проверках и тестах | structure-parser.sh, test-manifest-init.sh | переносимые системные утилиты |
+| `sort`, `tr` | сортировка нарушений и обработка токенов/вывода | structure-parser.sh, verify.sh, test-portability.sh | переносимые системные утилиты |
+| `cat` | чтение контрольных файлов в тестах | test-manifest-init.sh | переносимая системная утилита |
+| `chmod` | установка исполняемого бита тестового Perl-stub | test-manifest-init.sh | переносимая системная утилита |
+| `env` | поиск Bash по PATH в shebang | все исполняемые shell-скрипты | системная утилита
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | установка, откат и проверка файлов | manifest-init.sh, test-скрипты | coreutils / Git for Windows |
 
 ## 1. Исключённые зависимости

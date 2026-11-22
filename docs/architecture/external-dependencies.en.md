@@ -19,13 +19,19 @@ this file is its translation.
 | `bash` | interpreter for all infrastructure scripts | all `scripts/*.sh` | `#!/usr/bin/env bash` |
 | `git` | repository operations, changed-file detection | verify.sh, structure-parser.sh (indirect), manifest-init.sh (work-tree check) | preflight `command -v git` |
 | SHA-256 (`sha256sum` or `shasum -a 256`) | config overwrite protection; byte checks | manifest-init.sh (checksum guard) | runtime detection: `sha256sum`, else `shasum -a 256`; the detected tool is used consistently |
-| `perl` | manifest-init template rendering (placeholder and conditional substitution) | manifest-init.sh, `render_template` | not detected separately; shipped with Git for Windows, macOS, Linux |
+| `perl` | manifest-init template rendering (placeholder and conditional substitution) | manifest-init.sh, `render_template` | preflight: `command -v perl` and `perl -e 'exit 0'` |
 | `mktemp` | unique temp files and directories (collision safety) | manifest-init.sh, verify.sh | coreutils / Git for Windows / macOS |
 | `awk` | checksum output parsing, fixture generation in verify.sh | manifest-init.sh, verify.sh | base system install; only portable constructs used |
 | `cmp` | byte comparison of installed files against renders | manifest-init.sh | coreutils / Git for Windows / macOS |
 | `date` | config creation date `created=` | manifest-init.sh (`date +%F`, locale-independent) | base system install |
 | `grep`, `sed` | leftover-placeholder checks, output filtering | manifest-init.sh, verify.sh | portable constructs only (no GNU-only flags) |
 | `find` | project type analysis (code files, docs/) | manifest-init.sh (`analyze_project`) | portable flags |
+| `basename`, `dirname` | project and script directory name extraction | manifest-init.sh, test-manifest-init.sh | portable system utilities |
+| `head`, `wc` | line/word counting and output limiting in checks and tests | structure-parser.sh, test-manifest-init.sh | portable system utilities |
+| `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
+| `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
+| `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
+| `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies

@@ -105,6 +105,44 @@ rm -f "$TMP/scripts/seeded.sh"
 printf 'grep -q x "$1"\n' >"$TMP/scripts/declared.sh"
 run_check "declared-binary-accepted" "$TMP/scope" "$TMP/scripts" 0
 
+scope_listing=$(autonomy_scope)
+if grep -Fxq "$ROOT/docs/manifest.compact.md" <<<"$scope_listing" &&
+   ! grep -Fq "$ROOT/workflow/universal-comment-rules.en.md" <<<"$scope_listing"; then
+  note "current-scope-is-correct"
+else
+  deny "current-scope-is-correct: compact manifest missing or workflow scanned"
+fi
+
+fake_root="$TMP/fake-root"
+mkdir -p "$fake_root/scripts" "$fake_root/docs/templates" "$fake_root/openspec/specs" "$fake_root/workflow"
+printf 'BASE_SOURCES=(agents.template.md workflow/agent-rules.en.md)\\n' >"$fake_root/scripts/manifest-init.sh"
+printf 'template\\n' >"$fake_root/docs/templates/agents.template.md"
+printf 'English\\n' >"$fake_root/workflow/agent-rules.en.md"
+printf 'Russian\\n' >"$fake_root/workflow/agent-rules.ru.md"
+git -C "$fake_root" init -q
+git -C "$fake_root" add .
+saved_root=$ROOT
+ROOT=$fake_root
+future_scope=$(autonomy_scope)
+ROOT=$saved_root
+if grep -Fxq "$fake_root/workflow/agent-rules.en.md" <<<"$future_scope"; then
+  note "distributed-source-enters-scope"
+else
+  deny "distributed-source-enters-scope: workflow source not included"
+fi
+
+if [[ -n $seed_bin ]]; then
+  printf 'printf ok && %s -c x\\n' "$seed_bin" >"$TMP/scripts/compound.sh"
+  run_check "compound-command-caught" "$TMP/scope" "$TMP/scripts" 1 "$seed_bin"
+  rm -f "$TMP/scripts/compound.sh"
+  mkdir -p "$TMP/scripts/hooks"
+  printf '#!/usr/bin/env bash\\n%s -c x\\n' "$seed_bin" >"$TMP/scripts/hooks/pre-commit"
+  run_check "extensionless-hook-caught" "$TMP/scope" "$TMP/scripts" 1 "$seed_bin"
+else
+  deny "compound-command-caught: no executable candidate available"
+  deny "extensionless-hook-caught: no executable candidate available"
+fi
+
 echo "== RESULTS (${#PASS[@]} passed, ${#FAIL[@]} failed)"
 ((${#FAIL[@]})) && exit 1
 exit 0

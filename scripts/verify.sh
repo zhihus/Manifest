@@ -93,19 +93,39 @@ run_parser_tests() {
 # not cover workflow/ (unresolved decision U1: its role table records
 # an approved model-specific orchestrator decision).
 autonomy_scope() {
-  local f
-  for f in AGENTS.md llms.txt docs/manifest.md docs/project-manifest.md \
-           VERSIONING.md commit-rules.md releases.md openspec-rules.md; do
-    [[ -f $ROOT/$f ]] && printf '%s\n' "$ROOT/$f"
+  local f rel source candidate source_file="$ROOT/scripts/manifest-init.sh"
+  for f in AGENTS.md llms.txt docs/manifest.md docs/manifest.compact.md \
+           docs/project-manifest.md VERSION VERSIONING.md commit-rules.md \
+           releases.md RELEASES.md openspec-rules.md; do
+    [[ -f $ROOT/$f ]] || continue
+    git -C "$ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1 &&
+      printf '%s\\n' "$ROOT/$f"
   done
-  # Tracked files only: gitignored local material is out of scope.
-  find "$ROOT/docs/templates" "$ROOT/openspec/specs" "$ROOT/workflow" \
-    -type f \( -name '*.md' -o -name '*.txt' \) 2>/dev/null |
-    grep -v 'connected-projects.md' |
-    while IFS= read -r f; do
-      git -C "$ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1 &&
-        printf '%s\n' "$f"
-    done
+  # Current checked collections; workflow/ is not scanned wholesale.
+  for f in "$ROOT/docs/templates" "$ROOT/openspec/specs"; do
+    [[ -d $f ]] || continue
+    find "$f" -type f \\( -name '*.md' -o -name '*.txt' \\) 2>/dev/null
+  done | while IFS= read -r f; do
+    rel=${f#"$ROOT"/}
+    git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1 &&
+      printf '%s\\n' "$f"
+  done
+  # Follow manifest-init's source list: future distributed workflow
+  # files enter scope automatically when added to the install list.
+  if [[ -f $source_file ]]; then
+    while IFS= read -r source; do
+      [[ -n $source ]] || continue
+      case $source in */*) candidate="$ROOT/$source" ;; *) candidate="$ROOT/docs/templates/$source" ;; esac
+      [[ -f $candidate ]] || continue
+      rel=${candidate#"$ROOT"/}
+      git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1 &&
+        printf '%s\\n' "$candidate"
+    done < <(
+      sed -n '/^BASE_SOURCES=(/,/)/p' "$source_file" |
+        sed 's/^BASE_SOURCES=//' | tr -d '()"' | tr ' ' '\\n' |
+        sed '/^$/d'
+    )
+  fi
 }
 
 # check_autonomy [scope-dir-override] [scripts-dir-override]
@@ -135,16 +155,11 @@ check_autonomy() {
       fail "autonomy: forbidden content (path/PI/foreign project) in: $f
 $bad"
     fi
-    case $f in
-      *workflow/*) ;;  # model check excluded pending decision U1
-      *)
-        bad=$(grep -n -v "$allow" "$f" 2>/dev/null | grep -iE "$re_model" || true)
-        if [[ -n $bad ]]; then
-          fail "autonomy: model/harness-specific content in: $f
+    bad=$(grep -n -v "$allow" "$f" 2>/dev/null | grep -iE "$re_model" || true)
+    if [[ -n $bad ]]; then
+      fail "autonomy: model/harness-specific content in: $f
 $bad"
-        fi
-        ;;
-    esac
+    fi
   done
   # Bilingual pairing: every English edition in the scope must have a
   # Russian sibling (RU is authoritative).
@@ -169,46 +184,65 @@ $bad"
     fail "autonomy: external dependency register missing: docs/architecture/external-dependencies.ru.md"
     declared=" bash sh env "
   fi
-  # Collect function names and bash keywords/builtins — never flagged.
+  # Include *.sh scripts and the extensionless pre-commit hook.
+  local -a script_files=()
+  for f2 in "$scripts_dir"/*.sh "$scripts_dir"/hooks/pre-commit; do
+    [[ -f $f2 ]] && script_files+=("$f2")
+  done
   local funcs keywords
-  funcs=$(grep -hoE '^[a-z_][a-z0-9_]*\(\)' "$scripts_dir"/*.sh 2>/dev/null |
-    sed 's/()//' | sort -u | tr '\n' ' ')
+  if (("${#script_files[@]}")); then
+    funcs=$(grep -hE '^[a-z_][a-z0-9_]*\\(\\)' "${script_files[@]}" 2>/dev/null |
+      sed 's/()//' | sort -u | tr '\\n' ' ')
+  else
+    funcs=""
+  fi
   keywords=" echo printf read local declare exit return if then elif else fi for while until do done case esac function set shift trap cd pwd source eval exec export unset readonly test time wait true false break continue getopts shopt type typeset umask alias bg fg jobs builtin command enable dirs select coproc in { } [ ] [[ ]] "
-  # Line-leading external command check (deterministic, conservative):
-  # the first word of every logical line (comments and quoted strings
-  # stripped, leading VAR= assignments skipped) that resolves to an
-  # external binary must be declared in the register.
-  local f2 line t
-  for f2 in "$scripts_dir"/*.sh; do
-    [[ -f $f2 ]] || continue
-    # Strip comments and quoted strings once per file (no per-line
-    # process spawns); the token scan itself is pure Bash.
-    local -a lines=()
-    while IFS= read -r line; do lines+=("$line"); done < <(
-      sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g" "$f2")
-    for line in "${lines[@]}"; do
-      set -- $line
-      t=${1:-}
-      while [[ $t == *=* ]]; do
-        shift
-        t=${1:-}
-        [[ $# -gt 0 ]] || break
-      done
-      case $t in
-        '' | *.sh | [A-Z]*) continue;;
-      esac
-      case $t in
-        *[':/|=.']* | '-'*) continue;;
-      esac
-      # Case-statement pattern lines: "code | other)" — the next word
-      # starts with | or ).
-      if [[ ${2:-} == ['|)']* ]]; then continue; fi
-      [[ $keywords == *" $t "* ]] && continue
-      [[ $funcs == *" $t "* ]] && continue
-      [[ $declared == *" $t "* ]] && continue
-      command -v "$t" >/dev/null 2>&1 || continue
-      fail "autonomy: undeclared external binary '$t' invoked in $f2 (add it to docs/architecture/external-dependencies.ru.md or remove the use)"
-    done
+  # Split compound commands at shell operators and inspect command positions.
+  # Human review remains mandatory for constructs outside this conservative scan.
+  local f2 line segment t idx
+  local -a words=()
+  for f2 in "${script_files[@]}"; do
+    while IFS= read -r line || [[ -n $line ]]; do
+      line=$(printf '%s\\n' "$line" |
+        sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g")
+      line=${line//&&/$'\\n'}
+      line=${line//||/$'\\n'}
+      line=${line//;/ $'\\n'}
+      line=${line//|/$'\\n'}
+      line=${line//&/$'\\n'}
+      line=${line//(/$'\\n'}
+      line=${line//)/$'\\n'}
+      while IFS= read -r segment; do
+        read -r -a words <<< "$segment"
+        idx=0; t=""
+        while (( idx < ${#words[@]} )); do
+          t=${words[idx]}
+          case $t in
+            if|then|elif|else|while|until|do|!|time|coproc|in)
+              ((idx+=1)); continue ;;
+            command|builtin|exec)
+              ((idx+=1))
+              if (( idx < ${#words[@]} )) &&
+                 [[ ${words[idx]} == -v || ${words[idx]} == -V || ${words[idx]} == -p ]]; then
+                idx=${#words[@]}
+              fi
+              continue ;;
+            *=*|\>*|\<*|'$'|'[['|']]'|'(('|'))'|'{'|'}'|'')
+              ((idx+=1)); continue ;;
+            -*)
+              ((idx+=1)); continue ;;
+          esac
+          break
+        done
+        [[ -n $t ]] || continue
+        case $t in *.sh|[A-Z]*) continue ;; esac
+        [[ $keywords == *" $t "* ]] && continue
+        [[ $funcs == *" $t "* ]] && continue
+        [[ $declared == *" $t "* ]] && continue
+        command -v "$t" >/dev/null 2>&1 || continue
+        fail "autonomy: undeclared external binary '$t' invoked in $f2 (add it to docs/architecture/external-dependencies.ru.md or remove the use)"
+      done <<< "$line"
+    done < "$f2"
   done
 }
 

@@ -156,6 +156,9 @@ preflight() {
     fails+=("REINIT_REFUSED: .manifest already exists — the project is already initialized; re-initialization is not provided")
   [[ -d $TEMPLATES && -r $TEMPLATES ]] ||
     fails+=("template source unavailable or not readable: $TEMPLATES — pass --templates pointing to the Manifest docs/templates directory")
+  if ! command -v perl >/dev/null 2>&1 || ! perl -e 'exit 0' >/dev/null 2>&1; then
+    fails+=("Perl is required for template rendering but is not available in PATH — install Perl and retry")
+  fi
   if ! sha256_of "$0" >/dev/null 2>&1; then
     fails+=("no working SHA-256 tool in PATH — install coreutils (sha256sum) or Perl's shasum")
   fi
