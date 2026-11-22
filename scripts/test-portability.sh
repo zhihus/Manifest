@@ -37,59 +37,59 @@ run_check() { # run_check <label> <scope-dir> <scripts-dir> <expect:0|1> <patter
 }
 
 # Fixture scope: one benign public file.
-mkdir -p "$TMP/scope"
+mkdir -p "$TMP/scope" "$TMP/empty-scripts"
 printf '# clean file\n' >"$TMP/scope/clean.md"
 
 # 1. Clean tree passes.
-run_check "clean-scope-passes" "$TMP/scope" "$ROOT/scripts" 0
+run_check "clean-scope-passes" "$TMP/scope" "$TMP/empty-scripts" 0
 
 # 2. Machine path (Windows drive letter).
 printf 'path C:\\Users\\someone\\x\n' >"$TMP/scope/v1.md"
-run_check "machine-path-caught" "$TMP/scope" "$ROOT/scripts" 1 "C:"
+run_check "machine-path-caught" "$TMP/scope" "$TMP/empty-scripts" 1 "C:"
 rm -f "$TMP/scope/v1.md"
 
 # 3. Unix home path.
 printf 'see /home/someone/x\n' >"$TMP/scope/v2.md"
-run_check "home-path-caught" "$TMP/scope" "$ROOT/scripts" 1 "/home/"
+run_check "home-path-caught" "$TMP/scope" "$TMP/empty-scripts" 1 "/home/"
 rm -f "$TMP/scope/v2.md"
 
 # 4. Personal email.
 printf 'mail: person@example.com\n' >"$TMP/scope/v3.md"
-run_check "email-caught" "$TMP/scope" "$ROOT/scripts" 1 "@"
+run_check "email-caught" "$TMP/scope" "$TMP/empty-scripts" 1 "@"
 rm -f "$TMP/scope/v3.md"
 
 # 5. Unrelated project mention.
 printf 'uses handy-dictation-scrubber\n' >"$TMP/scope/v4.md"
-run_check "foreign-project-caught" "$TMP/scope" "$ROOT/scripts" 1 "handy"
+run_check "foreign-project-caught" "$TMP/scope" "$TMP/empty-scripts" 1 "handy"
 rm -f "$TMP/scope/v4.md"
 
 # 6. Model/harness-specific detail (non-workflow scope).
 printf 'model: Qwen3.8-27B\n' >"$TMP/scope/v5.md"
-run_check "model-name-caught" "$TMP/scope" "$ROOT/scripts" 1 "Qwen"
+run_check "model-name-caught" "$TMP/scope" "$TMP/empty-scripts" 1 "Qwen"
 rm -f "$TMP/scope/v5.md"
 
 # 7. Allowlist marker exempts a line.
 printf 'path C:\\Users\\someone\\x # portability-allow\n' >"$TMP/scope/v6.md"
-run_check "allow-marker-exempts" "$TMP/scope" "$ROOT/scripts" 0
+run_check "allow-marker-exempts" "$TMP/scope" "$TMP/empty-scripts" 0
 rm -f "$TMP/scope/v6.md"
 
 # 7a. A paired RU/EN document passes.
 mkdir -p "$TMP/pairs"
 printf 'Russian\n' >"$TMP/pairs/sample.ru.md"
 printf 'English\n' >"$TMP/pairs/sample.en.md"
-run_check "paired-ru-en-passes" "$TMP/pairs" "$ROOT/scripts" 0
+run_check "paired-ru-en-passes" "$TMP/pairs" "$TMP/empty-scripts" 0
 rm -rf "$TMP/pairs"
 
 # 7b. An English edition without RU is rejected.
 mkdir -p "$TMP/pairs"
 printf 'English\n' >"$TMP/pairs/sample.en.md"
-run_check "english-without-russian-caught" "$TMP/pairs" "$ROOT/scripts" 1 "without Russian sibling"
+run_check "english-without-russian-caught" "$TMP/pairs" "$TMP/empty-scripts" 1 "without Russian sibling"
 rm -rf "$TMP/pairs"
 
 # 7c. A Russian edition without EN is rejected.
 mkdir -p "$TMP/pairs"
 printf 'Russian\n' >"$TMP/pairs/sample.ru.md"
-run_check "russian-without-english-caught" "$TMP/pairs" "$ROOT/scripts" 1 "without English sibling"
+run_check "russian-without-english-caught" "$TMP/pairs" "$TMP/empty-scripts" 1 "without English sibling"
 rm -rf "$TMP/pairs"
 
 # 8. Undeclared external binary in a seeded script. The seed binary
@@ -110,10 +110,8 @@ fi
 
 # 9. Real repo: autonomy passes end to end and the human-review
 # routing line appears in verify.sh output.
-FAILS=()
-check_autonomy >/dev/null 2>&1
 vout=$(bash "$ROOT/scripts/verify.sh" 2>&1) && vrc=0 || vrc=$?
-if (("${#FAILS[@]} == 0)) && ((vrc == 0)) &&
+if ((vrc == 0)) &&
    grep -q 'human review' <<<"$vout" &&
    grep -q 'shell dependencies outside' <<<"$vout"; then
   note "real-repo-passes"
