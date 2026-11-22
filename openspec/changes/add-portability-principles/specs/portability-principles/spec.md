@@ -75,9 +75,10 @@ Manifest documents in the public-file scope MUST be maintained in two
 editions — Russian (authoritative) and English (translation) — and
 their content MUST correspond.
 
-The automated check verifies file pairing (every English edition has
-a `*.ru.md` sibling); content correspondence is verified by human
-review. The bilingual requirement is confirmed by the user
+The automated check verifies file pairing in both directions: every
+`*.en.md` edition has a `*.ru.md` sibling, and every `*.ru.md`
+edition has a `*.en.md` sibling. Content correspondence is verified
+by human review. The bilingual requirement is confirmed by the user
 (2026-11-22).
 
 #### Scenario: English edition without Russian sibling
@@ -86,10 +87,16 @@ review. The bilingual requirement is confirmed by the user
   matching `*.ru.md` sibling
 - **THEN** the automated check reports the file and exits non-zero
 
+#### Scenario: Russian edition without English sibling
+
+- **WHEN** a Russian document in the public-file scope has no
+  matching `*.en.md` sibling
+- **THEN** the automated check reports the file and exits non-zero
+
 #### Scenario: Paired editions
 
 - **WHEN** a document exists as `*.ru.md` and `*.en.md`
-- **THEN** the pairing check passes
+- **THEN** the bidirectional pairing check passes
 - **AND** content correspondence is covered by the human review
 
 ### Requirement: Scripts are portable Bash scripts without GNU-specific utility dependencies

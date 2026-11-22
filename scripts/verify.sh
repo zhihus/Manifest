@@ -167,6 +167,10 @@ $bad"
         [[ -f ${f%.en.md}.ru.md ]] ||
           fail "autonomy: English edition without Russian sibling: $f"
         ;;
+      *.ru.md)
+        [[ -f ${f%.ru.md}.en.md ]] ||
+          fail "autonomy: Russian edition without English sibling: $f"
+        ;;
     esac
   done
   # Declared-dependency check: every external binary invoked by a

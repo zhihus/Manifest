@@ -77,6 +77,25 @@ printf 'path C:\\Users\\someone\\x # portability-allow\n' >"$TMP/scope/v6.md"
 run_check "allow-marker-exempts" "$TMP/scope" "$ROOT/scripts" 0
 rm -f "$TMP/scope/v6.md"
 
+# 7a. A paired RU/EN document passes.
+mkdir -p "$TMP/pairs"
+printf 'Russian\n' >"$TMP/pairs/sample.ru.md"
+printf 'English\n' >"$TMP/pairs/sample.en.md"
+run_check "paired-ru-en-passes" "$TMP/pairs" "$ROOT/scripts" 0
+rm -rf "$TMP/pairs"
+
+# 7b. An English edition without RU is rejected.
+mkdir -p "$TMP/pairs"
+printf 'English\n' >"$TMP/pairs/sample.en.md"
+run_check "english-without-russian-caught" "$TMP/pairs" "$ROOT/scripts" 1 "without Russian sibling"
+rm -rf "$TMP/pairs"
+
+# 7c. A Russian edition without EN is rejected.
+mkdir -p "$TMP/pairs"
+printf 'Russian\n' >"$TMP/pairs/sample.ru.md"
+run_check "russian-without-english-caught" "$TMP/pairs" "$ROOT/scripts" 1 "without English sibling"
+rm -rf "$TMP/pairs"
+
 # 8. Undeclared external binary in a seeded script. The seed binary
 # must resolve on this machine (unresolvable names are skipped by
 # design); pick the first available undeclared candidate.

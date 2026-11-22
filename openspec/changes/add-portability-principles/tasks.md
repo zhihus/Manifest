@@ -155,8 +155,8 @@ outside the closed patterns, content correspondence) to the human
 review output of the section. Separate commit.
 Stop criterion: with a clean tree verify.sh exits 0; planting a
 `C:\Users\…` line in a fixture copy of a public file makes verify.sh
-exit 1 reporting file and line; removing an `*.ru.md` sibling of a
-fixture `.en.md` makes verify.sh exit 1; removing it restores 0.
+exit 1 reporting file and line; removing either language sibling from
+a fixture pair makes verify.sh exit 1; restoring both makes it pass.
 Maps to scenarios: Machine path in a public file; Clean tree; Model
 name in AGENTS.md; Unrelated project mention; English edition
 without Russian sibling; Paired editions; Seeded violation is
