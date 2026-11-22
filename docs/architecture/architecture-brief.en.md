@@ -1,9 +1,9 @@
 # Manifest — Architecture Brief
 
-**Version:** 0.3.1  
+**Version:** 0.4.0  
 **Status:** working edition, synced with the decisions of the
-2026-11-20/21 discussions; on 2026-11-22 reconciled with the decision
-register on the archiving point  
+2026-11-20/21 discussions and the 2026-11-22 protocol
+(`architecture-session-2026-11-22.ru.md`)  
 **Purpose:** fix the Manifest architecture and MVP scope before
 technical design. English translation of the authoritative Russian
 edition (`architecture-brief.ru.md`).
@@ -97,6 +97,10 @@ repository.
 All projects receive files from a single approved set. Re-approval
 of each template at installation time is not required.
 
+For the MVP a **single common template** is used (decided
+2026-11-22). Specialized templates for different project types are
+deferred to the roadmap.
+
 ### Mandatory base set
 
 For all projects:
@@ -112,6 +116,11 @@ For all projects:
 different purposes.
 
 ### Conditional templates
+
+The conditional rule sets for code and documentation projects (below)
+are not installed in the MVP: a single common template applies. This
+section is kept as the basis for specialized templates at the roadmap
+stage.
 
 Code projects additionally connect rules for:
 
@@ -175,6 +184,16 @@ project:
 7. Final installation check.
 8. Producing an understandable report.
 
+### Working directory and configuration
+
+The Manifest working directory is `.manifest` in the project root
+(decided 2026-11-22). Settings are stored in a separate configuration
+file. The configuration is stable and is not overwritten
+automatically. Re-initialization is not provided. A mechanism
+protecting against accidental overwrite is mandatory. The
+configuration file format and the flag schema remain open questions
+(§13).
+
 ### Preflight
 
 Before any changes, the necessary conditions are checked:
@@ -223,6 +242,15 @@ After a successful review and the final check the orchestrator:
 Intermediate commits are allowed. One commit does not have to
 correspond to one task.
 
+### Merge conflict
+
+A merge conflict is resolved by the Executor assigned by the
+orchestrator (decided 2026-11-22). After the resolution, automated
+tests and checks are mandatory. In addition, an independent review is
+performed by an agent with a clean context. The executor does not
+confirm the correctness of their own solution. The orchestrator
+controls the result and performs the merge.
+
 Todoing keeps references to the OpenSpec change and the final
 commit/merge.
 
@@ -269,6 +297,11 @@ Only after the user's approval is the task moved to "Ready".
 
 ### Kanban statuses
 
+Todoing is the single source of the task status; Manifest does not
+duplicate Todoing statuses and does not maintain a separate status
+mapping (decided 2026-11-22). Manifest's internal stages are kept.
+Manifest manages the sequence of stages and agent assignment.
+
 | Status | Purpose |
 | --- | --- |
 | Backlog | Discussion and detailing |
@@ -288,6 +321,16 @@ executed in numbering order unless the user says otherwise.
 
 The user does not perform technical acceptance and does not close
 tasks.
+
+### Task cancellation
+
+Any agent may recommend cancelling a task with a rationale (decided
+2026-11-22). Only the user confirms the cancellation. After the
+confirmation the orchestrator changes the task status in Todoing and
+archives the related OpenSpec change via the standard Archive
+mechanism. The main OpenSpec specifications are not updated.
+Archiving an OpenSpec change is the OpenSpec Archive mechanism,
+unrelated to the archive of disabled templates (§4).
 
 ### Todoing integration
 
@@ -432,7 +475,11 @@ performed by the Documentation Reviewer.
 Manifest control scripts are the same for all connected projects.
 
 Git hooks and control scripts are installed automatically through
-`manifest-init`.
+`manifest-init`. The existing mechanisms of Git and the AI harness
+are used; Manifest does not develop its own hook manager (decided
+2026-11-22). Hooks run the Manifest control scripts. Separate
+implementations per AI harness are not part of the MVP unless
+necessary.
 
 Control operates at all stages, not only before task completion.
 
@@ -472,7 +519,8 @@ check is unacceptable.
 ### Included in the MVP
 
 1. Manifest Core.
-2. Structure and set of approved templates.
+2. Structure and set of approved templates (for the MVP — a single
+   common template, decided 2026-11-22).
 3. `manifest-init`.
 4. Configuration of project types and tracks.
 5. Preflight.
@@ -489,6 +537,11 @@ check is unacceptable.
 
 ### Outside the MVP
 
+- Specialized templates for different project types (decided
+  2026-11-22).
+- A separate approved process for updating Manifest files in
+  connected projects; the update is not a re-initialization, the
+  process details are open (decided 2026-11-22).
 - Automatic merging of existing context files with Manifest
   templates.
 - Full migration of projects with their own developed context system.
@@ -506,11 +559,16 @@ mechanisms.
 
 | Question | What must be determined |
 | --- | --- |
-| Project configuration | Name, location, format and flag schema |
+| Project configuration | File format and flag schema (name and
+  location defined 2026-11-22: `.manifest`, a separate file) |
 | Git initialization | Whether `manifest-init` creates a Git repo for a new project without one |
-| Git hooks | How to install hooks without breaking the project's existing mechanisms |
+| Git hooks | Compatibility of installation with the project's
+  existing hook managers |
 | File protection | How to block context file changes before writing, not only at commit |
-| Synchronization | Technical mechanism for Todoing/OpenSpec/Git consistency at every stage |
+| Synchronization | Technical mechanism for Todoing/OpenSpec/Git
+  consistency at every stage (no status map; decided 2026-11-22) |
+| Manifest file updates | Details of the approved update process for
+  connected projects |
 | Preflight | Which problems can be fixed automatically and which only diagnosed |
 | Templates | How to determine the installed template version and organize later updates |
 | Archive | Conditions and mechanism of automatic restoration |
@@ -518,7 +576,8 @@ mechanisms.
 | Testing | Formal definition of the 100% requirement for program code |
 | File conflicts | How the agent should act when an existing file with the same name is found |
 | Logging | Which control operations it is really needed for |
-| Architect/Planner roles | Status of these workflow-README roles in the mandatory model is undefined |
+| Architect/Planner roles | Status of these workflow-README roles in
+  the mandatory model is undefined |
 
 ## 14. Architectural constraints
 

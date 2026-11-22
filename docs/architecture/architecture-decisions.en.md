@@ -2,7 +2,8 @@
 
 **Statuses:** **Accepted** (A), **Preliminary** (P), **Deferred** (D),
 **Unresolved** (U), **Done** (DN — analytical/documentation work),
-**Not implemented** (NI). Sources: brief v0.3.1, audits, Todoing
+**Not implemented** (NI). Sources: brief v0.4.0, the 2026-11-22
+protocol (`architecture-session-2026-11-22.ru.md`), audits, Todoing
 decisions (PR #1 todoing-x: PRODUCT.md, docs/architecture/decisions.md),
 discussions of 2026-11-20/21. Auditor recommendations are not
 decisions. Accepting a decision is not implementing a feature:
@@ -45,7 +46,15 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
 - A: Existing files are not overwritten; name conflicts are recorded;
   no auto-merge; disabled templates go to the archive.
 - U: Re-running manifest-init: file ownership classes.
+  Decided 2026-11-22: re-initialization is not provided; the working
+  directory is `.manifest` in the project root, settings live in a
+  separate stable configuration file that is not overwritten
+  automatically; a protection mechanism against accidental overwrite
+  is mandatory.
 - U: Hook strategy when existing hook managers are present.
+  Decided 2026-11-22: the existing mechanisms of Git and the AI
+  harness are used, no own hook manager is developed; installation
+  compatibility remains an open question.
 - U: Canonical file names of the set (Brief vs repository diverge).
 
 ## 4. Todoing
@@ -83,7 +92,16 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   is outside the MVP.
 - P: SQLite is a preliminary choice, pending a technical check.
 - D: GUI, shared task overview.
-- U: Manifest status map (6) ↔ Todoing.
+- U: Manifest status map (6) ↔ Todoing. Decided 2026-11-22: Todoing
+  is the single source of the task status; Manifest does not
+  duplicate statuses, a separate status mapping is not required;
+  Manifest's internal stages are kept.
+- Decided 2026-11-22, task cancellation: any agent may recommend
+  cancelling a task with a rationale; only the user confirms the
+  cancellation; after the confirmation the orchestrator changes the
+  task status in Todoing and archives the related OpenSpec change via
+  the standard Archive mechanism; the main OpenSpec specifications
+  are not updated.
 - NI (not implemented in todoing-x): history, versions, dependencies,
   locks, archiving, the new versioned API, Project ID. The current
   implementation is a prototype.
@@ -93,7 +111,10 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
 - A: One Todoing global task = one OpenSpec global task; Todoing
   stores links to the change and the final commit/merge.
 - U: Status synchronization across the three systems (transitions,
-  owner, source of truth); the term "global task".
+  owner, source of truth); the term "global task". The Manifest ↔
+  Todoing status map was dropped by the 2026-11-22 decision —
+  synchronization concerns stages and ownership, not status
+  duplication.
 
 ## 6. Roles and powers
 
@@ -133,7 +154,12 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   mechanisms (e.g. ZCode hooks); U: a universal guarantee for all
   harnesses.
 - U: Who resolves merge conflicts and whether a review is needed
-  afterwards.
+  afterwards. Decided 2026-11-22: the conflict is resolved by the
+  Executor assigned by the orchestrator; automated checks are
+  mandatory after the resolution; additionally an independent review
+  is performed by an agent with a clean context; the executor does
+  not confirm the correctness of their own solution; the orchestrator
+  controls the result and performs the merge.
 
 ## 8. Control and safety
 
@@ -171,6 +197,16 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   system; the track is determined by the model, completeness is
   checked by scripts.
 - U: Configuration format (name, location, flags) — Brief §13.
+  Decided 2026-11-22: the working directory is `.manifest` in the
+  project root, settings live in a separate file; the file format and
+  flag schema remain open.
+- Decided 2026-11-22, templates: the MVP uses a single common
+  template; specialized templates for project types are deferred to
+  the roadmap.
+- Decided 2026-11-22, Manifest updates: connected projects are to be
+  served by a separate approved process for updating Manifest files;
+  the update is not a re-initialization; the process details are
+  open.
 
 ## 11. MVP
 
@@ -179,6 +215,10 @@ installing files with overwrite protection; hooks and control
 scripts; Todoing and OpenSpec integration; consistency control of the
 three systems; context-files-guard; Git projects. Archiving as a
 function is agreed; its inclusion in the MVP is unresolved.
+Decided 2026-11-22: the MVP uses a single common template; task
+cancellation is part of the Todoing/OpenSpec integration; the process
+for updating Manifest files in connected projects is defined outside
+the MVP.
 MVP precondition (P): the minimal Todoing contract — link fields,
 contract version, history, versions, locks.
 Outside the MVP (D): auto-merge of context files; migration of
@@ -191,12 +231,17 @@ unresolved"; the decision remains with the user.
 
 ## 12. Unresolved questions (summary)
 
-Trust model (§1, §8); status map ↔ Todoing, project ID via the AI
-harness (§4); three-system synchronization, "global task" (§5);
-escalation outside the rework loop, Architect/Planner (§6); merge
-conflicts (§7); re-running manifest-init, file ownership, hooks, file
-names (§3); configuration (§10); compress-context (§2); template
-versions (Brief §13); recovery after failures; archiving in the MVP
-(§11).
+Trust model (§1, §8); project ID via the AI harness (§4);
+three-system synchronization, "global task" (§5);
+escalation outside the rework loop, Architect/Planner (§6);
+file ownership classes, file names (§3); configuration file format
+and flag schema (§10); compress-context (§2); template versions
+(Brief §13); recovery after failures; archiving in the MVP (§11).
 Decided 2026-11-21: Tester and Analyst in the role model (§6); the
 parallel-execution ban (§7).
+Decided 2026-11-22 (the `architecture-session-2026-11-22.ru.md`
+protocol): merge conflicts (§7); re-initialization, the `.manifest`
+directory, the configuration file (§3, §10); no own hook manager
+(§3); no status map required (§4); task cancellation with OpenSpec
+Archive (§4); a single common MVP template (§10, §11); the approved
+Manifest file update process (§10, §11).
