@@ -80,7 +80,7 @@ assert_contains "$output" "Markdown files checked: 3"
 sed 's/Status: draft/Status: invalid/' "$WORK/input/valid.md" > "$WORK/input/invalid root.md"
 sed 's/Version: 1.0.0/Version: invalid/' "$WORK/input/nested folder/valid nested.md" > "$WORK/input/nested folder/invalid nested.md"
 set +e
-output="$("$PARSER" --dir "$WORK/input" 2>&1)"
+output="$(bash "$PARSER" --dir "$WORK/input" 2>&1)"
 status=$?
 set -e
 if [[ "$status" == 1 ]]; then PASS=$((PASS + 1)); else FAIL=$((FAIL + 1)); fi
