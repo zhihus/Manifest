@@ -41,7 +41,7 @@ Orchestrator may combine roles across different changes but never within
 one deliverable. Reviewer findings go back to the Orchestrator, which
 re-runs the Implementer until findings are fully resolved; blocking
 errors escalate to the user. The mandatory role list lives in
-`architecture-brief.ru.md` §9 (7 roles, incl. Tester and Analyst).
+`docs/architecture/architecture-brief.ru.md` §9 (7 roles, incl. Tester and Analyst).
 
 ## 2. The Seven Steps and Gates
 
