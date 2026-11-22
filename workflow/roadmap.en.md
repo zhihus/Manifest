@@ -3,7 +3,7 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.1.0**  
+> **Version: 1.1.1**  
 > **Updated: 2026-11-22**  
 
 # Description
@@ -37,10 +37,14 @@ Universal format; all machine-checkable checks:
   must differ; `draft` → version not checked;
 * `Type` is the gate that selects the check set.
 
-### 1.4. Second hook — `commit-msg` — not implemented
+### 1.4. Second hook — `commit-msg` — implemented
 
-Validates the commit message per `commit-rules.md`. Only the
-`pre-commit` hook exists; `commit-msg` remains a future deliverable.
+`scripts/hooks/commit-msg` validates commit messages against the
+repository's `commit-rules.md`: allowed type, optional lowercase
+scope, lowercase English subject, no trailing period, and paired
+breaking-change marker/footer. The 50-character subject guidance
+remains a soft limit. The hook is development infrastructure and is
+excluded from the framework distribution (see 1.6).
 
 ### 1.5. Open questions — resolved
 
@@ -83,9 +87,9 @@ code). Content:
 * git workflow — unresolved (see 2.2).
 
 Status: **not implemented** — the template in
-`docs/templates/doc-content-rules.template.md` is a `{{PENDING}}`
-stub; it counts as done only when all points, including the git
-workflow, are complete.
+`docs/templates/doc-content-rules.template.md` is a `{{PENDING}}` stub;
+it counts as done only when all points, including the git workflow,
+are complete.
 
 ### 2.2. Open questions
 
