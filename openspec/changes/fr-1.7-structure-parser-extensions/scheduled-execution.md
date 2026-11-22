@@ -36,19 +36,19 @@ Create a Basic Task and configure its trigger as required.
 **Program/script:**
 
 ```text
-C:\\Program Files\\Git\\bin\\bash.exe
+C:\Program Files\Git\bin\bash.exe
 ```
 
 **Add arguments:**
 
 ```text
--lc "cd /c/WorkProjects/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&u001e"
+-lc "cd /c/WorkProjects/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1"
 ```
 
 **Start in:**
 
 ```text
-C:\\WorkProjects\\Manifest
+C:\WorkProjects\Manifest
 ```
 
 Replace the example paths with the actual Git installation and
