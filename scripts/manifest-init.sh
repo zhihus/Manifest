@@ -2,16 +2,20 @@
 # manifest-init.sh — initialize Manifest in a project (MVP stage 1).
 # Usage:
 #   manifest-init.sh --templates <dir> [--project <dir>]
+#                    [--project-name <name>]
+#                    [--tracks none|code|documentation|mixed]
 # Exit codes: 0 OK, 2 usage, 3 conflicts, 1 preflight/guard failure.
 set -euo pipefail
 
 PROJECT=.
 TEMPLATES=
-PROJECT_NAME=unnamed
-TRACKS=none
+PROJECT_NAME=
+TRACKS=
+ASK_NAME=0
+ASK_TRACKS=0
 
 usage() {
-  echo "usage: manifest-init.sh --templates <dir> [--project <dir>] [--tracks none|code|documentation|mixed]"
+  echo "usage: manifest-init.sh --templates <dir> [--project <dir>] [--project-name <name>] [--tracks none|code|documentation|mixed]"
   exit 2
 }
 
@@ -19,13 +23,68 @@ while (($#)); do
   case "$1" in
     --project) PROJECT=$2; shift 2 ;;
     --templates) TEMPLATES=$2; shift 2 ;;
+    --project-name) PROJECT_NAME=$2; shift 2 ;;
     --tracks) TRACKS=$2; shift 2 ;;
     *) usage ;;
   esac
 done
 [[ -n $TEMPLATES ]] || usage
+case $TRACKS in
+  "" | none | code | documentation | mixed) ;;
+  *) usage ;;
+esac
 
 MK=$PROJECT/.manifest
+
+analyze_project() {
+  local has_code=0 has_docs=0
+  find "$PROJECT" -maxdepth 3 -path "$PROJECT/.manifest" -prune -o \
+    -type f \( -name '*.c' -o -name '*.cpp' -o -name '*.cs' -o \
+    -name '*.go' -o -name '*.java' -o -name '*.js' -o -name '*.py' -o \
+    -name '*.rs' -o -name '*.sh' -o -name '*.ts' \) -print -quit |
+    grep -q . && has_code=1
+  [[ -d $PROJECT/docs ]] && has_docs=1
+  if ((has_code && has_docs)); then echo mixed
+  elif ((has_code)); then echo code
+  elif ((has_docs)); then echo documentation
+  else echo none
+  fi
+}
+
+interview() {
+  local proposed
+  proposed=$(analyze_project)
+  if [[ -z $PROJECT_NAME ]]; then
+    ASK_NAME=1
+    printf 'Project name [%s]: ' "$(basename "$PROJECT")"
+    read -r PROJECT_NAME
+    [[ -n $PROJECT_NAME ]] || PROJECT_NAME=$(basename "$PROJECT")
+  fi
+  if [[ -z $TRACKS ]]; then
+    ASK_TRACKS=1
+    printf 'Tracks — proposed: %s [confirm/change] (none|code|documentation|mixed): ' "$proposed"
+    read -r TRACKS
+    case $TRACKS in
+      code | documentation | mixed | none) ;;
+      *) TRACKS=$proposed ;;
+    esac
+  fi
+}
+
+INSTALLED=()
+CONFLICTS=()
+SKIPPED=()
+
+report() {
+  echo "== CONFIG"
+  sed 's/^/  /' "$MK/manifest.yaml"
+  echo "== INSTALLED (${#INSTALLED[@]})"
+  ((${#INSTALLED[@]})) && printf '  %s\n' "${INSTALLED[@]}"
+  echo "== CONFLICTS (${#CONFLICTS[@]})"
+  ((${#CONFLICTS[@]})) && printf '  %s\n' "${CONFLICTS[@]}"
+  echo "== SKIPPED (${#SKIPPED[@]})"
+  ((${#SKIPPED[@]})) && printf '  %s\n' "${SKIPPED[@]}"
+}
 
 preflight() {
   [[ -d $TEMPLATES && -r $TEMPLATES ]] || {
@@ -51,5 +110,7 @@ write_config() {
 }
 
 preflight
+interview
 write_config
+report
 echo "INIT OK"
