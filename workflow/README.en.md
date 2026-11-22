@@ -3,8 +3,8 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.1.0**  
-> **Updated: 2026-11-21**  
+> **Version: 1.1.1**  
+> **Updated: 2026-11-22**  
 
 # Description
 Process for working with LLM agents on the OpenSpec pipeline; task
@@ -108,7 +108,8 @@ reading). The Implementer role is performed by a **Documenter** — a
 separate agent whose only job is to produce the document per
 `spec.md` + `design.md`, marked `doc-only` in `tasks.md`. If a change
 contains both code and docs, the Documenter runs as a separate
-session, in parallel if desired. Review still happens (step 6) — a
+session like the other agents — sequentially; parallel dispatch is
+forbidden. Review still happens (step 6) — a
 semantic check: completeness, consistency, no requirements absent
 from the spec.
 
