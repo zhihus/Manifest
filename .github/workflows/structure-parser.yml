@@ -1,0 +1,27 @@
+name: Structure Parser
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - "scripts/structure-parser.sh"
+      - "scripts/test-structure-parser.sh"
+      - ".github/workflows/structure-parser.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  structure-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check Bash syntax
+        run: |
+          bash -n scripts/structure-parser.sh
+          bash -n scripts/test-structure-parser.sh
+
+      - name: Run structure parser regression tests
+        run: bash scripts/test-structure-parser.sh

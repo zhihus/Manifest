@@ -3,7 +3,7 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.1.1**  
+> **Version: 1.1.2**  
 > **Updated: 2026-11-22**  
 
 # Description
@@ -61,13 +61,16 @@ dev infrastructure, not the framework. The future change that fills
 `dist/` must include an acceptance scenario: `dist/` contains none
 of these files.
 
-### 1.7. Script extensions
+### 1.7. Script extensions — implemented
 
-Extension points for the structure parser beyond the MVP (the MVP
-takes a single file):
+Structure parser extensions are implemented:
 
-* directory walk — check all files, not one;
-* scheduled runs.
+* `scripts/structure-parser.sh --dir <directory>` recursively checks
+  regular lowercase `.md` files without following symbolic links;
+* the existing single-file interface remains unchanged;
+* failures are aggregated across all discovered files;
+* scheduled execution is documented for cron and Windows Task
+  Scheduler. Manifest does not install or manage schedulers.
 
 ## 2. Doc projects
 

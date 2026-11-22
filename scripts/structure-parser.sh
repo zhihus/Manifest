@@ -5,7 +5,9 @@
 # rules define WHAT is checked, this script grows with them.
 #
 # Usage: structure-parser.sh <file.md>
+#        structure-parser.sh --dir <directory>
 #   <file.md>  Markdown document to validate
+#   --dir      Recursively validate regular *.md files (no symlink traversal)
 # Exit codes: 0 clean, 1 violations found, 2 usage error.
 set -euo pipefail
 
@@ -319,5 +321,65 @@ main() {
   check_heading_length
   report
 }
+
+# --- directory mode: validate every regular Markdown file ---
+run_directory() {
+  local directory="$1" file count=0 result=0 rc file_list
+  if [[ ! -d "$directory" || ! -r "$directory" ]]; then
+    echo "ОШИБКА: каталог недоступен / ERROR: directory is not accessible: $directory" >&2
+    return 2
+  fi
+  directory="$(cd "$directory" 2>/dev/null && pwd)" || {
+    echo "ОШИБКА: не удалось открыть каталог / ERROR: cannot enter directory: $directory" >&2
+    return 2
+  }
+  file_list="$(mktemp "${TMPDIR:-/tmp}/manifest-structure-parser.XXXXXX")" || {
+    echo "ОШИБКА: не удалось создать временный файл / ERROR: cannot create temporary file" >&2
+    return 2
+  }
+  if ! find "$directory" -type f -name '*.md' -print0 > "$file_list"; then
+    echo "ОШИБКА: обход каталога завершился с ошибкой / ERROR: directory traversal failed: $directory" >&2
+    rm -f "$file_list"
+    return 2
+  fi
+  while IFS= read -r -d '' file; do
+    count=$((count + 1))
+    if bash "$SCRIPT_PATH" "$file"; then
+      :
+    else
+      rc=$?
+      if (( rc == 2 )); then
+        result=2
+      elif (( rc == 1 && result == 0 )); then
+        result=1
+      fi
+    fi
+  done < "$file_list"
+  rm -f "$file_list"
+  if (( count == 0 )); then
+    echo "ОШИБКА: Markdown-файлы не найдены / ERROR: no Markdown files found: $directory" >&2
+    return 2
+  fi
+  printf 'Проверено Markdown-файлов / Markdown files checked: %s\n' "$count"
+  return "$result"
+}
+
+SCRIPT_PATH="$0"
+if [[ "$SCRIPT_PATH" != */* ]]; then
+  SCRIPT_PATH="$(command -v "$SCRIPT_PATH")"
+fi
+SCRIPT_PATH="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)/$(basename "$SCRIPT_PATH")"
+
+if [[ "${1:-}" == "--dir" ]]; then
+  if (( $# != 2 )); then
+    echo "Использование / Usage: structure-parser.sh --dir <directory>" >&2
+    exit 2
+  fi
+  if run_directory "$2"; then
+    exit 0
+  else
+    exit $?
+  fi
+fi
 
 main "$@"
