@@ -41,17 +41,19 @@ changed_set() {
 # --- 3. parser tests: references (over-reporting) + fixture (under-reporting) ---
 run_parser_tests() {
   local f rc=0
-  for f in "$ROOT"/workflow/*.ru.md "$ROOT"/workflow/*.en.md; do
-    if ! bash "$ROOT/$PARSER" "$f" > /tmp/verify-ref-out.txt 2>&1; then
-      rc=1
-      fail "парсер не проходит эталон / parser fails on reference: $f"
-      awk 'NR<=10 {print "  " $0}' /tmp/verify-ref-out.txt
-    fi
-  done
   # tmp must survive until the EXIT trap fires, so a script-global
   # variable is used; a function-local one is out of scope by then.
+  # A unique per-run temp directory avoids collisions between
+  # concurrent invocations and other users of /tmp.
   VERIFY_TMP=$(mktemp -d)
   trap 'rm -rf "$VERIFY_TMP"' EXIT
+  for f in "$ROOT"/workflow/*.ru.md "$ROOT"/workflow/*.en.md; do
+    if ! bash "$ROOT/$PARSER" "$f" > "$VERIFY_TMP/ref-out.txt" 2>&1; then
+      rc=1
+      fail "парсер не проходит эталон / parser fails on reference: $f"
+      awk 'NR<=10 {print "  " $0}' "$VERIFY_TMP/ref-out.txt"
+    fi
+  done
   python - "$VERIFY_TMP" > /dev/null <<'EOF'
 import sys
 fixture = (
@@ -80,7 +82,6 @@ EOF
     rc=1
     fail "парсер не нашёл заложенные нарушения / parser missed the seeded violations"
   fi
-  rm -f /tmp/verify-ref-out.txt
   return $rc
 }
 
