@@ -16,7 +16,7 @@ assert_status() {
   local expected="$1" actual output
   shift
   set +e
-  output="$("$PARSER" "$@" 2>&1)"
+  output="$(bash "$PARSER" "$@" 2>&1)"
   actual=$?
   set -e
   if [[ "$actual" == "$expected" ]]; then
@@ -70,7 +70,7 @@ assert_status 0 "$WORK/input/valid.md" >/dev/null
 
 # Recursive mode discovers root and nested Markdown files, including spaces.
 set +e
-output="$("$PARSER" --dir "$WORK/input" 2>&1)"
+output="$(bash "$PARSER" --dir "$WORK/input" 2>&1)"
 status=$?
 set -e
 if [[ "$status" == 0 ]]; then PASS=$((PASS + 1)); else FAIL=$((FAIL + 1)); fi
