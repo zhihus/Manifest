@@ -15,7 +15,7 @@ Entry point: `AGENTS.md`
 * `docs/architecture/` — architecture documents and audits
   (architecture brief, decision registers, MVP/roadmap split, role
   model, integration audits, external dependency register:
-  `docs/architecture/external-dependencies.en.md`). Russian editions
+  `docs/architecture/external-dependencies.ru.md`). Russian editions
   are authoritative (`*.ru.md`); English versions (`*.en.md`) are
   translations.
   Historical decision records; do not delete.

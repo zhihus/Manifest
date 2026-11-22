@@ -38,7 +38,7 @@ dependency. Link the register from `llms.txt` (Directories section,
 one line). Separate commit.
 Stop criterion: both files exist with identical entry sets; every
 binary invoked by `scripts/*.sh` or `scripts/hooks/*` (grep over the scripts and hooks) has an
-entry; `llms.txt` links the register.
+entry; `llms.txt` links the authoritative Russian register.
 Maps to scenarios: External dependency register exists and is
 referenced; Perl rendering dependency documented.
 
