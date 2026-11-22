@@ -22,7 +22,7 @@ The process returns:
 Create a crontab entry, replacing the repository path and schedule:
 
 ```cron
-*/30 * * * * cd /path/to/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1
+*/30 * * * * cd /path/to/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1; status=$?; printf 'exit=%s\\n' "$status" >> /path/to/Manifest/logs/structure-parser.log; exit "$status"
 ```
 
 Cron records command output in the configured log. A non-zero process
@@ -42,7 +42,7 @@ C:\Program Files\Git\bin\bash.exe
 **Add arguments:**
 
 ```text
--lc "cd /c/WorkProjects/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1"
+-lc "mkdir -p logs; bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1; status=$?; echo exit=$status >> logs/structure-parser.log; exit $status"
 ```
 
 **Start in:**
