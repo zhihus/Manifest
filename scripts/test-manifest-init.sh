@@ -54,7 +54,7 @@ ok=1
 for f in AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md; do
   [[ -f $TMP/fresh/$f ]] || { ok=0; FAIL+=("fresh: $f not installed"); }
 done
-n=$(grep -c '^  ' <<<"$(sed -n '/== INSTALLED/,/== CONFLICTS/p' <<<"$out" | head -n -1)")
+n=$(grep -c '^  ' <<<"$(sed -n '/== INSTALLED/,/== CONFLICTS/p' <<<"$out" | sed '$d')")
 [[ $n -eq 5 ]] || { ok=0; FAIL+=("fresh: INSTALLED has $n lines, want 5"); }
 grep -q '{{' "$TMP/fresh"/*.md "$TMP/fresh/llms.txt" "$TMP/fresh/VERSION" &&
   { ok=0; FAIL+=("fresh: leftover placeholder"); }
