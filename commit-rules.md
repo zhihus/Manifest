@@ -1,5 +1,10 @@
 # commit-rules.md
 
+Commit rules for the Manifest project itself. The universal framework
+version distributed to connected projects is
+`workflow/commit-rules.en.md`; it does not include the review and
+merge flow below.
+
 **Format:** `<type>(<scope>): <subject>`
 - `type` — one of: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 - `scope` — logical area of the codebase (module, component, subsystem), optional, use short stable identifiers (e.g., `audio-capture`, `config-loader`)

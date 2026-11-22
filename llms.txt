@@ -13,7 +13,13 @@ Entry point: `AGENTS.md`
 
 ## Directories
 
-* `docs/` — project documentation.
+* `docs/` — project documentation. Manifest specification:
+  `docs/manifest.md` (full) and `docs/manifest.compact.md`
+  (compressed); project-level manifest with frozen decisions:
+  `docs/project-manifest.md`.
+* `docs/architecture/` — architecture documents and audits
+  (architecture brief, decision registers, role model, integration
+  audits). Historical decision records; do not delete.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates). Entry: `workflow/README.en.md`.
@@ -31,7 +37,7 @@ Entry point: `AGENTS.md`
   with the full agent content material:
   `workflow/agent-rules-draft.ru.md`. Registry of connected
   projects: `workflow/connected-projects.md`.
-  Roadmap (planned work, not yet implemented):
+  Roadmap (planned work; implemented items are marked):
   `workflow/roadmap.en.md`.
 * `temp/` — scratch space (gitignored).
 * `scripts/` — development infrastructure of the Manifest project
@@ -48,7 +54,9 @@ No build step; runs from source.
 * Workflow: `AGENTS.md`
 * Versioning: `VERSIONING.md`
 * Releases: `releases.md`
-* Commits: `commit-rules.md`
+* Commits: `commit-rules.md` (Manifest project itself); universal
+  framework version for connected projects:
+  `workflow/commit-rules.en.md`
 * OpenSpec tasks: `openspec-rules.md`
 * Access boundaries: `.llmignore` (read first)
 

@@ -14,7 +14,8 @@
 
 ## Sub-projects
 
-* A head project's sub-projects (under `skills/`) are separate projects.
+* A head project's sub-projects are separate projects; each lives in its
+  own location outside the head repo (see `llms.txt`).
 * Each sub-project keeps its own `VERSION`, independent of the head project's version.
 
 ## Bump

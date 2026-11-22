@@ -3,12 +3,15 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.0.0**  
-> **Updated: 2026-11-10**  
+> **Version: 1.0.1**  
+> **Updated: 2026-11-22**  
 
 # Description
 Universal commit message rules for a project connected to the Manifest
-framework.
+framework. This file is the framework template distributed to
+connected projects; the Manifest project itself follows its own
+tailored copy at `commit-rules.md` (repo root), which additionally
+defines the review and merge flow.
 
 ## 1. Message format
 
