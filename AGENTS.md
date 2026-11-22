@@ -19,26 +19,6 @@ Type: **doc**.
 
 - Register every new sub-project in `llms.txt` with a brief comment.
 
-Sub-projects:
-
-- `handy/dictation-scrubber/` — **separate project** since 2026-11-05:
-  `C:\WorkProjects\handy-dictation-scrubber\` (history exported from
-  this repo via subtree split). Do not edit it here.
-- **Skills** — `C:\WorkProjects\skills\` is a plain shared folder
-  (no git of its own) since 2026-11-10. Each subfolder is an
-  independent project with its own repository (`compress-context`,
-  `compress-context-benchmark`, `eval-analyze`, …). Do not edit them
-  here; work inside the respective project folder.
-- **context-files-guard** — **separate project** since 2026-11-05:
-  `C:\WorkProjects\context-files-guard\` (change `add-context-files-guard`
-  exported from `openspec/changes/` via subtree split). Do not edit it here.
-
-**Two experimental reference projects.**
-Manifest (this project, root) is documentation-based; InvestPlan
-(`C:\WorkProjects\InvestPlan`) is code-based. Their context files are the
-source for the final manifest: requirements for these files (checks,
-auxiliary skills, applications).
-
 **Plans.** Plan files live in `docs/plans/`. Plan files are stored compressed;
 compression is done with the compress-context skill. Always read the English
 version (`.en.md`) of a plan. If no English version exists, read the version
