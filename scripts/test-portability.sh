@@ -119,6 +119,7 @@ fake_root="$TMP/fake-root"
 mkdir -p "$fake_root/scripts" "$fake_root/docs/templates" "$fake_root/openspec/specs" "$fake_root/workflow"
 printf 'BASE_SOURCES=(agents.template.md workflow/agent-rules.en.md)\n' >"$fake_root/scripts/manifest-init.sh"
 printf 'template\n' >"$fake_root/docs/templates/agents.template.md"
+printf 'non-Markdown template\n' >"$fake_root/docs/templates/custom.template"
 printf 'English\n' >"$fake_root/workflow/agent-rules.en.md"
 printf 'Russian\n' >"$fake_root/workflow/agent-rules.ru.md"
 git -C "$fake_root" init -q
@@ -127,10 +128,11 @@ saved_root=$ROOT
 ROOT=$fake_root
 future_scope=$(autonomy_scope)
 ROOT=$saved_root
-if grep -Fxq "$fake_root/workflow/agent-rules.en.md" <<<"$future_scope"; then
+if grep -Fxq "$fake_root/workflow/agent-rules.en.md" <<<"$future_scope" &&
+   grep -Fxq "$fake_root/docs/templates/custom.template" <<<"$future_scope"; then
   note "distributed-source-enters-scope"
 else
-  deny "distributed-source-enters-scope: workflow source not included"
+  deny "distributed-source-enters-scope: distributed source or non-Markdown template not included"
 fi
 
 # 14. Avoid GNU-only utility options in scripts intended for macOS.

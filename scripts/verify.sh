@@ -102,7 +102,7 @@ autonomy_scope() {
   # Current checked collections; workflow/ is not scanned wholesale.
   for f in "$ROOT/docs/templates" "$ROOT/openspec/specs"; do
     [[ -d $f ]] || continue
-    find "$f" -type f \( -name '*.md' -o -name '*.txt' \) 2>/dev/null
+    find "$f" -type f 2>/dev/null
   done | while IFS= read -r f; do
     rel=${f#"$ROOT"/}
     git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1 &&
