@@ -88,10 +88,8 @@ run_parser_tests() {
 # files. They never modify files and never impose requirements on
 # projects that use Manifest.
 # Public-file scope (closed list + distributed dirs; local config is
-# excluded): workflow/connected-projects.md is a local machine
-# registry, not a distributed rule. The model/harness-name check does
-# not cover workflow/ (unresolved decision U1: its role table records
-# an approved model-specific orchestrator decision).
+# excluded). workflow/ is not scanned wholesale; any file added to
+# manifest-init's install source list is included automatically.
 autonomy_scope() {
   local f rel source candidate source_file="$ROOT/scripts/manifest-init.sh"
   for f in AGENTS.md llms.txt docs/manifest.md docs/manifest.compact.md \
@@ -99,16 +97,16 @@ autonomy_scope() {
            releases.md RELEASES.md openspec-rules.md; do
     [[ -f $ROOT/$f ]] || continue
     git -C "$ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1 &&
-      printf '%s\\n' "$ROOT/$f"
+      printf '%s\n' "$ROOT/$f"
   done
   # Current checked collections; workflow/ is not scanned wholesale.
   for f in "$ROOT/docs/templates" "$ROOT/openspec/specs"; do
     [[ -d $f ]] || continue
-    find "$f" -type f \\( -name '*.md' -o -name '*.txt' \\) 2>/dev/null
+    find "$f" -type f \( -name '*.md' -o -name '*.txt' \) 2>/dev/null
   done | while IFS= read -r f; do
     rel=${f#"$ROOT"/}
     git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1 &&
-      printf '%s\\n' "$f"
+      printf '%s\n' "$f"
   done
   # Follow manifest-init's source list: future distributed workflow
   # files enter scope automatically when added to the install list.
@@ -119,10 +117,10 @@ autonomy_scope() {
       [[ -f $candidate ]] || continue
       rel=${candidate#"$ROOT"/}
       git -C "$ROOT" ls-files --error-unmatch "$rel" >/dev/null 2>&1 &&
-        printf '%s\\n' "$candidate"
+        printf '%s\n' "$candidate"
     done < <(
       sed -n '/^BASE_SOURCES=(/,/)/p' "$source_file" |
-        sed 's/^BASE_SOURCES=//' | tr -d '()"' | tr ' ' '\\n' |
+        sed 's/^BASE_SOURCES=//' | tr -d '()"' | tr ' ' '\n' |
         sed '/^$/d'
     )
   fi
@@ -191,8 +189,8 @@ $bad"
   done
   local funcs keywords
   if (("${#script_files[@]}")); then
-    funcs=$(grep -hE '^[a-z_][a-z0-9_]*\\(\\)' "${script_files[@]}" 2>/dev/null |
-      sed 's/()//' | sort -u | tr '\\n' ' ')
+    funcs=$(grep -hE '^[a-z_][a-z0-9_]*\(\)' "${script_files[@]}" 2>/dev/null |
+      sed 's/()//' | sort -u | tr '\n' ' ')
   else
     funcs=""
   fi
@@ -203,15 +201,15 @@ $bad"
   local -a words=()
   for f2 in "${script_files[@]}"; do
     while IFS= read -r line || [[ -n $line ]]; do
-      line=$(printf '%s\\n' "$line" |
+      line=$(printf '%s\n' "$line" |
         sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g")
-      line=${line//&&/$'\\n'}
-      line=${line//||/$'\\n'}
-      line=${line//;/ $'\\n'}
-      line=${line//|/$'\\n'}
-      line=${line//&/$'\\n'}
-      line=${line//(/$'\\n'}
-      line=${line//)/$'\\n'}
+      line=${line//&&/$'\n'}
+      line=${line//||/$'\n'}
+      line=${line//;/ $'\n'}
+      line=${line//|/$'\n'}
+      line=${line//&/$'\n'}
+      line=${line//(/$'\n'}
+      line=${line//)/$'\n'}
       while IFS= read -r segment; do
         read -r -a words <<< "$segment"
         idx=0; t=""

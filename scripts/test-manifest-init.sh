@@ -207,9 +207,9 @@ grep -q 'CHECKSUM_MISMATCH' <<<"$out" ||
 # A present but non-working Perl executable must fail preflight.
 mkdir -p "$TMP/no-perl" "$TMP/perl-stub"
 git -C "$TMP/no-perl" init -q
-printf '#!/usr/bin/env bash\\nexit 1\\n' >"$TMP/perl-stub/perl"
+printf '#!/usr/bin/env bash\nexit 1\n' >"$TMP/perl-stub/perl"
 chmod +x "$TMP/perl-stub/perl"
-out=$(PATH="$TMP/perl-stub:$PATH" bash "$INIT" --templates "$TEMPLATES" \\
+out=$(PATH="$TMP/perl-stub:$PATH" bash "$INIT" --templates "$TEMPLATES" \
   --project "$TMP/no-perl" --project-name demo --tracks code 2>&1) &&
   rc=0 || rc=$?
 ok=1

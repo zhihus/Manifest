@@ -31,7 +31,7 @@ this file is its translation.
 | `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
-| `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility
+| `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
