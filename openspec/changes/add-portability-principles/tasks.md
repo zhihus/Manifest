@@ -131,6 +131,17 @@ and re-verification pass on both; all existing fixtures pass with
 the new format.
 Maps to scenarios: macOS without sha256sum; No SHA-256 tool at all.
 
+- [x] FR 3.6 perl-preflight
+
+In `scripts/manifest-init.sh`, verify during preflight that Perl is
+available and can execute a trivial program (`perl -e 'exit 0'`)
+before any project files are written. Add a regression fixture using
+a non-working Perl stub and verify that installation fails with an
+actionable message and leaves the project unchanged.
+Stop criterion: the Perl stub fixture fails preflight before creating
+`.manifest`; normal installations and all existing fixtures pass.
+Maps to scenarios: Perl is unavailable.
+
 ## 4. Automated checks
 
 - [x] FR 4.1 verify-autonomy-patterns
