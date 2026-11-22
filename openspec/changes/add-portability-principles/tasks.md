@@ -148,8 +148,8 @@ Maps to scenarios: Perl is unavailable.
 
 Extend `scripts/verify.sh` with an autonomy section: run the
 forbidden-pattern checks (design D2 pattern list) over the check
-scope (design D1, including the bilingual-pairing check: every
-English edition in scope must have a `*.ru.md` sibling); report
+scope (design D1, including the bidirectional bilingual-pairing check: every
+`*.en.md` edition must have a `*.ru.md` sibling and vice versa); report
 file and line; route judgment findings (unrelated-project mentions
 outside the closed patterns, content correspondence) to the human
 review output of the section. Separate commit.
