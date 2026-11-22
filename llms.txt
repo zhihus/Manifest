@@ -18,8 +18,10 @@ Entry point: `AGENTS.md`
   (compressed); project-level manifest with frozen decisions:
   `docs/project-manifest.md`.
 * `docs/architecture/` — architecture documents and audits
-  (architecture brief, decision registers, role model, integration
-  audits). Historical decision records; do not delete.
+  (architecture brief, decision registers, MVP/roadmap split, role
+  model, integration audits). Russian editions are authoritative
+  (`*.ru.md`); English versions (`*.en.md`) are translations.
+  Historical decision records; do not delete.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates). Entry: `workflow/README.en.md`.
