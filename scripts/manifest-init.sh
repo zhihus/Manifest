@@ -86,6 +86,21 @@ report() {
   ((${#SKIPPED[@]})) && printf '  %s\n' "${SKIPPED[@]}"
 }
 
+checksum_guard() {
+  [[ ! -f $MK/manifest.yaml ]] && return 0
+  [[ -f $MK/manifest.yaml.checksum ]] || {
+    echo "CHECKSUM_MISSING: .manifest/manifest.yaml.checksum not found"
+    exit 1
+  }
+  local expected actual
+  expected=$(awk '{print $1}' "$MK/manifest.yaml.checksum")
+  actual=$( (cd "$MK" && sha256sum manifest.yaml) | awk '{print $1}' )
+  [[ $actual == "$expected" ]] || {
+    echo "CHECKSUM_MISMATCH: .manifest/manifest.yaml does not match its protection record"
+    exit 1
+  }
+}
+
 preflight() {
   [[ -d $TEMPLATES && -r $TEMPLATES ]] || {
     echo "PREFLIGHT FAIL: template source unavailable: $TEMPLATES"
@@ -109,6 +124,7 @@ write_config() {
   ( cd "$MK" && sha256sum manifest.yaml > manifest.yaml.checksum )
 }
 
+checksum_guard
 preflight
 interview
 write_config
