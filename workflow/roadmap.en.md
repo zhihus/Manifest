@@ -3,27 +3,29 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.0.0**  
-> **Updated: 2026-11-10**  
+> **Version: 1.1.0**  
+> **Updated: 2026-11-22**  
 
 # Description
-Planned work for the Manifest workflow. Each item is a future
-deliverable, not yet implemented.
+Planned work for the Manifest workflow. Implemented items are marked
+as such; the rest remain future deliverables.
 
 ## 1. Verification process
 
-### 1.1. Commit
+### 1.1. Commit — implemented
 
-The model is required to commit — the requirement is recorded in
-context files (which files — to be decided later).
+The model is required to commit; the requirement is recorded in
+`workflow/agent-rules.ru.md` (§ Commits), distributed to connected
+projects by the `add-init-temp-and-commit-distribution` change.
 
-### 1.2. Verification
+### 1.2. Verification — implemented
 
-The model is required to run the verification script before
-committing — the requirement is recorded in context files (which
-files — to be decided later).
+`scripts/verify.sh` runs as a pre-commit hook (`scripts/hooks/pre-commit`);
+the requirement to pass it before committing is part of the same
+agent rules. The hook is the project's own dev infrastructure and is
+excluded from the framework distribution (see 1.6).
 
-### 1.3. Script
+### 1.3. Script — implemented
 
 Universal format; all machine-checkable checks:
 
@@ -35,16 +37,17 @@ Universal format; all machine-checkable checks:
   must differ; `draft` → version not checked;
 * `Type` is the gate that selects the check set.
 
-### 1.4. Second hook — `commit-msg`
+### 1.4. Second hook — `commit-msg` — not implemented
 
-Validates the commit message per `commit-rules.md`.
+Validates the commit message per `commit-rules.md`. Only the
+`pre-commit` hook exists; `commit-msg` remains a future deliverable.
 
-### 1.5. Open questions
+### 1.5. Open questions — resolved
 
-* rendering format of the metadata block (table / `<br>` / separate
-  blockquotes);
-* where to record the model's obligations (commit, verification) —
-  in `AGENTS.md` or in the rule files.
+* rendering format of the metadata block: blockquotes (current
+  practice across `workflow/` files);
+* model's obligations (commit, verification) are recorded in the
+  agent file (`workflow/agent-rules.ru.md`), not in `AGENTS.md`.
 
 ### 1.6. Distribution build — exclusions
 
