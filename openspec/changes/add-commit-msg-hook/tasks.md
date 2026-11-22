@@ -2,7 +2,7 @@
 
 ## 1. Hook and regression tests
 
-- [ ] FR 1.1 commit-msg-validator
+- [x] FR 1.1 commit-msg-validator
 
 Implement scripts/hooks/commit-msg according to design D1-D4. Add
 scripts/test-commit-msg.sh with cases for valid ordinary messages,
