@@ -174,8 +174,8 @@ $bad"
   local reg=$ROOT/docs/architecture/external-dependencies.ru.md
   local declared tools t tok f2
   if [[ -f $reg ]]; then
-    declared=$( { grep -oE '`[a-z0-9_-]+`' "$reg"; grep '^|' "$reg" |
-      awk -F'|' 'NR>2 {print $2}' | grep -oE '[a-z0-9_-]+'; } |
+    declared=$(grep '^|' "$reg" | awk -F'|' 'NR>2 {print $2}' |
+      grep -oE '[a-z0-9_-]+' |
       tr 'A-Z' 'a-z' | sort -u | tr '\n' ' ')
     declared="$declared bash sh env "
   else
