@@ -214,7 +214,8 @@ $bad"
   keywords=" echo printf read local declare exit return if then elif else fi for while until do done case esac function set shift trap cd pwd source eval exec export unset readonly test time wait true false break continue getopts shopt type typeset umask alias bg fg jobs builtin command enable dirs select coproc in { } [ ] [[ ]] : . ! "
   # Split compound commands at shell operators and inspect command positions.
   # Human review remains mandatory for constructs outside this conservative scan.
-  local f2 line segment t idx
+  local f2 line segment t idx cache_index cache_i
+  local -a checked_commands=() resolved_commands=()
   local double_quoted='"[^"]*"' single_quoted="'[^']*'"
   local -a words=()
   local in_case_pattern=0
@@ -273,7 +274,25 @@ $bad"
         [[ $keywords == *" $t "* ]] && continue
         [[ $funcs == *" $t "* ]] && continue
         [[ $declared == *" $t "* ]] && continue
-        command -v "$t" >/dev/null 2>&1 || continue
+        # Cache both successful and unsuccessful lookups. Use indexed arrays
+        # because the project supports the Bash 3.2 shipped with macOS.
+        cache_index=-1
+        for cache_i in "${!checked_commands[@]}"; do
+          if [[ ${checked_commands[cache_i]} == "$t" ]]; then
+            cache_index=$cache_i
+            break
+          fi
+        done
+        if (( cache_index < 0 )); then
+          checked_commands+=("$t")
+          if command -v "$t" >/dev/null 2>&1; then
+            resolved_commands+=(1)
+          else
+            resolved_commands+=(0)
+          fi
+          cache_index=$(("${#checked_commands[@]}" - 1))
+        fi
+        (( resolved_commands[cache_index] )) || continue
         fail "autonomy: undeclared external binary '$t' invoked in $f2 (add it to docs/architecture/external-dependencies.ru.md or remove the use)"
       done <<< "$line"
     done < "$f2"
