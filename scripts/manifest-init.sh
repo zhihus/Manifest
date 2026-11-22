@@ -2,7 +2,8 @@
 # manifest-init.sh — initialize Manifest in a project (MVP stage 1).
 # Usage:
 #   manifest-init.sh --templates <dir> [--project <dir>]
-#                    [--project-name <name>]
+#                    [--project-name <name>] [--purpose <text>]
+#                    [--initial-version <v>]
 #                    [--tracks none|code|documentation|mixed]
 # Exit codes: 0 OK, 2 usage, 3 conflicts, 1 preflight/guard failure.
 set -euo pipefail
@@ -10,12 +11,14 @@ set -euo pipefail
 PROJECT=.
 TEMPLATES=
 PROJECT_NAME=
+PURPOSE=
+INITIAL_VERSION=0.1.0
 TRACKS=
 ASK_NAME=0
 ASK_TRACKS=0
 
 usage() {
-  echo "usage: manifest-init.sh --templates <dir> [--project <dir>] [--project-name <name>] [--tracks none|code|documentation|mixed]"
+  echo "usage: manifest-init.sh --templates <dir> [--project <dir>] [--project-name <name>] [--purpose <text>] [--initial-version <v>] [--tracks none|code|documentation|mixed]"
   exit 2
 }
 
@@ -24,6 +27,8 @@ while (($#)); do
     --project) PROJECT=$2; shift 2 ;;
     --templates) TEMPLATES=$2; shift 2 ;;
     --project-name) PROJECT_NAME=$2; shift 2 ;;
+    --purpose) PURPOSE=$2; shift 2 ;;
+    --initial-version) INITIAL_VERSION=$2; shift 2 ;;
     --tracks) TRACKS=$2; shift 2 ;;
     *) usage ;;
   esac
@@ -69,6 +74,11 @@ interview() {
       *) TRACKS=$proposed ;;
     esac
   fi
+  if [[ -z $PURPOSE && ( $ASK_NAME -eq 1 || $ASK_TRACKS -eq 1 ) ]]; then
+    printf 'Project purpose [optional, Enter to skip]: '
+    read -r PURPOSE
+  fi
+  [[ -n $PURPOSE ]] || PURPOSE="Purpose: not established."
 }
 
 INSTALLED=()
@@ -79,11 +89,11 @@ report() {
   echo "== CONFIG"
   sed 's/^/  /' "$MK/manifest.yaml"
   echo "== INSTALLED (${#INSTALLED[@]})"
-  ((${#INSTALLED[@]})) && printf '  %s\n' "${INSTALLED[@]}"
+  if ((${#INSTALLED[@]})); then printf '  %s\n' "${INSTALLED[@]}"; fi
   echo "== CONFLICTS (${#CONFLICTS[@]})"
-  ((${#CONFLICTS[@]})) && printf '  %s\n' "${CONFLICTS[@]}"
+  if ((${#CONFLICTS[@]})); then printf '  %s\n' "${CONFLICTS[@]}"; fi
   echo "== SKIPPED (${#SKIPPED[@]})"
-  ((${#SKIPPED[@]})) && printf '  %s\n' "${SKIPPED[@]}"
+  if ((${#SKIPPED[@]})); then printf '  %s\n' "${SKIPPED[@]}"; fi
 }
 
 checksum_guard() {
@@ -137,9 +147,71 @@ write_config() {
   ( cd "$MK" && sha256sum manifest.yaml > manifest.yaml.checksum )
 }
 
+# Name-mapping table (design D4): installed file <- source template.
+BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
+BASE_SOURCES=(agents.template.md llm.template.txt commit-rules.template.md version.template versioning.template.md)
+
+# Render a template per the placeholder policy (design D7):
+# conditional blocks render through the templates' own fallback
+# branches (ENTRY_POINT / BUILD_METHOD stay empty), then variables
+# are substituted from interview data or deterministic defaults.
+render_template() {
+  local src=$1 dst=$2
+  PROJECT_NAME="$PROJECT_NAME" PURPOSE="$PURPOSE" \
+    INITIAL_VERSION="$INITIAL_VERSION" \
+    perl -pe '
+      s/\{%\s*if\s+\w+\s*%\}(.*?)\{%\s*else\s*%\}(.*?)\{%\s*endif\s*%\}/$2/gs;
+      s/\{%\s*if\s+\w+\s*%\}.*?\{%\s*endif\s*%\}//gs;
+      s/\{\{PROJECT_NAME\}\}/$ENV{PROJECT_NAME}/g;
+      s/\{\{PROJECT_PURPOSE\}\}/$ENV{PURPOSE}/g;
+      s/\{\{INITIAL_VERSION\}\}/$ENV{INITIAL_VERSION}/g;
+      s/\{\{PROJECT_CONTEXT\}\}/Not established./g;
+      s/\{\{PROJECT_DIRECTORIES\}\}/Not established./g;
+    ' "$src" >"$dst"
+}
+
+install_templates() {
+  local i name src rendered
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  for i in "${!BASE_NAMES[@]}"; do
+    name=${BASE_NAMES[$i]}
+    src=$TEMPLATES/${BASE_SOURCES[$i]}
+    if [[ -e $PROJECT/$name ]]; then
+      CONFLICTS+=("$name")
+      continue
+    fi
+    rendered=$tmpdir/$name
+    if ! render_template "$src" "$rendered"; then
+      echo "INSTALL_CORRUPT $name (render failed)"
+      rm -rf "$tmpdir"
+      exit 1
+    fi
+    # A file with a leftover placeholder is never installed.
+    if grep -q -e '{{' -e '{%' "$rendered"; then
+      echo "INSTALL_CORRUPT $name (unresolved placeholder)"
+      rm -rf "$tmpdir"
+      exit 1
+    fi
+    cp "$rendered" "$PROJECT/$name"
+    cmp -s "$rendered" "$PROJECT/$name" || {
+      echo "INSTALL_CORRUPT $name (installed file differs from render)"
+      rm -rf "$tmpdir"
+      exit 1
+    }
+    INSTALLED+=("$name")
+  done
+  rm -rf "$tmpdir"
+  report
+  if ((${#CONFLICTS[@]})); then
+    echo "INIT DONE WITH CONFLICTS (${#CONFLICTS[@]})"
+    exit 3
+  fi
+  echo "INIT OK"
+}
+
 checksum_guard
 preflight
 interview
 write_config
-report
-echo "INIT OK"
+install_templates
