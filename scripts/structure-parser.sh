@@ -344,7 +344,7 @@ run_directory() {
     echo "ОШИБКА: Markdown-файлы не найдены / ERROR: no Markdown files found: $directory" >&2
     return 2
   fi
-  printf 'Проверено Markdown-файлов / Markdown files checked: %s\\n' "$count"
+  printf 'Проверено Markdown-файлов / Markdown files checked: %s\n' "$count"
   return "$result"
 }
 
