@@ -218,10 +218,11 @@ $bad"
   local -a words=()
   local in_case_pattern=0
   for f2 in "${script_files[@]}"; do
+    in_case_pattern=0
     while IFS= read -r line || [[ -n $line ]]; do
       # Case-arm labels are patterns, not command invocations.
       if [[ $line =~ ^[[:space:]]*case[[:space:]] ]]; then
-        in_case_pattern=1
+        if [[ $line != *")"* ]]; then in_case_pattern=1; fi
         continue
       fi
       if (( in_case_pattern )); then
