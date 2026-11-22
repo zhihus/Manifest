@@ -2,7 +2,7 @@
 
 ## 1. Directory validation
 
-- [ ] FR 1.7 directory-mode
+- [x] FR 1.7 directory-mode
   Add `--dir <directory>` while preserving the single-file interface.
   Recursively discover regular `.md` files, validate all files, and
   aggregate the exit status. Add focused regression tests.
@@ -15,7 +15,7 @@
 
 ## 2. Scheduled execution documentation
 
-- [ ] FR 1.8 scheduled-run-guide
+- [x] FR 1.8 scheduled-run-guide
   Document one-shot scheduled invocation for cron and Windows Task
   Scheduler. State prerequisites and show how to capture exit status
   and logs. Do not install or configure a scheduler.
