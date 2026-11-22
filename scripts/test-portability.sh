@@ -119,7 +119,7 @@ check_autonomy >/dev/null 2>&1
 vout=$(bash "$ROOT/scripts/verify.sh" 2>&1) && vrc=0 || vrc=$?
 if (("${#FAILS[@]} == 0)) && ((vrc == 0)) &&
    grep -q 'human review' <<<"$vout" &&
-   grep -q 'shell dependency usage' <<<"$vout"; then
+   grep -q 'shell dependencies outside' <<<"$vout"; then
   note "real-repo-passes"
 else
   deny "real-repo-passes: exit $vrc / ${FAILS[*]} / output: $vout"
