@@ -133,6 +133,18 @@ else
   deny "distributed-source-enters-scope: workflow source not included"
 fi
 
+# 14. Avoid GNU-only utility options in scripts intended for macOS.
+if grep -nE 'find .*-(maxdepth|mindepth|quit)([[:space:]]|$)' "$ROOT"/scripts/*.sh; then
+  deny "macos-find-options-portable: GNU-only find option found"
+else
+  note "macos-find-options-portable"
+fi
+if grep -nE 'head[[:space:]]+-n[[:space:]]+-[0-9]+' "$ROOT"/scripts/*.sh; then
+  deny "macos-head-options-portable: GNU-only head option found"
+else
+  note "macos-head-options-portable"
+fi
+
 if [[ -n $seed_bin ]]; then
   printf 'printf ok && %s -c x\n' "$seed_bin" >"$TMP/scripts/compound.sh"
   run_check "compound-command-caught" "$TMP/scope" "$TMP/scripts" 1 "$seed_bin"

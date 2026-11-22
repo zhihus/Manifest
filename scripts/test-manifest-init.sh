@@ -15,6 +15,17 @@ trap 'rm -rf "$TMP"' EXIT
 PASS=()
 FAIL=()
 
+hash_pair() { # hash_pair <manifest-dir> — portable snapshot for the re-init fixture
+  local dir=$1
+  if (cd "$dir" && sha256sum manifest.yaml manifest.yaml.checksum >/dev/null 2>&1); then
+    (cd "$dir" && sha256sum manifest.yaml manifest.yaml.checksum)
+  elif (cd "$dir" && shasum -a 256 manifest.yaml manifest.yaml.checksum >/dev/null 2>&1); then
+    (cd "$dir" && shasum -a 256 manifest.yaml manifest.yaml.checksum)
+  else
+    return 1
+  fi
+}
+
 assert() { # assert <label> <expected-exit> <fixture-dir> <pattern...>
   local label=$1 want=$2 dir=$3; shift 3
   local out rc
@@ -141,8 +152,8 @@ ok=1
 grep -q 'REINIT_REFUSED' <<<"$out" ||
   { ok=0; FAIL+=("reinit: no REINIT_REFUSED token"); }
 # .manifest contents must stay byte-identical across the refused run.
-bef=$( (cd "$TMP/fresh/.manifest" && sha256sum manifest.yaml manifest.yaml.checksum) )
-aft=$( (cd "$TMP/fresh/.manifest" && sha256sum manifest.yaml manifest.yaml.checksum) )
+bef=$(hash_pair "$TMP/fresh/.manifest") || { ok=0; FAIL+=("reinit: no working SHA-256 utility"); }
+aft=$(hash_pair "$TMP/fresh/.manifest") || { ok=0; FAIL+=("reinit: no working SHA-256 utility on second read"); }
 [[ $bef == "$aft" ]] || { ok=0; FAIL+=("reinit: .manifest files modified"); }
 ((ok)) && PASS+=("reinit")
 

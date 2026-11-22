@@ -181,6 +181,22 @@ into the checked set (fixture test). Human review of changed shell
 scripts covers constructs outside the conservative scanner grammar.
 Maps to scenarios: File becomes distributed; Undeclared binary; Shell construct beyond scanner grammar.
 
+- [x] FR 4.3 macos-utility-options
+
+Keep infrastructure scripts compatible with the BSD utilities available
+on macOS: do not use GNU-only `find` options (such as `-maxdepth`,
+`-mindepth`, `-quit`) or negative-count `head -n -N`. Remove the
+depth restriction from project analysis rather than relying on a
+non-portable option. Replace the negative head count with portable
+`sed '$d'`. Make the re-init checksum fixture select a working
+`sha256sum` or `shasum -a 256`. Add static regression checks for
+these forbidden options.
+Stop criterion: `scripts/test-portability.sh` passes both macOS
+utility-option checks; the re-init fixture uses either supported
+SHA-256 utility. No GNU-only option remains in the affected scripts.
+Maps to scenarios: Scripts are portable Bash scripts without
+GNU-specific utility dependencies.
+
 ## 5. Verification
 
 - [x] FR 5.1 portability-verify-scenario

@@ -48,10 +48,10 @@ MK=$PROJECT/.manifest
 
 analyze_project() {
   local has_code=0 has_docs=0
-  find "$PROJECT" -maxdepth 3 -path "$PROJECT/.manifest" -prune -o \
+  find "$PROJECT" -path "$PROJECT/.manifest" -prune -o \
     -type f \( -name '*.c' -o -name '*.cpp' -o -name '*.cs' -o \
     -name '*.go' -o -name '*.java' -o -name '*.js' -o -name '*.py' -o \
-    -name '*.rs' -o -name '*.sh' -o -name '*.ts' \) -print -quit |
+    -name '*.rs' -o -name '*.sh' -o -name '*.ts' \) -print |
     grep -q . && has_code=1
   [[ -d $PROJECT/docs ]] && has_docs=1
   if ((has_code && has_docs)); then echo mixed

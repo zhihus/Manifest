@@ -25,7 +25,7 @@
 | `cmp` | байтовое сравнение установленных файлов с рендером | manifest-init.sh, test-manifest-init.sh | coreutils / Git for Windows / macOS |
 | `date` | дата создания конфигурации `created=` | manifest-init.sh (`date +%F`, локаленезависимо) | базовый состав систем |
 | `grep`, `sed` | проверка остаточных placeholder'ов, фильтрация вывода | все инфраструктурные скрипты и тесты | используются только в переносимых конструкциях (без GNU-only флагов) |
-| `find` | анализ типа проекта (кодовые файлы, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | переносимые флаги |
+| `find` | анализ типа проекта (кодовые файлы, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | POSIX-флаги без GNU-only расширений |
 | `basename`, `dirname` | извлечение имени проекта и каталога скрипта | manifest-init.sh, test-manifest-init.sh | переносимые системные утилиты |
 | `head`, `wc` | подсчёт и ограничение строк/слов в проверках и тестах | structure-parser.sh, test-manifest-init.sh | переносимые системные утилиты |
 | `sort`, `tr` | сортировка нарушений и обработка токенов/вывода | structure-parser.sh, verify.sh, test-portability.sh | переносимые системные утилиты |

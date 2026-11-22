@@ -25,7 +25,7 @@ this file is its translation.
 | `cmp` | byte comparison of installed files against renders | manifest-init.sh, test-manifest-init.sh | coreutils / Git for Windows / macOS |
 | `date` | config creation date `created=` | manifest-init.sh (`date +%F`, locale-independent) | base system install |
 | `grep`, `sed` | leftover-placeholder checks, output filtering | all infrastructure scripts and tests | portable constructs only (no GNU-only flags) |
-| `find` | project type analysis (code files, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | portable flags |
+| `find` | project type analysis (code files, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | POSIX flags without GNU-only extensions |
 | `basename`, `dirname` | project and script directory name extraction | manifest-init.sh, test-manifest-init.sh | portable system utilities |
 | `head`, `wc` | line/word counting and output limiting in checks and tests | structure-parser.sh, test-manifest-init.sh | portable system utilities |
 | `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
