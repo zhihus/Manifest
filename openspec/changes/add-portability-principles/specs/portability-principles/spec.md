@@ -97,10 +97,7 @@ Repository scripts MUST run as portable Bash scripts without GNU-specific utilit
 
 Repository infrastructure scripts include `scripts/*.sh` and hooks under `scripts/hooks/`, including extensionless hooks. A declared dependency entry
 records the tool, its purpose, the scripts using it, and the detection
-method. Using an undeclared external binary is a violation. The
-command-position scanner is not a complete Bash parser; a human
-reviewer MUST inspect changed scripts for invocations outside its
-supported grammar.
+method. Using an undeclared external binary is a violation.
 
 #### Scenario: Undeclared binary
 
@@ -113,6 +110,18 @@ supported grammar.
 - **WHEN** `manifest-init` renders templates with Perl
 - **THEN** the register documents Perl with its purpose (template
   rendering) and scope (manifest-init only)
+
+### Requirement: Shell dependency scan limits require human review
+The automated command-position scanner is not a complete Bash parser.
+A human reviewer MUST inspect changed infrastructure scripts for
+external command invocations outside the scanner's supported grammar.
+
+#### Scenario: Shell construct beyond scanner grammar
+
+- **WHEN** an infrastructure script uses command invocation syntax
+  outside the scanner's supported grammar
+- **THEN** the reviewer inspects the command and confirms its
+  dependency register entry
 
 ### Requirement: Repository verification includes automated autonomy checks
 The repository verification script MUST include the autonomy and
