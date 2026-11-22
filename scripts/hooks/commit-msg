@@ -26,8 +26,8 @@ if [[ ! $subject =~ $header_re ]]; then
   exit 1
 fi
 
-has_bang=${BASH_REMATCH[4]}
-subject_text=${BASH_REMATCH[5]}
+has_bang=${BASH_REMATCH[3]}
+subject_text=${BASH_REMATCH[4]}
 if [[ $subject_text == *"." || $subject_text == *" " ]]; then
   echo "commit-msg: subject must not end with a period or space" >&2
   exit 1
