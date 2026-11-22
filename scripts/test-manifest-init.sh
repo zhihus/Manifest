@@ -145,14 +145,15 @@ grep -q '== REPORT\|== INSTALLED\|== CONFLICTS' <<<"$out" ||
 ((ok)) && PASS+=("corrupt")
 
 # Regression: re-init refuses with the REINIT_REFUSED token.
+# Snapshot the files BEFORE the refused attempt.
+ok=1
+bef=$(hash_pair "$TMP/fresh/.manifest") || { ok=0; FAIL+=("reinit: no working SHA-256 utility"); }
 out=$(bash "$INIT" --templates "$TEMPLATES" --project "$TMP/fresh" \
   --project-name demo --tracks code 2>&1) && rc=0 || rc=$?
-ok=1
 [[ $rc -ne 0 ]] || { ok=0; FAIL+=("reinit: exit $rc, want non-zero"); }
 grep -q 'REINIT_REFUSED' <<<"$out" ||
   { ok=0; FAIL+=("reinit: no REINIT_REFUSED token"); }
 # .manifest contents must stay byte-identical across the refused run.
-bef=$(hash_pair "$TMP/fresh/.manifest") || { ok=0; FAIL+=("reinit: no working SHA-256 utility"); }
 aft=$(hash_pair "$TMP/fresh/.manifest") || { ok=0; FAIL+=("reinit: no working SHA-256 utility on second read"); }
 [[ $bef == "$aft" ]] || { ok=0; FAIL+=("reinit: .manifest files modified"); }
 ((ok)) && PASS+=("reinit")
