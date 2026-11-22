@@ -97,7 +97,10 @@ Repository scripts MUST run as portable Bash scripts without GNU-specific utilit
 
 Repository infrastructure scripts include `scripts/*.sh` and hooks under `scripts/hooks/`, including extensionless hooks. A declared dependency entry
 records the tool, its purpose, the scripts using it, and the detection
-method. Using an undeclared external binary is a violation.
+method. Using an undeclared external binary is a violation. The
+command-position scanner is not a complete Bash parser; a human
+reviewer MUST inspect changed scripts for invocations outside its
+supported grammar.
 
 #### Scenario: Undeclared binary
 

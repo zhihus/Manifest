@@ -248,6 +248,7 @@ $bad"
 main() {
   check_existence
   check_autonomy
+  echo "verify.sh: human review required for public-file content (unrelated-project mentions outside closed patterns, RU/EN correspondence) and shell dependency usage beyond the conservative command scanner"
   local set
   set=$(changed_set)
   case "$set" in
@@ -256,7 +257,6 @@ main() {
         printf '%s\n' "${FAILS[@]}"
         exit 1
       fi
-      echo "verify.sh: autonomy: automated checks passed; human review of the public-file scope is still required (unrelated-project mentions outside the closed patterns, RU/EN content correspondence)"
       echo "verify.sh: OK"
       exit 0
       ;;

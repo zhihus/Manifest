@@ -166,7 +166,8 @@ content beyond the register cross-check, `workflow/`,
 Stop criterion: adding an undeclared binary call to a fixture copy
 of a script makes verify.sh exit 1 naming the binary; registering
 it restores 0; moving a file into a distributed-source list pulls it
-into the checked set (fixture test).
+into the checked set (fixture test). Human review of changed shell
+scripts covers constructs outside the conservative scanner grammar.
 Maps to scenarios: File becomes distributed; Undeclared binary.
 
 ## 5. Verification
