@@ -359,8 +359,11 @@ if [[ "${1:-}" == "--dir" ]]; then
     echo "Использование / Usage: structure-parser.sh --dir <directory>" >&2
     exit 2
   fi
-  run_directory "$2"
-  exit $?
+  if run_directory "$2"; then
+    exit 0
+  else
+    exit $?
+  fi
 fi
 
 main "$@"
