@@ -60,13 +60,14 @@ DOC
 mkdir -p "$WORK/input/nested folder" "$WORK/empty"
 write_valid "$WORK/input/valid.md"
 write_valid "$WORK/input/nested folder/valid nested.md"
+write_valid "$WORK/input/nested folder/special & name.md"
 
 # Existing single-file mode remains supported.
 assert_status 0 "$WORK/input/valid.md" >/dev/null
 
 # Recursive mode discovers root and nested Markdown files, including spaces.
 output="$(assert_status 0 --dir "$WORK/input")"
-assert_contains "$output" "Markdown files checked: 2"
+assert_contains "$output" "Markdown files checked: 3"
 
 # Two independent violations must both be reported in one directory run.
 sed 's/Status: draft/Status: invalid/' "$WORK/input/valid.md" > "$WORK/input/invalid root.md"
