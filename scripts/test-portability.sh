@@ -138,6 +138,7 @@ if [[ -n $seed_bin ]]; then
   mkdir -p "$TMP/scripts/hooks"
   printf '#!/usr/bin/env bash\n%s -c x\n' "$seed_bin" >"$TMP/scripts/hooks/pre-commit"
   run_check "extensionless-hook-caught" "$TMP/scope" "$TMP/scripts" 1 "$seed_bin"
+  rm -f "$TMP/scripts/hooks/pre-commit"
 else
   deny "compound-command-caught: no executable candidate available"
   deny "extensionless-hook-caught: no executable candidate available"

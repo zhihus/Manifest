@@ -8,7 +8,7 @@
 
 # Description
 The single source listing the external binary tools that Manifest
-repository infrastructure scripts (`scripts/*.sh`) may invoke.
+repository infrastructure scripts (`scripts/*.sh` and hooks under `scripts/hooks/`) may invoke.
 Adding a new external dependency requires an entry in this register.
 Entry format: tool, purpose, scope of use, detection method. The
 Russian edition (`external-dependencies.ru.md`) is authoritative;
@@ -16,7 +16,7 @@ this file is its translation.
 
 | Tool | Purpose | Scope | Detection |
 | --- | --- | --- | --- |
-| `bash` | interpreter for all infrastructure scripts | all `scripts/*.sh` | `#!/usr/bin/env bash` |
+| `bash` | interpreter for all infrastructure scripts | `scripts/*.sh` and `scripts/hooks/*` | `#!/usr/bin/env bash` |
 | `git` | repository operations, changed-file detection | verify.sh, structure-parser.sh (indirect), manifest-init.sh (work-tree check) | preflight `command -v git` |
 | SHA-256 (`sha256sum` or `shasum -a 256`) | config overwrite protection; byte checks | manifest-init.sh (checksum guard) | runtime detection: `sha256sum`, else `shasum -a 256`; the detected tool is used consistently |
 | `perl` | manifest-init template rendering (placeholder and conditional substitution) | manifest-init.sh, `render_template` | preflight: `command -v perl` and `perl -e 'exit 0'` |

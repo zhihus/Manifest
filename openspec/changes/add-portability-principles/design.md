@@ -96,7 +96,7 @@ user (2026-11-22) and recorded in this change.
   `perl` (manifest-init template rendering only — documented, not
   replaced), `mktemp`, `awk`, `cmp` (coreutils), `date`, `grep`,
   `sed`. The initial list is illustrative: the binding requirement is
-  that every binary invoked by `scripts/*.sh` has an entry (enforced
+  that every binary invoked by `scripts/*.sh` or hooks under `scripts/hooks/` has an entry (enforced
   by the FR 1.2 stop criterion and FR 4.2 check). `python` is
   removed, not registered. D1–D8 are decisions of this change; the
   register documents perl as an existing implementation fact, not as

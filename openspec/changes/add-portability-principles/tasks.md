@@ -37,7 +37,7 @@ an entry. Explicitly note Python was removed and is not a
 dependency. Link the register from `llms.txt` (Directories section,
 one line). Separate commit.
 Stop criterion: both files exist with identical entry sets; every
-binary invoked by `scripts/*.sh` (grep over the scripts) has an
+binary invoked by `scripts/*.sh` or `scripts/hooks/*` (grep over the scripts and hooks) has an
 entry; `llms.txt` links the register.
 Maps to scenarios: External dependency register exists and is
 referenced; Perl rendering dependency documented.
@@ -156,7 +156,7 @@ caught.
 Add to the verify.sh autonomy section: the scope principle check
 (any file under the install/distribution source lists of design D1
 is inside the checked set) and the register cross-check — every
-external binary invoked by `scripts/*.sh` must have an entry in
+external binary invoked by `scripts/*.sh` or `scripts/hooks/*` must have an entry in
 `docs/architecture/external-dependencies.ru.md` (simple name list
 extracted from the register); allowlist mechanism for false
 positives (inline comment marker). Do not check `docs/architecture/`
