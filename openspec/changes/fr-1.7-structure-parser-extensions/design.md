@@ -13,7 +13,7 @@ and scheduled runs.
 - Add recursive validation of Markdown files in an explicit directory.
 - Continue through all discovered files and aggregate failures.
 - Support paths containing spaces and other shell-special characters.
-- Keep the parser portable to Bash 3.2 and standard POSIX utilities.
+- Use the same Bash baseline as the existing parser and rely only on standard utilities already required by the project.
 - Make periodic execution possible through external schedulers.
 
 **Non-Goals:**
