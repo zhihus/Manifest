@@ -93,11 +93,7 @@ review. The bilingual requirement is confirmed by the user
 - **AND** content correspondence is covered by the human review
 
 ### Requirement: Scripts are portable Bash scripts without GNU-specific utility dependencies
-Repository scripts MUST run as portable Bash scripts without GNU-specific utility dependencies, and every external binary they invoke MUST be declared in the external dependency register with its purpose and scope.
-
-Repository infrastructure scripts include `scripts/*.sh` and hooks under `scripts/hooks/`, including extensionless hooks. A declared dependency entry
-records the tool, its purpose, the scripts using it, and the detection
-method. Using an undeclared external binary is a violation.
+Repository scripts MUST run as portable Bash scripts without GNU-specific utility dependencies. Every external binary invoked by `scripts/*.sh` or hooks under `scripts/hooks/` MUST have a register entry recording its purpose, scope, and detection method. Invoking an undeclared binary is a violation.
 
 #### Scenario: Undeclared binary
 

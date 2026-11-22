@@ -18,7 +18,7 @@ this file is its translation.
 | --- | --- | --- | --- |
 | `bash` | interpreter for all infrastructure scripts | `scripts/*.sh` and `scripts/hooks/*` | `#!/usr/bin/env bash` |
 | `git` | repository operations, changed-file detection | all infrastructure scripts and the `scripts/hooks/pre-commit` hook | preflight `command -v git` |
-| SHA-256 (`sha256sum` or `shasum -a 256`) | config overwrite protection; byte checks | manifest-init.sh (checksum guard) | runtime detection: `sha256sum`, else `shasum -a 256`; the detected tool is used consistently |
+| SHA-256 (`sha256sum` or `shasum -a 256`) | config overwrite protection; byte checks | manifest-init.sh (checksum guard), test-manifest-init.sh (checksum regression fixture) | runtime detection: `sha256sum`, else `shasum -a 256`; the detected tool is used consistently |
 | `perl` | manifest-init template rendering (placeholder and conditional substitution) | manifest-init.sh, `render_template` | preflight: `command -v perl` and `perl -e 'exit 0'` |
 | `mktemp` | unique temp files and directories (collision safety) | manifest-init.sh, verify.sh, test-manifest-init.sh, test-portability.sh | coreutils / Git for Windows / macOS |
 | `awk` | checksum output parsing, fixture generation in verify.sh | manifest-init.sh, verify.sh | base system install; only portable constructs used |

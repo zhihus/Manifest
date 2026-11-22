@@ -19,7 +19,7 @@ Entry point: `AGENTS.md`
   are authoritative (`*.ru.md`); English versions (`*.en.md`) are
   translations.
   Historical decision records; do not delete.
-* `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
+* `docs/plans/` — plan files (stored compressed; `.ru.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates). Entry: `workflow/README.en.md`.
   Naming rules for files and directories:

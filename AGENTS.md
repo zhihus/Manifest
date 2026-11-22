@@ -1,10 +1,10 @@
-**Language.** Reply to the user in Russian. Default all artifacts
-(docs, code, identifiers, comments, commits) to English unless told
-otherwise. Reason in English. When starting development of a new
-document file, create the Russian version (`.ru.md`) alongside the
-English one. **RU/EN workflow:** `.ru.md` is a working draft for the
-user's review; the user approves RU, then the agent translates it into
-the English (final) file; RU may be deleted later.
+**Language.** Reply to the user in Russian. Default code, identifiers,
+comments, and commit messages to English. Maintain document editions
+in Russian and English: `.ru.md` is authoritative and is the version
+the user reviews; `.en.md` is its faithful translation. Create or
+update the Russian edition first, then synchronize the English
+translation. Never delete the Russian edition or treat English as
+authoritative. Reason in English.
 
 **Transcription format.** In the structure file's header transcription: each
 line of the real document comes first, followed by a line starting with
@@ -23,9 +23,11 @@ Type: **doc**.
 compressed; the agent must perform context compression before storing
 or updating a plan, using an available context-compression skill or
 mechanism of its own choice, and the compression must preserve
-invariants, constraints, and technical values. Always read the English
-version (`.en.md`) of a plan. If no English version exists, read the
-version in any language. English takes priority.
+invariants, constraints, and technical values. Always read the Russian
+authoritative version (`.ru.md`). The English version (`.en.md`) is
+a translation and never takes priority. If no Russian version exists,
+read the available version and create the Russian edition when the plan
+is next updated.
 
 **Rules.**
 

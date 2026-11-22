@@ -18,7 +18,7 @@
 | --- | --- | --- | --- |
 | `bash` | интерпретатор всех скриптов инфраструктуры | `scripts/*.sh` и `scripts/hooks/*` | `#!/usr/bin/env bash` |
 | `git` | работа с репозиторием, определение изменённых файлов | все инфраструктурные скрипты и hook `scripts/hooks/pre-commit` | preflight `command -v git` |
-| SHA-256 (`sha256sum` или `shasum -a 256`) | защита конфигурации от перезаписи; байтовые проверки | manifest-init.sh (checksum guard) | детекция при запуске: `sha256sum`, иначе `shasum -a 256`; выбранная утилита используется согласованно |
+| SHA-256 (`sha256sum` или `shasum -a 256`) | защита конфигурации от перезаписи; байтовые проверки | manifest-init.sh (checksum guard), test-manifest-init.sh (checksum regression fixture) | детекция при запуске: `sha256sum`, иначе `shasum -a 256`; выбранная утилита используется согласованно |
 | `perl` | рендеринг шаблонов manifest-init (подстановка placeholder'ов и условных блоков) | manifest-init.sh, функция `render_template` | preflight: `command -v perl` и `perl -e 'exit 0'` |
 | `mktemp` | уникальные временные файлы и каталоги (защита от коллизий) | manifest-init.sh, verify.sh, test-manifest-init.sh, test-portability.sh | входит в coreutils / Git for Windows / macOS |
 | `awk` | разбор вывода checksum, генерация fixture в verify.sh | manifest-init.sh, verify.sh | входит в базовый состав систем; BSD/GNU совместимость по используемым конструкциям |
