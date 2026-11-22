@@ -24,12 +24,17 @@ usage() {
 
 while (($#)); do
   case "$1" in
-    --project) PROJECT=$2; shift 2 ;;
-    --templates) TEMPLATES=$2; shift 2 ;;
-    --project-name) PROJECT_NAME=$2; shift 2 ;;
-    --purpose) PURPOSE=$2; shift 2 ;;
-    --initial-version) INITIAL_VERSION=$2; shift 2 ;;
-    --tracks) TRACKS=$2; shift 2 ;;
+    --project | --templates | --project-name | --purpose | --initial-version | --tracks)
+      (($# >= 2)) || usage
+      case "$1" in
+        --project) PROJECT=$2 ;;
+        --templates) TEMPLATES=$2 ;;
+        --project-name) PROJECT_NAME=$2 ;;
+        --purpose) PURPOSE=$2 ;;
+        --initial-version) INITIAL_VERSION=$2 ;;
+        --tracks) TRACKS=$2 ;;
+      esac
+      shift 2 ;;
     *) usage ;;
   esac
 done
@@ -56,27 +61,33 @@ analyze_project() {
   fi
 }
 
+ask() { # ask <prompt-var> <prompt> — read a line; EOF is fatal (nothing written yet).
+  local var=$1
+  printf '%s' "$2"
+  if ! read -r "$var"; then
+    echo "INTERVIEW_EOF: no answer could be read (EOF on stdin); nothing was written to the project" >&2
+    exit 1
+  fi
+}
+
 interview() {
   local proposed
   proposed=$(analyze_project)
   if [[ -z $PROJECT_NAME ]]; then
     ASK_NAME=1
-    printf 'Project name [%s]: ' "$(basename "$PROJECT")"
-    read -r PROJECT_NAME
+    ask PROJECT_NAME "Project name [$(basename "$PROJECT")]: "
     [[ -n $PROJECT_NAME ]] || PROJECT_NAME=$(basename "$PROJECT")
   fi
   if [[ -z $TRACKS ]]; then
     ASK_TRACKS=1
-    printf 'Tracks — proposed: %s [confirm/change] (none|code|documentation|mixed): ' "$proposed"
-    read -r TRACKS
+    ask TRACKS "Tracks — proposed: $proposed [confirm/change] (none|code|documentation|mixed): "
     case $TRACKS in
       code | documentation | mixed | none) ;;
       *) TRACKS=$proposed ;;
     esac
   fi
   if [[ -z $PURPOSE && ( $ASK_NAME -eq 1 || $ASK_TRACKS -eq 1 ) ]]; then
-    printf 'Project purpose [optional, Enter to skip]: '
-    read -r PURPOSE
+    ask PURPOSE "Project purpose [optional, Enter to skip]: "
   fi
   [[ -n $PURPOSE ]] || PURPOSE="Purpose: not established."
 }
@@ -117,13 +128,14 @@ preflight() {
     fails+=("git not available in PATH — install Git")
   git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
     fails+=("project is not inside a Git work tree — run 'git init' in the project first")
-  if ! ( : >"$PROJECT/.manifest-write-probe" ) 2>/dev/null; then
+  # Write probe with a unique name: a pre-existing user file named
+  # .manifest-write-probe can never be overwritten or removed.
+  local probe
+  probe=$(mktemp "$PROJECT/.manifest-write-probe.XXXXXX" 2>/dev/null) &&
+    rm -f "$probe" ||
     fails+=("project root is not writable — grant write permission to the project root")
-  else
-    rm -f "$PROJECT/.manifest-write-probe"
-  fi
   [[ -e $MK ]] &&
-    fails+=(".manifest already exists — the project is already initialized; re-initialization is not provided")
+    fails+=("REINIT_REFUSED: .manifest already exists — the project is already initialized; re-initialization is not provided")
   [[ -d $TEMPLATES && -r $TEMPLATES ]] ||
     fails+=("template source unavailable or not readable: $TEMPLATES — pass --templates pointing to the Manifest docs/templates directory")
   command -v sha256sum >/dev/null 2>&1 ||

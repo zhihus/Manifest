@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # test-manifest-init.sh — mechanical verification of manifest-init.sh
-# against the four fixture scenarios of add-manifest-init-mvp (FR 4.1).
+# against the five fixture scenarios of add-manifest-init-mvp (FR 4.1)
+# plus four regression tests (reinit, probe, usage, interview EOF).
 # Usage: bash scripts/test-manifest-init.sh
 # Exit codes: 0 all fixtures pass, 1 at least one fixture fails.
 set -uo pipefail
@@ -131,6 +132,53 @@ done
 grep -q '== REPORT\|== INSTALLED\|== CONFLICTS' <<<"$out" ||
   { ok=0; FAIL+=("corrupt: full report not printed"); }
 ((ok)) && PASS+=("corrupt")
+
+# Regression: re-init refuses with the REINIT_REFUSED token.
+out=$(bash "$INIT" --templates "$TEMPLATES" --project "$TMP/fresh" \
+  --project-name demo --tracks code 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -ne 0 ]] || { ok=0; FAIL+=("reinit: exit $rc, want non-zero"); }
+grep -q 'REINIT_REFUSED' <<<"$out" ||
+  { ok=0; FAIL+=("reinit: no REINIT_REFUSED token"); }
+# .manifest contents must stay byte-identical across the refused run.
+bef=$( (cd "$TMP/fresh/.manifest" && sha256sum manifest.yaml manifest.yaml.checksum) )
+aft=$( (cd "$TMP/fresh/.manifest" && sha256sum manifest.yaml manifest.yaml.checksum) )
+[[ $bef == "$aft" ]] || { ok=0; FAIL+=("reinit: .manifest files modified"); }
+((ok)) && PASS+=("reinit")
+
+# Regression: a pre-existing user file named .manifest-write-probe
+# survives init untouched; no probe leftovers remain.
+mkdir -p "$TMP/probe" && git -C "$TMP/probe" init -q
+printf 'user data\n' >"$TMP/probe/.manifest-write-probe"
+out=$(bash "$INIT" --templates "$TEMPLATES" --project "$TMP/probe" \
+  --project-name demo --tracks code 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -eq 0 ]] || { ok=0; FAIL+=("probe: exit $rc, want 0"); }
+[[ "$(cat "$TMP/probe/.manifest-write-probe" 2>/dev/null)" == 'user data' ]] ||
+  { ok=0; FAIL+=("probe: user file modified or removed"); }
+ls "$TMP/probe"/.manifest-write-probe.* >/dev/null 2>&1 &&
+  { ok=0; FAIL+=("probe: leftover probe file"); }
+((ok)) && PASS+=("probe")
+
+# Regression: --templates without a value prints usage, exits 2.
+out=$(bash "$INIT" --templates 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -eq 2 ]] || { ok=0; FAIL+=("usage: exit $rc, want 2"); }
+grep -q 'usage:' <<<"$out" || { ok=0; FAIL+=("usage: no usage line"); }
+((ok)) && PASS+=("usage")
+
+# Regression: interview EOF (empty stdin, no flags) fails cleanly,
+# nothing is written to the project.
+mkdir -p "$TMP/eof" && git -C "$TMP/eof" init -q
+out=$(bash "$INIT" --templates "$TEMPLATES" --project "$TMP/eof" \
+  </dev/null 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -ne 0 ]] || { ok=0; FAIL+=("eof: exit $rc, want non-zero"); }
+grep -q 'INTERVIEW_EOF' <<<"$out" ||
+  { ok=0; FAIL+=("eof: no INTERVIEW_EOF message"); }
+[[ ! -e $TMP/eof/.manifest ]] ||
+  { ok=0; FAIL+=("eof: partial .manifest left behind"); }
+((ok)) && PASS+=("eof")
 
 echo "== RESULTS (${#PASS[@]} passed, ${#FAIL[@]} failed)"
 printf 'PASS %s\n' "${PASS[@]}"

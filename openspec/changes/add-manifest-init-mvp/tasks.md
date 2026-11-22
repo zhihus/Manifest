@@ -130,10 +130,12 @@ project without context files.
 - [x] FR 4.1 init-verify-scenario
 
 Create `scripts/test-manifest-init.sh` (Bash) that mechanically
-verifies the change in a temp directory: builds four fixtures (fresh
+verifies the change in a temp directory: builds five fixtures (fresh
 Git project; project with `AGENTS.md` and `VERSIONING.md` present;
 project with tampered `manifest.yaml` checksum; directory outside a
-Git work tree) and runs `scripts/manifest-init.sh` against each.
+Git work tree; project where a template carries an unresolvable
+placeholder, exercising `INSTALL_CORRUPT` rollback of the files
+created by the run) and runs `scripts/manifest-init.sh` against each.
 Expected results, asserted by exit code and content checks: fresh —
 exit 0, five files installed, report has INSTALLED five lines,
 conflicts empty, no `{{` and no `{{PROJECT_NAME}}` left in installed
@@ -143,5 +145,5 @@ exit non-zero, `CHECKSUM_MISMATCH`, config unchanged; no-git — exit
 non-zero, failure report names the Git check. Clean up its temp
 files on exit.
 Stop criterion: `bash scripts/test-manifest-init.sh` exits 0 with a
-four-line PASS summary, one PASS per fixture.
+PASS summary, one `PASS <fixture>` line per fixture.
 Maps to scenarios: all scenarios of the three capabilities.
