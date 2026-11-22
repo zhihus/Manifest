@@ -344,7 +344,7 @@ run_directory() {
   fi
   while IFS= read -r -d '' file; do
     count=$((count + 1))
-    if "$SCRIPT_PATH" "$file"; then
+    if bash "$SCRIPT_PATH" "$file"; then
       :
     else
       rc=$?
