@@ -1,6 +1,6 @@
 # Manifest — Architecture Brief
 
-**Version:** 0.4.0  
+**Version:** 0.4.1  
 **Status:** working edition, synced with the decisions of the
 2026-11-20/21 discussions and the 2026-11-22 protocol
 (`architecture-session-2026-11-22.ru.md`)  
@@ -114,6 +114,11 @@ For all projects:
 
 `VERSIONING.md` and `RELEASES.md` are separate documents with
 different purposes.
+
+> Note (2026-11-22): no `RELEASES.md` template exists yet, so
+> `manifest-init` in the MVP installs the five base-set files
+> (without `RELEASES.md`); the file is added to a project manually
+> once a template appears.
 
 ### Conditional templates
 
