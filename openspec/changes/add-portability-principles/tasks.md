@@ -178,7 +178,8 @@ Stop criterion: adding an undeclared binary call to a fixture copy
 of a script makes verify.sh exit 1 naming the binary; registering
 it restores 0; moving a file into a distributed-source list pulls it
 into the checked set (fixture test). Human review of changed shell
-scripts covers constructs outside the conservative scanner grammar.
+scripts covers constructs outside the conservative scanner grammar
+and platform-specific commands unavailable in the current PATH.
 Maps to scenarios: File becomes distributed; Undeclared binary; Shell construct beyond scanner grammar.
 
 - [x] FR 4.3 macos-utility-options

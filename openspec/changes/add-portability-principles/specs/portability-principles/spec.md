@@ -115,16 +115,19 @@ Repository scripts MUST run as portable Bash scripts without GNU-specific utilit
   rendering) and scope (manifest-init only)
 
 ### Requirement: Shell dependency scan limits require human review
-The automated command-position scanner is not a complete Bash parser.
+The automated command-position scanner is not a complete Bash parser
+and only flags external command tokens resolvable in the current PATH.
 A human reviewer MUST inspect changed infrastructure scripts for
-external command invocations outside the scanner's supported grammar.
+invocations outside the scanner's supported grammar and for
+platform-specific commands unavailable in the current PATH.
 
 #### Scenario: Shell construct beyond scanner grammar
 
 - **WHEN** an infrastructure script uses command invocation syntax
   outside the scanner's supported grammar
 - **THEN** the reviewer inspects the command and confirms its
-  dependency register entry
+  dependency register entry, including when the command is unavailable
+  in the current PATH
 
 ### Requirement: Repository verification includes automated autonomy checks
 The repository verification script MUST include the autonomy and

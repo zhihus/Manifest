@@ -173,8 +173,9 @@ $bad"
         ;;
     esac
   done
-  # Declared-dependency check: every external binary invoked by a
-  # script must appear in the external dependency register.
+  # Declared-dependency check: every statically identified external
+  # command resolvable in the current PATH must appear in the register.
+  # Platform-specific commands absent from PATH require human review.
   local reg=$ROOT/docs/architecture/external-dependencies.ru.md
   local declared tools t tok f2
   if [[ -f $reg ]]; then
@@ -252,7 +253,7 @@ $bad"
 main() {
   check_existence
   check_autonomy
-  echo "verify.sh: human review required for public-file content (unrelated-project mentions outside closed patterns, RU/EN correspondence) and shell dependency usage beyond the conservative command scanner"
+  echo "verify.sh: human review required for public-file content (unrelated-project mentions outside closed patterns, RU/EN correspondence) and shell dependencies outside the conservative scanner, including platform-specific commands unavailable in PATH"
   local set
   set=$(changed_set)
   case "$set" in
