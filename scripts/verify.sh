@@ -190,7 +190,7 @@ $bad"
   local funcs keywords
   if (("${#script_files[@]}")); then
     funcs=$(grep -hE '^[a-z_][a-z0-9_]*\(\)' "${script_files[@]}" 2>/dev/null |
-      sed 's/()//' | sort -u | tr '\n' ' ')
+      sed 's/()//' | sort -u | tr '\n' ' ' || true)
   else
     funcs=""
   fi
