@@ -54,30 +54,28 @@ run_parser_tests() {
       awk 'NR<=10 {print "  " $0}' "$VERIFY_TMP/ref-out.txt"
     fi
   done
-  python - "$VERIFY_TMP" > /dev/null <<'EOF'
-import sys
-fixture = (
-    "# T" + "e" * 140 + "\n"
-    "\n"
-    "# \u041c\u0435\u0442\u0430\u0434\u0430\u043d\u043d\u044b\u0435\n"
-    "> **Status: in-development**  \n"
-    "> **Type: document**  \n"
-    "> **Version: 1.0**  \n"
-    "> **Updated: 2026-11-09**  \n"
-    "\n"
-    "# \u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435\n"
-    "Text.\n"
-    "\n"
-    "## 1. \u041f\u0435\u0440\u0432\u044b\u0439\n"
-    "\n"
-    "## 3. \u0412\u0442\u043e\u0440\u043e\u0439\n"
-    "\n"
-    "### 3.1. \u041d\u0435\u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u044b\u0435\n"
-    "\n"
-    "\u274c \u043f\u0440\u0438\u043c\u0435\u0440 \u0431\u0435\u0437 \u043c\u0435\u0442\u043a\u0438\n"
-)
-open(sys.argv[1] + "/fixture.md", "w", encoding="utf-8", newline="\n").write(fixture)
-EOF
+  # Fixture written in portable Bash/awk (no Python): byte-identical
+  # to the original generator output.
+  {
+    awk 'BEGIN { s = "# T"; for (i = 0; i < 140; i++) s = s "e"; print s }'
+    printf '\n'
+    printf '# Метаданные\n'
+    printf '> **Status: in-development**  \n'
+    printf '> **Type: document**  \n'
+    printf '> **Version: 1.0**  \n'
+    printf '> **Updated: 2026-11-09**  \n'
+    printf '\n'
+    printf '# Описание\n'
+    printf 'Text.\n'
+    printf '\n'
+    printf '## 1. Первый\n'
+    printf '\n'
+    printf '## 3. Второй\n'
+    printf '\n'
+    printf '### 3.1. Неправильные\n'
+    printf '\n'
+    printf '❌ пример без метки\n'
+  } > "$VERIFY_TMP/fixture.md"
   if bash "$ROOT/$PARSER" "$VERIFY_TMP/fixture.md" > /dev/null 2>&1; then
     rc=1
     fail "парсер не нашёл заложенные нарушения / parser missed the seeded violations"
@@ -85,13 +83,148 @@ EOF
   return $rc
 }
 
+# --- autonomy checks (portability-principles) ---
+# Mechanical privacy/autonomy checks over Manifest's own public
+# files. They never modify files and never impose requirements on
+# projects that use Manifest.
+# Public-file scope (closed list + distributed dirs; local config is
+# excluded): workflow/connected-projects.md is a local machine
+# registry, not a distributed rule. The model/harness-name check does
+# not cover workflow/ (unresolved decision U1: its role table records
+# an approved model-specific orchestrator decision).
+autonomy_scope() {
+  local f
+  for f in AGENTS.md llms.txt docs/manifest.md docs/project-manifest.md \
+           VERSIONING.md commit-rules.md releases.md openspec-rules.md; do
+    [[ -f $ROOT/$f ]] && printf '%s\n' "$ROOT/$f"
+  done
+  # Tracked files only: gitignored local material is out of scope.
+  find "$ROOT/docs/templates" "$ROOT/openspec/specs" "$ROOT/workflow" \
+    -type f \( -name '*.md' -o -name '*.txt' \) 2>/dev/null |
+    grep -v 'connected-projects.md' |
+    while IFS= read -r f; do
+      git -C "$ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1 &&
+        printf '%s\n' "$f"
+    done
+}
+
+# check_autonomy [scope-dir-override] [scripts-dir-override]
+#   (overrides exist for fixture testing; empty = real repo scope)
+check_autonomy() {
+  local scope_dir=${1:-} scripts_dir=${2:-$ROOT/scripts}
+  local files=() f bad
+  # A line containing this marker is exempt from the checks.
+  local allow='portability-allow'
+  # Forbidden patterns: machine paths, personal data, unrelated
+  # projects. Applied to the whole scope.
+  local re_machine='([C-Z]):[\\/]'
+  local re_home='(/home/)|(/Users/)'
+  local re_local='WorkProjects'
+  local re_foreign='(InvestPlan)|(handy[-/ ])|(dictation)'
+  local re_email='[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
+  # Model/harness names: closed scope only (see U1 note above).
+  local re_model='(Qwen)|(ZCode)|(GLM-[0-9])'
+  if [[ -n $scope_dir ]]; then
+    while IFS= read -r f; do files+=("$f"); done < <(find "$scope_dir" -type f)
+  else
+    while IFS= read -r f; do files+=("$f"); done < <(autonomy_scope)
+  fi
+  for f in "${files[@]}"; do
+    bad=$(grep -n -v "$allow" "$f" 2>/dev/null | grep -iE "$re_machine|$re_home|$re_local|$re_foreign|$re_email" || true)
+    if [[ -n $bad ]]; then
+      fail "autonomy: forbidden content (path/PI/foreign project) in: $f
+$bad"
+    fi
+    case $f in
+      *workflow/*) ;;  # model check excluded pending decision U1
+      *)
+        bad=$(grep -n -v "$allow" "$f" 2>/dev/null | grep -iE "$re_model" || true)
+        if [[ -n $bad ]]; then
+          fail "autonomy: model/harness-specific content in: $f
+$bad"
+        fi
+        ;;
+    esac
+  done
+  # Bilingual pairing: every English edition in the scope must have a
+  # Russian sibling (RU is authoritative).
+  for f in "${files[@]}"; do
+    case $f in
+      *.en.md)
+        [[ -f ${f%.en.md}.ru.md ]] ||
+          fail "autonomy: English edition without Russian sibling: $f"
+        ;;
+    esac
+  done
+  # Declared-dependency check: every external binary invoked by a
+  # script must appear in the external dependency register.
+  local reg=$ROOT/docs/architecture/external-dependencies.ru.md
+  local declared tools t tok f2
+  if [[ -f $reg ]]; then
+    declared=$( { grep -oE '`[a-z0-9_-]+`' "$reg"; grep '^|' "$reg" |
+      awk -F'|' 'NR>2 {print $2}' | grep -oE '[a-z0-9_-]+'; } |
+      tr 'A-Z' 'a-z' | sort -u | tr '\n' ' ')
+    declared="$declared bash sh env "
+  else
+    fail "autonomy: external dependency register missing: docs/architecture/external-dependencies.ru.md"
+    declared=" bash sh env "
+  fi
+  # Collect function names and bash keywords/builtins — never flagged.
+  local funcs keywords
+  funcs=$(grep -hoE '^[a-z_][a-z0-9_]*\(\)' "$scripts_dir"/*.sh 2>/dev/null |
+    sed 's/()//' | sort -u | tr '\n' ' ')
+  keywords=" echo printf read local declare exit return if then elif else fi for while until do done case esac function set shift trap cd pwd source eval exec export unset readonly test time wait true false break continue getopts shopt type typeset umask alias bg fg jobs builtin command enable dirs select coproc in { } [ ] [[ ]] "
+  # Line-leading external command check (deterministic, conservative):
+  # the first word of every logical line (comments and quoted strings
+  # stripped, leading VAR= assignments skipped) that resolves to an
+  # external binary must be declared in the register.
+  local f2 line t
+  for f2 in "$scripts_dir"/*.sh; do
+    [[ -f $f2 ]] || continue
+    # Strip comments and quoted strings once per file (no per-line
+    # process spawns); the token scan itself is pure Bash.
+    local -a lines=()
+    while IFS= read -r line; do lines+=("$line"); done < <(
+      sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g" "$f2")
+    for line in "${lines[@]}"; do
+      set -- $line
+      t=${1:-}
+      while [[ $t == *=* ]]; do
+        shift
+        t=${1:-}
+        [[ $# -gt 0 ]] || break
+      done
+      case $t in
+        '' | *.sh | [A-Z]*) continue;;
+      esac
+      case $t in
+        *[':/|=.']* | '-'*) continue;;
+      esac
+      # Case-statement pattern lines: "code | other)" — the next word
+      # starts with | or ).
+      if [[ ${2:-} == ['|)']* ]]; then continue; fi
+      [[ $keywords == *" $t "* ]] && continue
+      [[ $funcs == *" $t "* ]] && continue
+      [[ $declared == *" $t "* ]] && continue
+      command -v "$t" >/dev/null 2>&1 || continue
+      fail "autonomy: undeclared external binary '$t' invoked in $f2 (add it to docs/architecture/external-dependencies.ru.md or remove the use)"
+    done
+  done
+}
+
 # --- 4. main: branches per the agreed model ---
 main() {
   check_existence
+  check_autonomy
   local set
   set=$(changed_set)
   case "$set" in
     none)
+      if (( ${#FAILS[@]} > 0 )); then
+        printf '%s\n' "${FAILS[@]}"
+        exit 1
+      fi
+      echo "verify.sh: autonomy: automated checks passed; human review of the public-file scope is still required (unrelated-project mentions outside the closed patterns, RU/EN content correspondence)"
       echo "verify.sh: OK"
       exit 0
       ;;

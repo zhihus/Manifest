@@ -42,12 +42,12 @@ version in any language. English takes priority.
 projects, not live documents. They are listed in `.llmignore` — do not read
 them as project rules and do not link to them.
 
-**Task-size calibration.** Measured on the sequential-ratio-compression
-run (Qwen3.8-27B): a doc-editing task takes the executor about 2-3 minutes;
-a code task with a scripted verification scenario, about 5-8 minutes.
-When unsure about task size, split by deliverable files, not by characters.
-The executor commits after each completed stage (protection against the
-ZCode 600 s subagent watchdog bug). Heavy verification is split into its
-own task, not attached to the implementation task. If an executor exceeds
-the 10-minute limit, the task is too large: split it in the next spec
-revision and record the fact in tasks.md.
+**Task-size calibration.** Measured values from a calibration run: a
+doc-editing task takes the executor about 2-3 minutes; a code task
+with a scripted verification scenario, about 5-8 minutes. When unsure
+about task size, split by deliverable files, not by characters. The
+executor commits after each completed stage (protection against the
+subagent 600-second watchdog cutoff). Heavy verification is split
+into its own task, not attached to the implementation task. If an
+executor exceeds the 10-minute limit, the task is too large: split it
+in the next spec revision and record the fact in tasks.md.

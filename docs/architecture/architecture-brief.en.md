@@ -1,6 +1,6 @@
 # Manifest — Architecture Brief
 
-**Version:** 0.4.1  
+**Version:** 0.4.2  
 **Status:** working edition, synced with the decisions of the
 2026-11-20/21 discussions and the 2026-11-22 protocol
 (`architecture-session-2026-11-22.ru.md`)  
@@ -600,6 +600,25 @@ The following principles are mandatory:
 9. Manifest does not manage the settings of a specific AI harness.
 10. All reference templates are stored centrally in the Manifest
     repository.
+
+## 15. Autonomy and portability
+
+Principles approved 2026-11-22 (change `add-portability-principles`):
+
+1. Public Manifest files contain no machine-specific absolute paths,
+   no personal data, no references to unrelated projects, and no
+   instructions tied to a specific model or AI harness.
+2. The infrastructure consists of portable Bash scripts without
+   GNU-specific utility dependencies; every external binary used is
+   declared in the external dependency register
+   (`external-dependencies.en.md`).
+3. Templates reference context files only by canonical names that
+   Manifest installs.
+4. Line endings are normalized via `.gitattributes`; script and
+   template bytes are stable across platforms.
+5. Automated autonomy checks run on every repository verification
+   and cover only Manifest's own files; they impose no requirements
+   on projects that use Manifest.
 
 ---
 

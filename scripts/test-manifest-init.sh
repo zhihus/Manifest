@@ -180,6 +180,30 @@ grep -q 'INTERVIEW_EOF' <<<"$out" ||
   { ok=0; FAIL+=("eof: partial .manifest left behind"); }
 ((ok)) && PASS+=("eof")
 
+# Regression: SHA-256 detection skips a broken sha256sum and falls
+# back to shasum (macOS scenario). stubbin shadows the real
+# sha256sum with a failing stub; the rest of PATH stays intact.
+mkdir -p "$TMP/shasum" "$TMP/stubbin" && git -C "$TMP/shasum" init -q
+printf '#!/usr/bin/env bash\nexit 1\n' >"$TMP/stubbin/sha256sum"
+out=$(PATH="$TMP/stubbin:$PATH" bash "$INIT" --templates "$TEMPLATES" \
+  --project "$TMP/shasum" --project-name demo --tracks code 2>&1) &&
+  rc=0 || rc=$?
+ok=1
+[[ $rc -eq 0 ]] || { ok=0; FAIL+=("shasum: exit $rc, want 0: $out"); }
+grep -qE '^[a-z]+:[0-9a-f]{64}' "$TMP/shasum/.manifest/manifest.yaml.checksum" ||
+  { ok=0; FAIL+=("shasum: checksum not <tool>:<sha256-hex>"); }
+grep -q '^shasum:' "$TMP/shasum/.manifest/manifest.yaml.checksum" ||
+  { ok=0; FAIL+=("shasum: checksum does not record the shasum tool"); }
+# Tamper check with the same environment: guard must still work.
+printf 'x' >>"$TMP/shasum/.manifest/manifest.yaml"
+out=$(PATH="$TMP/stubbin:$PATH" bash "$INIT" --templates "$TEMPLATES" \
+  --project "$TMP/shasum" --project-name demo --tracks code 2>&1) &&
+  rc=0 || rc=$?
+[[ $rc -ne 0 ]] || { ok=0; FAIL+=("shasum: tamper not detected"); }
+grep -q 'CHECKSUM_MISMATCH' <<<"$out" ||
+  { ok=0; FAIL+=("shasum: no CHECKSUM_MISMATCH"); }
+((ok)) && PASS+=("shasum")
+
 echo "== RESULTS (${#PASS[@]} passed, ${#FAIL[@]} failed)"
 printf 'PASS %s\n' "${PASS[@]}"
 if ((${#FAIL[@]})); then printf 'FAIL %s\n' "${FAIL[@]}"; fi

@@ -14,8 +14,10 @@ Entry point: `AGENTS.md`
   `docs/project-manifest.md`.
 * `docs/architecture/` — architecture documents and audits
   (architecture brief, decision registers, MVP/roadmap split, role
-  model, integration audits). Russian editions are authoritative
-  (`*.ru.md`); English versions (`*.en.md`) are translations.
+  model, integration audits, external dependency register:
+  `docs/architecture/external-dependencies.en.md`). Russian editions
+  are authoritative (`*.ru.md`); English versions (`*.en.md`) are
+  translations.
   Historical decision records; do not delete.
 * `docs/plans/` — plan files (stored compressed; `.en.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process

@@ -19,6 +19,6 @@
 * Code: `CODE_RULES.md`
 * Tests: `TEST_RULES.md`
 * Logging: `LOG_RULES.md`
-* Commits: `commit-rules.md`
+* Commits: `COMMIT_RULES.md`
 * Versioning: `VERSIONING.md`
-* Releases: `releases.md`
+* Releases: `RELEASES.md`

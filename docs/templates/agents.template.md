@@ -30,8 +30,8 @@ Name: **{{PROJECT_NAME}}**.
 
 ## Git
 
-* `commit-rules.md`
-* `releases.md`
+* `COMMIT_RULES.md`
+* `RELEASES.md`
 
 ## Versioning
 

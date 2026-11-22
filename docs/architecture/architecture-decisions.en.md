@@ -18,6 +18,20 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
 
 - A: Git is the mandatory foundation; changes within approved tasks;
   OpenSpec is mandatory (except automatic Manifest operations).
+- A (2026-11-22, change `add-portability-principles`, confirmed by
+  the user in the 2026-11-22 review): autonomy and
+  portability. Public Manifest files contain no machine paths, no
+  personal data, no unrelated-project references, and no ties to a
+  specific model or AI harness (records in `docs/architecture/` are
+  historical decisions, outside the check). The infrastructure
+  consists of portable Bash scripts without GNU-specific utility
+  dependencies; every external binary is declared in the register
+  (`external-dependencies.en.md`; the Perl used by template rendering
+  is documented, Python is removed). SHA-256 is detected
+  (`sha256sum` or `shasum -a 256`). Templates reference only
+  canonical installed filenames. Line endings are normalized by
+  `.gitattributes`. Autonomy checks are automated in verify.sh and
+  cover only Manifest's own files.
 - A: Manifest ↔ Todoing — only via CLI and a versioned JSON contract,
   no direct storage reads.
 - A: Todoing provides universal mechanisms and hooks without Manifest

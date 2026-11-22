@@ -107,6 +107,24 @@ report() {
   if ((${#SKIPPED[@]})); then printf '  %s\n' "${SKIPPED[@]}"; fi
 }
 
+# SHA-256 tool detection (portable): sha256sum, or shasum -a 256 on
+# macOS. A tool is accepted only if it actually works on a probe; the
+# output is normalized to the hash field only. On success the global
+# SHA_TOOL_USED records which tool produced the hash.
+SHA_TOOL_USED=
+sha256_of() { # sha256_of <file> -> hash, non-zero exit if no tool
+  local _h
+  if command -v sha256sum >/dev/null 2>&1; then
+    _h=$(sha256sum "$1" 2>/dev/null) &&
+      { printf '%s\n' "${_h%% *}"; SHA_TOOL_USED=sha256sum; return 0; }
+  fi
+  if command -v shasum >/dev/null 2>&1; then
+    _h=$(shasum -a 256 "$1" 2>/dev/null) &&
+      { printf '%s\n' "${_h%% *}"; SHA_TOOL_USED=shasum; return 0; }
+  fi
+  return 1
+}
+
 checksum_guard() {
   [[ ! -f $MK/manifest.yaml ]] && return 0
   [[ -f $MK/manifest.yaml.checksum ]] || {
@@ -114,8 +132,8 @@ checksum_guard() {
     exit 1
   }
   local expected actual
-  expected=$(awk '{print $1}' "$MK/manifest.yaml.checksum")
-  actual=$( (cd "$MK" && sha256sum manifest.yaml) | awk '{print $1}' )
+  expected=$(sed 's/^[^:]*://' "$MK/manifest.yaml.checksum")
+  actual=$(sha256_of "$MK/manifest.yaml")
   [[ $actual == "$expected" ]] || {
     echo "CHECKSUM_MISMATCH: .manifest/manifest.yaml does not match its protection record"
     exit 1
@@ -138,8 +156,9 @@ preflight() {
     fails+=("REINIT_REFUSED: .manifest already exists — the project is already initialized; re-initialization is not provided")
   [[ -d $TEMPLATES && -r $TEMPLATES ]] ||
     fails+=("template source unavailable or not readable: $TEMPLATES — pass --templates pointing to the Manifest docs/templates directory")
-  command -v sha256sum >/dev/null 2>&1 ||
-    fails+=("sha256sum not available in PATH — install coreutils/sha256sum")
+  if ! sha256_of "$0" >/dev/null 2>&1; then
+    fails+=("no working SHA-256 tool in PATH — install coreutils (sha256sum) or Perl's shasum")
+  fi
   if ((${#fails[@]})); then
     echo "PREFLIGHT FAIL (${#fails[@]} check(s)):"
     printf '  - %s\n' "${fails[@]}"
@@ -156,7 +175,11 @@ write_config() {
     echo "created=$(date +%F)"
   } >"$tmp"
   mv "$tmp" "$MK/manifest.yaml"
-  ( cd "$MK" && sha256sum manifest.yaml > manifest.yaml.checksum )
+  # The checksum records the SHA-256 tool that produced it:
+  # "<tool>:<hash>"; the guard extracts the hash after the prefix.
+  sha256_of "$MK/manifest.yaml" >/dev/null
+  printf '%s:%s\n' "$SHA_TOOL_USED" "$(sha256_of "$MK/manifest.yaml")" \
+    >"$MK/manifest.yaml.checksum"
 }
 
 # Name-mapping table (design D4): installed file <- source template.
