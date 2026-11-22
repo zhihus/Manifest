@@ -53,8 +53,8 @@ deliverables, executor commits per stage, heavy verification split,
 reference, keep all numeric guidance and the commit-per-stage rule,
 phrase the reasons harness-free. English-only file; lines ≤100
 chars. Separate commit.
-Stop criterion: `grep -iE 'qwen|zcode|glm' AGENTS.md` finds nothing;
-the calibration numbers and rules are unchanged in the diff.
+Stop criterion: the forbidden model/harness-identifier scan finds no
+match in `AGENTS.md`; calibration numbers and rules remain unchanged.
 Maps to scenarios: Public files carry no model- or harness-specific
 instructions.
 

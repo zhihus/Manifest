@@ -29,8 +29,8 @@ facts about the machine or the setup where Manifest is developed.
    follows installation and distribution (a file Manifest starts
    distributing to connected projects automatically enters the check
    scope), and the RU/EN bilingual editions requirement.
-3. Public `AGENTS.md` loses model/harness-specific facts (Qwen3.8-27B,
-   ZCode watchdog); the calibration rule is kept, stated harness-free.
+3. Public `AGENTS.md` loses model- and harness-specific configuration
+   details; the task-size calibration rule is retained without them.
 4. `scripts/verify.sh` drops its undeclared Python dependency; fixture
    generation is rewritten in portable Bash/awk.
 5. Template references use canonical installed filenames
