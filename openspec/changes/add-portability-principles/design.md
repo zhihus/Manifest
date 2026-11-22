@@ -100,7 +100,9 @@ user (2026-11-22) and recorded in this change.
   by the FR 1.2 stop criterion and FR 4.2 check). `python` is
   removed, not registered. D1–D8 are decisions of this change; the
   register documents perl as an existing implementation fact, not as
-  an earlier-approved decision.
+  an earlier-approved decision. The command-position scanner is
+  conservative, not a full Bash parser; human review MUST inspect
+  changed shell scripts for invocations outside its grammar.
 - **D6. SHA-256 is detected, not assumed; the checksum records the
   tool.** `manifest-init` preflight accepts any of `sha256sum` or
   `shasum -a 256`; the chosen tool is used consistently for the
