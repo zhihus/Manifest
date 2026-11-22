@@ -69,11 +69,38 @@ Constraints from accepted decisions:
   `REINIT_REFUSED`. Writing the config itself is a single
   `install -m 644` of a temp file into the verified-empty directory.
 - **D4. Template source: `docs/templates/` of the Manifest
-  repository.** The MVP copies the mandatory base set defined in the
-  brief (`AGENTS.md`, `llms.txt`, `COMMIT_RULES.md`, `VERSION`,
-  `VERSIONING.md`, `RELEASES.md`). The Manifest repo location is
-  passed to the script as an argument/flag, not hardcoded — MVP
-  runs from a checkout, not from a published distribution.
+  repository, with a name-mapping table** (user decision 2026-11-22,
+  resolving the FR 3.1 contradiction). Installed file ← source
+  template:
+  | Installed | Source |
+  |---|---|
+  | `AGENTS.md` | `agents.template.md` |
+  | `llms.txt` | `llm.template.txt` |
+  | `COMMIT_RULES.md` | `commit-rules.template.md` |
+  | `VERSION` | `version.template` |
+  | `VERSIONING.md` | `versioning.template.md` |
+  `RELEASES.md` is **excluded from the MVP install set** (no
+  template exists; none is invented). Working files from `workflow/`
+  are Manifest's own rules and are NOT distributed to connected
+  projects. The Manifest repo location is passed as an argument/flag,
+  not hardcoded — MVP runs from a checkout, not from a published
+  distribution.
+- **D7. Placeholder policy** (user decision 2026-11-22: files with
+  unresolved mandatory placeholders are not installed). Inventory of
+  the five templates:
+  - filled from interview data: `{{PROJECT_NAME}}` (both `AGENTS.md`
+    and `llms.txt`), `{{PROJECT_PURPOSE}}` (both; collected by a new
+    optional interview question / `--purpose` flag; empty answer
+    becomes the neutral line "Purpose: not established.");
+  - deterministic defaults, overridable by flags: `{{INITIAL_VERSION}}`
+    → `0.1.0` (`--initial-version`);
+  - conditional blocks with built-in fallbacks: `{{ENTRY_POINT}}`,
+    `{{BUILD_METHOD}}` — left empty, the template's own "not
+    established" branch renders;
+  - neutral defaults: `{{PROJECT_CONTEXT}}`, `{{PROJECT_DIRECTORIES}}`
+    → "Not established." (single line).
+  The install verifies no `{{` remains in any installed file; a
+  leftover placeholder aborts with `INSTALL_CORRUPT`.
 - **D5. Conflict policy: skip and report.** A target file that exists
   is skipped untouched and listed as a conflict in the final report
   and in the exit status; the install is otherwise completed (no

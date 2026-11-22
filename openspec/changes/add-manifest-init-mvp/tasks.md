@@ -92,25 +92,38 @@ only, no automatic fixing; Check happens before write.
 - [ ] FR 3.1 template-install-impl
 
 Implement template installation in `scripts/manifest-init.sh` after
-Preflight and config creation. Copy exactly the six base files
-`AGENTS.md`, `llms.txt`, `COMMIT_RULES.md`, `VERSION`,
-`VERSIONING.md`, `RELEASES.md` from `$TEMPLATES` into the project
-root. For each: if the target exists, copy nothing and add the path
-to the CONFLICTS list; else install and add to INSTALLED. After
-copying, byte-compare each installed file with its source
-(`cmp -s`); on difference print `INSTALL_CORRUPT <file>` and exit
-non-zero. Continue past conflicts (do not abort remaining installs).
-Final exit codes: 0 all six installed; 3 at least one conflict;
-non-zero as set by Preflight failure. Feed INSTALLED and CONFLICTS
-into the report of FR 1.2.
-Stop criterion: fixture with existing `AGENTS.md` and
-`VERSIONING.md` installs the other four, keeps both existing files
-byte-identical to before, lists two conflicts, exits 3.
+Preflight and config creation, using the name-mapping table (design
+D4): `AGENTS.md` ← `agents.template.md`, `llms.txt` ←
+`llm.template.txt`, `COMMIT_RULES.md` ← `commit-rules.template.md`,
+`VERSION` ← `version.template`, `VERSIONING.md` ←
+`versioning.template.md` (five files; `RELEASES.md` excluded — no
+template is invented). For each: if the target exists, copy nothing
+and add the path to the CONFLICTS list; else render the source
+template and install it. Placeholder filling (design D7):
+`{{PROJECT_NAME}}` and `{{PROJECT_PURPOSE}}` from interview data (add
+an optional `--purpose` flag and interview question; empty purpose →
+"Purpose: not established."), `{{INITIAL_VERSION}}` → `0.1.0` default
+overridable by new `--initial-version` flag, `{{ENTRY_POINT}}` and
+`{{BUILD_METHOD}}` left empty so the templates' own fallback branches
+render, `{{PROJECT_CONTEXT}}` and `{{PROJECT_DIRECTORIES}}` → "Not
+established.". After install: verify no `{{` remains in any installed
+file, and byte-compare each installed file with a fresh deterministic
+render of its template (`cmp -s`) produced in a temp location outside
+the project; on failure print `INSTALL_CORRUPT <file>` and exit
+non-zero, removing the temp render. Continue past conflicts (do not
+abort remaining installs). Final exit codes: 0 all five installed;
+3 at least one conflict; non-zero as set by Preflight failure. Feed
+INSTALLED and CONFLICTS into the report of FR 1.2.
+Stop criterion: fixture with existing `AGENTS.md` and `VERSIONING.md`
+installs the other three, keeps both existing files byte-identical to
+before, lists two conflicts, exits 3; a fresh fixture installs five
+files with no `{{` anywhere in them and `PROJECT_NAME` substituted.
 Maps to scenarios: Mandatory base set is installed; Single common MVP
 template; Existing files are never overwritten; Conflicts are
-reported and do not abort the rest; Installed files match the
-template source content; Report after install with one conflict;
-Successful init of a Git project without context files.
+reported and do not abort the rest; Placeholders are resolved before
+install; Installed files are verified against the template render;
+Report after install with one conflict; Successful init of a Git
+project without context files.
 
 ## Wave 4 — verification
 
@@ -122,8 +135,9 @@ Git project; project with `AGENTS.md` and `VERSIONING.md` present;
 project with tampered `manifest.yaml` checksum; directory outside a
 Git work tree) and runs `scripts/manifest-init.sh` against each.
 Expected results, asserted by exit code and content checks: fresh —
-exit 0, six files installed, report has INSTALLED six lines,
-conflicts empty; conflicts — exit 3, four installed, two conflicts,
+exit 0, five files installed, report has INSTALLED five lines,
+conflicts empty, no `{{` and no `{{PROJECT_NAME}}` left in installed
+files; conflicts — exit 3, three installed, two conflicts,
 pre-existing files unchanged (cmp against saved copies); tampered —
 exit non-zero, `CHECKSUM_MISMATCH`, config unchanged; no-git — exit
 non-zero, failure report names the Git check. Clean up its temp

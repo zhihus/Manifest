@@ -9,16 +9,16 @@ reporting.
 ## ADDED Requirements
 
 ### Requirement: Mandatory base set is installed
-The system MUST install the mandatory base context file set: AGENTS.md, llms.txt, COMMIT_RULES.md, VERSION, VERSIONING.md, RELEASES.md.
+The system MUST install the mandatory base context file set of exactly five files: AGENTS.md, llms.txt, COMMIT_RULES.md, VERSION, VERSIONING.md.
 
-The system installs the mandatory base context file set defined by
-the Manifest brief: `AGENTS.md`, `llms.txt`, `COMMIT_RULES.md`,
-`VERSION`, `VERSIONING.md`, `RELEASES.md`.
+The system installs exactly five files via the name-mapping table
+(design D4); `RELEASES.md` is excluded from the MVP install set: no
+template exists and none is invented.
 
 #### Scenario: Fresh project
 
 - **WHEN** none of the base set files exist in the project root
-- **THEN** all six files are installed from the template source
+- **THEN** all five files are installed from the template source
 - **AND** the report lists each installed file
 
 ### Requirement: Single common MVP template
@@ -52,22 +52,48 @@ Name conflicts MUST NOT stop installation of the remaining missing files, and ev
 Name conflicts do not stop installation of the remaining missing
 files; every conflict is listed in the final report.
 
-#### Scenario: Two of six files exist
+#### Scenario: Two of five files exist
 
 - **WHEN** two of the base set files already exist
-- **THEN** the four missing files are installed
+- **THEN** the three missing files are installed
 - **AND** the report lists the two conflicts
 - **AND** the command exits with a status reflecting that conflicts
   occurred (non-zero, distinguishable from Preflight failure)
 
-### Requirement: Installed files match the template source content
-Installed files MUST be byte-identical copies of the template source files.
+### Requirement: Placeholders are resolved before install
+The system MUST NOT install a file that still contains an unresolved template placeholder.
 
-Installed files are byte-identical copies of the template source
-files; nothing is generated or adapted in place during install.
+Placeholders are filled deterministically (design D7): `PROJECT_NAME`
+and `PROJECT_PURPOSE` from interview data (empty purpose becomes
+"Purpose: not established."), `INITIAL_VERSION` with default `0.1.0`
+unless overridden, `ENTRY_POINT` and `BUILD_METHOD` conditionals via
+the templates' own fallback branches, `PROJECT_CONTEXT` and
+`PROJECT_DIRECTORIES` with "Not established.".
 
-#### Scenario: Installed file compared to source
+#### Scenario: Unfilled mandatory placeholder
+
+- **WHEN** rendering would leave a `{{PLACEHOLDER}}` marker in an
+  installed file
+- **THEN** the file is not installed
+- **AND** the command exits non-zero with `INSTALL_CORRUPT`
+
+#### Scenario: No interview data for purpose
+
+- **WHEN** no purpose is provided in the interview or by flag
+- **THEN** the installed files contain the neutral line
+  "Purpose: not established." instead of `{{PROJECT_PURPOSE}}`
+
+### Requirement: Installed files are verified against the template render
+Installed files MUST be verified by byte-comparing each installed file with a fresh deterministic render of its source template, and any difference MUST abort with a reported file name.
+
+Each source template is rendered with the same substitution values to
+a temporary location outside the project and compared with the
+installed file; on difference the command prints `INSTALL_CORRUPT
+<file>` and exits non-zero, removing the temp render.
+
+#### Scenario: Installed file compared to render
 
 - **WHEN** a file is installed
-- **THEN** its content equals the corresponding template source file
-  content
+- **THEN** its content byte-equals the deterministic render of its
+  source template
+- **AND** no temporary render file is left in the project
