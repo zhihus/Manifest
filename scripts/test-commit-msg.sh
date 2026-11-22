@@ -14,7 +14,7 @@ run_case() {
   local label=$1 expected=$2 message=$3 actual
   printf '%s' "$message" > "$TMP/message"
   cp "$TMP/message" "$TMP/original"
-  if bash "$HOOK" "$TMP/message" >/dev/null 2>&1; then
+  if "$HOOK" "$TMP/message" >/dev/null 2>&1; then
     actual=0
   else
     actual=$?
@@ -45,7 +45,7 @@ run_case missing-breaking-footer 1 $'fix(parser)!: handle empty input\n'
 run_case footer-without-marker 1 $'fix(parser): handle empty input\n\nBREAKING CHANGE: change parser contract\n'
 run_case empty-breaking-footer 1 $'fix(parser)!: handle empty input\n\nBREAKING CHANGE:   \n'
 
-if bash "$HOOK" >/dev/null 2>&1; then
+if "$HOOK" >/dev/null 2>&1; then
   FAIL+=("missing-argument: unexpectedly accepted")
 else
   rc=$?
