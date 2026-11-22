@@ -34,7 +34,7 @@ assert_contains() {
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
-    printf 'FAIL: output does not contain: %s\n' "$needle" >&2
+    printf 'FAIL: output does not contain: %s\nActual output:\n%s\n' "$needle" "$haystack" >&2
   fi
 }
 
