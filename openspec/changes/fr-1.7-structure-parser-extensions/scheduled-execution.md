@@ -25,9 +25,7 @@ Create a crontab entry, replacing the repository path and schedule:
 */30 * * * * cd /path/to/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1; status=$?; printf 'exit=%s\\n' "$status" >> /path/to/Manifest/logs/structure-parser.log; exit "$status"
 ```
 
-Cron records command output in the configured log. A non-zero process
-exit status indicates a failed run; use the host's cron logging or
-monitoring to alert on it.
+The command appends parser output and the process exit status to the log. Configure host monitoring or cron mail to alert when the command exits non-zero.
 
 ## Windows / Task Scheduler
 
