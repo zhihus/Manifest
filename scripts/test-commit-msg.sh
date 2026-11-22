@@ -54,5 +54,5 @@ fi
 
 printf 'RESULTS: %s passed, %s failed\n' "${#PASS[@]}" "${#FAIL[@]}"
 printf 'PASS %s\n' "${PASS[@]}"
-printf 'FAIL %s\n' "${FAIL[@]}"
-(("${#FAIL[@]}" == 0))
+if ((${#FAIL[@]})); then printf 'FAIL %s\n' "${FAIL[@]}"; fi
+((${#FAIL[@]} == 0))
