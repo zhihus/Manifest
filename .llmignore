@@ -1,12 +1,9 @@
 docs/manifest.md
 docs/manifest.compact.md
 docs/project-manifest.md
-docs/plan-1.0.0-context-files-guard.md
 docs/templates/
 *.ru.md
 test-run-reports/
-handy/handy/
-handy/dictation-scrubber/logs/
 temp/
 logs/
 target/
