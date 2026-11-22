@@ -199,13 +199,23 @@ $bad"
   else
     funcs=""
   fi
-  keywords=" echo printf read local declare exit return if then elif else fi for while until do done case esac function set shift trap cd pwd source eval exec export unset readonly test time wait true false break continue getopts shopt type typeset umask alias bg fg jobs builtin command enable dirs select coproc in { } [ ] [[ ]] "
+  keywords=" echo printf read local declare exit return if then elif else fi for while until do done case esac function set shift trap cd pwd source eval exec export unset readonly test time wait true false break continue getopts shopt type typeset umask alias bg fg jobs builtin command enable dirs select coproc in { } [ ] [[ ]] : . ! "
   # Split compound commands at shell operators and inspect command positions.
   # Human review remains mandatory for constructs outside this conservative scan.
   local f2 line segment t idx
   local -a words=()
+  local in_case_pattern=0
   for f2 in "${script_files[@]}"; do
     while IFS= read -r line || [[ -n $line ]]; do
+      # Case-arm labels are patterns, not command invocations.
+      if [[ $line =~ ^[[:space:]]*case[[:space:]] ]]; then
+        in_case_pattern=1
+        continue
+      fi
+      if (( in_case_pattern )); then
+        [[ $line == *")"* ]] && in_case_pattern=0
+        continue
+      fi
       line=$(printf '%s\n' "$line" |
         sed -e 's/#.*$//' -e 's/"[^"]*"//g' -e "s/'[^']*'//g")
       line=${line//&&/$'\n'}
@@ -285,4 +295,6 @@ main() {
   exit 0
 }
 
-main "$@"
+if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
+  main "$@"
+fi
