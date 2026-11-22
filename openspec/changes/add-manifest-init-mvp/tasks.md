@@ -2,7 +2,7 @@
 
 ## Wave 1 — manifest-init core
 
-- [ ] FR 1.1 init-entrypoint-skeleton
+- [x] FR 1.1 init-entrypoint-skeleton
 
 Create `scripts/manifest-init.sh` (Bash, `set -euo pipefail`). The
 script accepts two arguments: `--project <dir>` (target project root,
@@ -29,7 +29,7 @@ Maps to scenarios: Config location; Re-run against an initialized
 project; Modified configuration detected; Protection against accidental
 configuration overwrite.
 
-- [ ] FR 1.2 interview-and-report
+- [x] FR 1.2 interview-and-report
 
 Extend `scripts/manifest-init.sh`. Implement the interview: analyze
 the target project (presence of code files by extension and of a
@@ -49,7 +49,7 @@ Maps to scenarios: Interview determines the project configuration;
 User adjusts proposed configuration; Final report is produced on
 every completed run.
 
-- [ ] FR 1.3 checksum-guard
+- [x] FR 1.3 checksum-guard
 
 Extend `scripts/manifest-init.sh` with the guard used on every run:
 before anything else, if `.manifest/manifest.yaml` exists, recompute
@@ -67,7 +67,7 @@ against accidental configuration overwrite.
 
 ## Wave 2 — preflight
 
-- [ ] FR 2.1 preflight-full
+- [x] FR 2.1 preflight-full
 
 Implement the full `preflight()` in `scripts/manifest-init.sh`, run
 before any write. Checks, all mandatory: (1) `git` binary available
@@ -89,7 +89,7 @@ only, no automatic fixing; Check happens before write.
 
 ## Wave 3 — template install
 
-- [ ] FR 3.1 template-install-impl
+- [x] FR 3.1 template-install-impl
 
 Implement template installation in `scripts/manifest-init.sh` after
 Preflight and config creation, using the name-mapping table (design
@@ -127,7 +127,7 @@ project without context files.
 
 ## Wave 4 — verification
 
-- [ ] FR 4.1 init-verify-scenario
+- [x] FR 4.1 init-verify-scenario
 
 Create `scripts/test-manifest-init.sh` (Bash) that mechanically
 verifies the change in a temp directory: builds four fixtures (fresh
