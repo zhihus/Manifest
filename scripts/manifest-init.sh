@@ -102,14 +102,27 @@ checksum_guard() {
 }
 
 preflight() {
-  [[ -d $TEMPLATES && -r $TEMPLATES ]] || {
-    echo "PREFLIGHT FAIL: template source unavailable: $TEMPLATES"
+  local fails=()
+  command -v git >/dev/null 2>&1 ||
+    fails+=("git not available in PATH — install Git")
+  git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
+    fails+=("project is not inside a Git work tree — run 'git init' in the project first")
+  if ! ( : >"$PROJECT/.manifest-write-probe" ) 2>/dev/null; then
+    fails+=("project root is not writable — grant write permission to the project root")
+  else
+    rm -f "$PROJECT/.manifest-write-probe"
+  fi
+  [[ -e $MK ]] &&
+    fails+=(".manifest already exists — the project is already initialized; re-initialization is not provided")
+  [[ -d $TEMPLATES && -r $TEMPLATES ]] ||
+    fails+=("template source unavailable or not readable: $TEMPLATES — pass --templates pointing to the Manifest docs/templates directory")
+  command -v sha256sum >/dev/null 2>&1 ||
+    fails+=("sha256sum not available in PATH — install coreutils/sha256sum")
+  if ((${#fails[@]})); then
+    echo "PREFLIGHT FAIL (${#fails[@]} check(s)):"
+    printf '  - %s\n' "${fails[@]}"
     exit 1
-  }
-  [[ ! -e $MK ]] || {
-    echo "REINIT_REFUSED: .manifest already exists; re-initialization is not provided"
-    exit 1
-  }
+  fi
 }
 
 write_config() {
