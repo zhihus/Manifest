@@ -61,6 +61,7 @@ mkdir -p "$WORK/input/nested folder" "$WORK/empty"
 write_valid "$WORK/input/valid.md"
 write_valid "$WORK/input/nested folder/valid nested.md"
 write_valid "$WORK/input/nested folder/special & name.md"
+ln -s "$WORK/input/valid.md" "$WORK/input/nested folder/linked.md"
 
 # Existing single-file mode remains supported.
 assert_status 0 "$WORK/input/valid.md" >/dev/null
