@@ -3,17 +3,13 @@
 ## MODIFIED Requirements
 
 ### Requirement: Mandatory base set is installed
-The system MUST install the mandatory base context file set of exactly five files: AGENTS.md, llms.txt, COMMIT_RULES.md, VERSION, VERSIONING.md.
-
-The system installs exactly five files via the name-mapping table
-(design D4). `RELEASES.md` is classified per the Architecture Brief
-(§4): part of the mandatory base set, temporarily not installed
-because no template exists and none is invented; it is not a
-conditional template. Template files reference other context files
-only by canonical installed filenames — exactly the names Manifest
-installs (`COMMIT_RULES.md`, `VERSIONING.md`) — or the declared
-canonical conditional names (`CODE_RULES.md`, `TEST_RULES.md`,
-`LOG_RULES.md`), or the canonical base-set name `RELEASES.md`.
+The system MUST install exactly five base files: `AGENTS.md`,
+`llms.txt`, `COMMIT_RULES.md`, `VERSION`, and `VERSIONING.md`.
+Template references MUST use canonical installed filenames.
+`RELEASES.md` is part of the mandatory base set per Architecture
+Brief §4 but is not installed until a template exists; it is not
+conditional. Conditional references use `CODE_RULES.md`,
+`TEST_RULES.md`, and `LOG_RULES.md`.
 
 #### Scenario: Fresh project
 
