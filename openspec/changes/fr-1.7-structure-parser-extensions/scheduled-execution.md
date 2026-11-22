@@ -22,7 +22,7 @@ The process returns:
 Create a crontab entry, replacing the repository path and schedule:
 
 ```cron
-*/30 * * * * cd /path/to/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1; status=$?; printf 'exit=%s\\n' "$status" >> /path/to/Manifest/logs/structure-parser.log; exit "$status"
+*/30 * * * * cd /path/to/Manifest && mkdir -p logs && bash scripts/structure-parser.sh --dir workflow >> logs/structure-parser.log 2>&1; status=$?; printf 'exit=%s\n' "$status" >> /path/to/Manifest/logs/structure-parser.log; exit "$status"
 ```
 
 The command appends parser output and the process exit status to the log. Configure host monitoring or cron mail to alert when the command exits non-zero.
