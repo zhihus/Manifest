@@ -25,7 +25,12 @@
 - Isolated Bash smoke test of the directory traversal/aggregation
   logic with a stub validator: PASS (nested paths, spaces, multiple
   files, symlink exclusion, empty directory, and aggregate failure).
-- Source review of the regression test scenarios: PASS.
+- GitHub Actions Bash syntax checks: PASS.
+- First GitHub Actions integration run: FAIL because the existing
+  parser file is not executable (mode 100644), while the new directory
+  walker and tests invoked it directly. Both invocations were changed
+  to call it through Bash. A successful rerun has not yet been observed.
+- Regression test script syntax: PASS.
 
 ## Not performed
 
