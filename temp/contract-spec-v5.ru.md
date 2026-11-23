@@ -631,7 +631,7 @@ per-task guard; обратный порядок запрещён.
    (`max(файл, max seq журналов)`), forward-recovery, quarantine.
 7. **Блокировки** — `lock`/`unlock`/`heartbeat` с `--owner` (UUIDv4), heartbeat от
    текущего момента, check-and-act под commit-lock, **per-task guard
-   истёкшего (rename + re-read, без разрыва)**, `LOCK_EXPIRED`, эксклюзивность
+   с OS-level межпроцессной блокировкой**, `LOCK_EXPIRED`, эксклюзивность
    чтения; таблица требований к `--owner` и блокировкам для всех команд.
 8. **Soft-delete + restore** — `delete` → `deleted: true`, `restore` →
    `deleted: false` (новая версия, статус/`control_version` не меняются, видимость
