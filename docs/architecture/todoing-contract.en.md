@@ -114,6 +114,13 @@ Manifest-specific or OpenSpec-specific fields or rules.
   or relation; it only enforces the requested scope.
 - Add/remove requires the owner's lock and creates a task version and history
   event; adding an identical active reference is a no-op.
+- Re-adding the same active reference on the same task is a no-op; changing the
+  relation for the same namespace/value pair is a conflict.
+- Repeating removal of an inactive reference is a no-op; an unknown reference_id
+  returns external_ref_not_found.
+- Reference-list reads obey lock read-exclusion; a non-owner cannot read data from
+  a locked task.
+- External references are included in task responses and immutable version snapshots.
 
 **Review records**
 
