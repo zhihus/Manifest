@@ -258,6 +258,9 @@ Manifest не трактует archive как отмену и не исполь�
 
 - Перед передачей результата Manifest переводит задачу в review и передаёт Reviewer необходимые артефакты через собственный workflow.
 - Reviewer независимо проверяет результат.
+- Manifest вызывает task.review.add с review_id, version_no проверяемой версии,
+  reviewer label, outcome и упорядоченным массивом comments. actor_id envelope
+  фиксирует агента Reviewer.
 - При одобрении Todoing сохраняет структурированную запись Review с outcome approved; Manifest переводит задачу в verified.
 - При запросе изменений Todoing атомарно сохраняет запись Review с outcome changes_requested и увеличивает revision_count ровно на один; Manifest возвращает задачу в in_progress.
 - Повторная отправка того же review_id с идентичным содержимым идемпотентна; тот же ID с другим содержимым отклоняется. Review record ссылается на конкретную immutable version задачи. Запись Review не меняет workflow status. Повторные циклы не создают отдельные Todoing статусы.
@@ -283,9 +286,9 @@ revision_count — количество Review records с outcome changes_reques
 - Каждое успешное сохранение состояния задачи в Todoing создаёт неизменяемую версию и запись истории в одной транзакции; no-op не создаёт новую версию.
 - Manifest использует task.history.list, task.version.list, task.version.get и task.version.compare для аудита и сопоставления.
 - task.version.approve задаёт baseline существующей версии и не создаёт новую.
-- Git-связь добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Итоговая ссылка назначается отдельно через task.commit.finalize. Обе ссылки — метаданные прослеживаемости, не доказательство выполнения критериев.
+- Git-связь каждого существенного изменения добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Итоговый merge commit назначается отдельно через task.commit.finalize. Обе ссылки — метаданные прослеживаемости, не доказательство выполнения критериев.
 - Политика веток, review, merge и определение итогового коммита принадлежат Manifest.
-- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing. Task snapshots должны сохранять ссылки и final commit marker на момент версии.
+- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing. Для OpenSpec используется namespace `openspec.change`, value равен ID каталога change, relation — `implements`. Для одной задачи Manifest допускает не более одной активной ссылки этого namespace; один change ID глобально привязан не более чем к одной задаче. При отмене ссылка сохраняется для аудита. Task snapshots сохраняют ссылки и final commit marker на момент версии.
 
 ## 6. Зависимости
 
@@ -394,10 +397,11 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 5. Heartbeat продлевает lease; истёкший lock нельзя продлить.
 6. Recovery создаёт новую fencing generation; прежний владелец не может продолжить работу.
 7. Недопустимый status transition отклоняется Todoing и не обходится Manifest.
-8. Reviewer changes_requested создаёт в Todoing Review record и увеличивает revision_count ровно на один; число версий Todoing не используется как счётчик.
+8. Reviewer changes_requested создаёт в Todoing Review record, привязанный к проверяемой версии, и увеличивает revision_count ровно на один; число версий Todoing не используется как счётчик.
 9. Reviewer approved переводит задачу в Verified; итоговая проверка переводит в Completed.
 10. Отмена возможна только после пользовательского подтверждения; фиксируется outcome cancelled и архивируется связанный OpenSpec change, основные спецификации не меняются.
 11. Git SHA связывается с задачей, но не считается доказательством завершения.
+12. OpenSpec change связывается с Todoing task через namespace openspec.change; отмена не удаляет связь.
 12. Сбой между Todoing и OpenSpec/Git обнаруживается и обрабатывается recovery workflow; ложная атомарность между системами не предполагается.
 13. Snapshot не создаётся при активной блокировке; после освобождения блокировок проходит verify.
 14. Все критические ошибки обрабатываются по error code; повреждение store/history приводит к остановке мутаций.
