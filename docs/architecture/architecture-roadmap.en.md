@@ -29,7 +29,8 @@ authoritative; this is its English translation.
 7. Installing Git hooks and control scripts.
 8. Integration of the Todoing and OpenSpec processes, including task
    cancellation: any agent may recommend cancelling with a rationale,
-   only the user confirms the cancellation, the orchestrator records outcome `cancelled` through the Todoing API
+   only the user confirms cancellation, and the orchestrator records outcome
+   `cancelled` through the Todoing API
    (workflow status remains unchanged) and archives the OpenSpec change via
    the standard Archive mechanism without updating the main specifications
    (decided 2026-11-22).
@@ -83,7 +84,7 @@ is fixed:
 
 Workflow level (see `workflow/roadmap.en.md` v1.1.0):
 
-- the `commit-msg` hook (commit message validation) — implemented; see `workflow/roadmap.en.md` §1.4;
+- the `commit-msg` hook — implemented; see `workflow/roadmap.en.md` §1.4;
 - parser extensions: directory walk, scheduled runs;
 - rules for documentation projects: filling in
   `doc-content-rules.template.md`, git workflow for doc projects;
@@ -97,7 +98,7 @@ The full register — `architecture-decisions.ru.md` §12 and
 
 | Question | Blocks |
 | --- | --- |
-| Universal Todoing API extensions (external references, Review records, final commit marker) | §1.2 — MVP integration precondition |
+| Todoing API extensions (external refs, Review records, final marker) | §1.2 — MVP precondition |
 | Configuration file format and flag schema | manifest-init
   (`.manifest` and a separate file defined 2026-11-22) |
 | Git initialization of a new project without a repository | manifest-init |
