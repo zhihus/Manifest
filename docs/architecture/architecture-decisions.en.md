@@ -115,9 +115,9 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   Manifest's internal stages are kept.
 - Decided 2026-11-22, task cancellation: any agent may recommend
   cancelling a task with a rationale; only the user confirms the
-  cancellation; after the confirmation the orchestrator changes the
-  task status in Todoing and archives the related OpenSpec change via
-  the standard Archive mechanism; the main OpenSpec specifications
+  cancellation; after confirmation the orchestrator records outcome `cancelled` through
+  `task.cancel` (workflow status remains unchanged) and archives the related
+  OpenSpec change through the standard Archive mechanism; the main OpenSpec specifications
   are not updated.
 - I (implemented in todoing-x at HEAD 947048d): SQLite JSON API v1, Project ID,
   task CRUD/status/outcome, immutable versions, append-only operation history,
