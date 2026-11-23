@@ -366,9 +366,10 @@ consistency of Todoing, OpenSpec and Git.
   not prescribe the storage engine.
 - Import/export and backup are follow-up tasks; backup is provided by
   Manifest, Git is not a backup.
-- Project ID is mandatory at the integration boundary; Manifest creates a stable
-  UUIDv4 once, stores it in its own configuration, and passes it in every API
-  request envelope. Project ID is not a credential.
+- Project ID is mandatory at the integration boundary; Manifest stores a stable
+  ID in its own configuration and passes it in every API request envelope. The ID
+  format and generation method remain a technical decision. Project ID is not a
+  credential.
 
 ## 8. OpenSpec
 
