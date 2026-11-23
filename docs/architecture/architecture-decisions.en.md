@@ -2,7 +2,7 @@
 
 **Statuses:** **Accepted** (A), **Preliminary** (P), **Deferred** (D),
 **Unresolved** (U), **Done** (DN — analytical/documentation work),
-**Not implemented** (NI). Sources: brief v0.4.0, the 2026-11-22
+**Not implemented** (NI). Sources: brief v0.4.2, the 2026-11-22
 protocol (`architecture-session-2026-11-22.ru.md`), audits, Todoing
 decisions (PR #1 todoing-x: PRODUCT.md, docs/architecture/decisions.md),
 discussions of 2026-11-20/21. Auditor recommendations are not
