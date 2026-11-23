@@ -103,13 +103,15 @@ Manifest-specific or OpenSpec-specific fields or rules.
 
 - `task.external-ref.add`: accepts `task_id`, `namespace`, `value`, and
   `relation`, creating a typed link to an external artifact.
-- `task.external-ref.list`: returns a task's external references.
-- `task.external-ref.remove`: removes an active link through an append-only event,
+- `task.external-ref.list`: accepts `task_id` and returns the task's active references.
+- `task.external-ref.remove`: accepts `task_id` and `reference_id`, removing an active link through an append-only event,
   preserving history and versions.
 - An active `namespace + value` pair MUST be unique within one project store.
   Todoing does not interpret the namespace. Add/remove requires the owner's lock,
   creates a task version and history event; adding an existing active link is a no-op.
-- External references are included in task snapshots and immutable versions.
+- Adding an identical active reference is a no-op; a conflicting namespace/value
+  pair with a different link is rejected.
+- External references are included in task responses and immutable version snapshots.
 
 **Review records**
 
@@ -117,24 +119,26 @@ Manifest-specific or OpenSpec-specific fields or rules.
   `outcome` (`approved` or `changes_requested`), and a `comments` array.
   Envelope `actor_id` records the technical actor; `reviewer` is the reviewer's
   role or display name.
-- `task.review.list`: returns append-only review history with pagination.
+- `task.review.list`: accepts `task_id`, an optional cursor, and limit; returns
+  append-only review history with pagination.
 - Repeating a `review_id` with the same payload is idempotent. Reusing it with a
   different payload is rejected.
 - A review references an existing immutable task version. Adding a review does not
   change workflow status.
 - Each new review record, task version, and history event MUST be committed
   atomically. An idempotent repeat MUST NOT create another version.
-- `revision_count` is stored in task state and increases by exactly one for each
-  new `changes_requested` record. Multiple comments in one record do not increase
-  it. The counter, Review record, task version, and history event are committed
-  atomically.
+- `revision_count` is stored in task state and returned in the task response. It
+  increases by exactly one for each new `changes_requested` record. Multiple
+  comments in one record do not increase it. The counter, Review record, task
+  version, and history event are committed atomically.
 
 **Final commit reference**
 
 - `task.commit.finalize` accepts `task_id` and a Git revision, resolves it to a
   full SHA, and sets the single final commit reference.
 - The operation requires the current owner's active lock and creates an immutable
-  version and append-only history event.
+  version and append-only history event. Repeating the same SHA is a no-op; trying
+  to assign a different SHA when a marker already exists is rejected without change.
 - Ordinary commit references remain separate traceability references.
 
 ## 3. Task and status model
@@ -285,7 +289,8 @@ cancelled task requires an explicit decision and `task.reopen`.
 - Branch, review, merge, and final-commit policy belong to Manifest.
 - OpenSpec change IDs and other external identifiers MUST NOT be stored as Git
   commit references. Manifest links them to Task IDs through Todoing's generic
-  external-reference API.
+  external-reference API. Task snapshots preserve external references and the final
+  commit marker as they existed at that version.
 
 ## 6. Dependencies
 
@@ -317,6 +322,10 @@ text.
 | `task_terminal` | Require an explicit reopen decision; do not retry mutation automatically |
 | `task_archived` | Do not mutate until explicit restore |
 | `dependency_cycle` | Reject dependency change and report the cycle |
+| `external_ref_conflict` | Do not overwrite the active link; report namespace/value conflict |
+| `review_id_conflict` | Do not change Review history; require a new review_id |
+| `review_version_not_found` | Reject Review when the reviewed version does not exist |
+| `final_commit_conflict` | Do not replace an existing final commit marker |
 | `store_corrupt` / `history_record_failed` | Fail closed: stop mutations and escalate |
 | `store_busy` | Retry only when `retryable=true`, under a bounded retry policy |
 | `invalid_request` / `unsupported_api_version` | Treat as integration error; do not retry unchanged |
@@ -423,6 +432,12 @@ recovery. It MUST NOT claim cross-system atomicity.
     are released.
 14. Critical errors are handled by error code; store/history corruption stops
     mutations.
+15. An active namespace/value external-reference pair is unique within a store;
+    removal preserves its history.
+16. Repeating a review_id with the same payload creates no version and does not
+    increment revision_count; a different payload is rejected.
+17. The final commit marker is set once; the same SHA is idempotent and a different
+    SHA cannot replace it.
 
 ## 13. Decisions required before approval
 
