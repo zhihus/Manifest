@@ -106,8 +106,9 @@ role-model-decisions.ru.md; целевые документы Todoing в PR #1.
   этапы Manifest сохраняются.
 - Решено 22.11.2026, отмена задач: любой агент может рекомендовать
   отмену с обоснованием; отмену подтверждает только пользователь;
-  после подтверждения оркестратор меняет статус задачи в Todoing и
-  архивирует связанное OpenSpec change штатным механизмом Archive;
+  после подтверждения оркестратор фиксирует outcome `cancelled` через
+  `task.cancel` (workflow status не меняется) и архивирует связанное OpenSpec
+  change штатным механизмом Archive;
   основные спецификации OpenSpec не обновляются.
 - В (реализовано в todoing-x на HEAD 947048d): SQLite JSON API v1, Project ID,
   task CRUD/status/outcome, immutable versions, append-only operation history,
