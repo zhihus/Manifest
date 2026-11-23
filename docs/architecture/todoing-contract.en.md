@@ -113,6 +113,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
   creates a task version and history event; adding an existing active link is a no-op.
 - Adding an identical active reference is a no-op; a conflicting namespace/value
   pair with a different link is rejected.
+- External-reference reads obey lock read-exclusion; a non-owner cannot read data
+  from a locked task.
 - External references are included in task responses and immutable version snapshots.
 
 **Review records**
@@ -126,9 +128,11 @@ Manifest-specific or OpenSpec-specific fields or rules.
 - Repeating a `review_id` with the same payload is idempotent. Reusing it with a
   different payload is rejected.
 - A review references an existing immutable task version. Adding a review does not
-  change workflow status.
-- Each new review record, task version, and history event MUST be committed
-  atomically. An idempotent repeat MUST NOT create another version.
+  change workflow status. Review creation and listing obey lock ownership; a
+  non-owner cannot read Review data from a locked task.
+- Each new review record, revision_count update, task version, history event, and
+  snapshot MUST be committed atomically. An idempotent repeat MUST NOT create
+  another version.
 - `revision_count` is stored in task state and returned in the task response. It
   increases by exactly one for each new `changes_requested` record. Multiple
   comments in one record do not increase it. The counter, Review record, task
@@ -501,7 +505,7 @@ recovery. It MUST NOT claim cross-system atomicity.
 5. Heartbeat renews a lease; an expired lease cannot be renewed.
 6. Recovery creates a new fencing generation; the former owner cannot continue.
 7. Todoing rejects an invalid status transition; Manifest does not bypass it.
-8. Reviewer `changes_requested` creates one Review record and increments
+8. Reviewer `changes_requested` creates one Todoing Review record and increments
    `revision_count` exactly once; task-version count is not used as the counter.
 9. Reviewer approval moves the task to Verified; final checks move it to Completed.
 10. Cancellation requires user approval, records outcome `cancelled`, and archives
