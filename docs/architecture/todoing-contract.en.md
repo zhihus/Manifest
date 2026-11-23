@@ -13,7 +13,9 @@ Manifest; not a task to implement Todoing.
 >
 > Decision history is preserved: decisions П1-П8 (v2/v3), D1-D5 (v4), and the
 > v6 amendments are fully included; the previous spec editions (v2-v5) are
-> not changed.
+> not changed; they are kept in this section as historical editions:
+> `contract-spec-final.ru.md` (v2), `contract-spec-v3.ru.md`,
+> `contract-spec-v4.ru.md`, `contract-spec-v5.ru.md`.
 ## 0. What changed relative to v5
 
 The v5 audit identified 8 groups of findings. v6 fixes them:
