@@ -86,6 +86,7 @@ Manifest-specific или OpenSpec-specific поля и правила.
   Добавление/удаление требует lock владельца, создаёт новую версию задачи и
   запись истории; повторное добавление активной связи — no-op.
 - Добавление уже существующей идентичной активной ссылки — no-op; конфликт namespace/value с иной связью отклоняется.
+- Чтение списка ссылок подчиняется lock read-exclusion; внешний клиент не получает данные заблокированной задачи.
 - Внешние ссылки входят в task response и immutable task version snapshots.
 
 **Review records**
@@ -98,9 +99,10 @@ Manifest-specific или OpenSpec-specific поля и правила.
 - Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
   payload отклоняется.
 - Review привязан к существующей immutable version. Добавление записи не
-  меняет workflow status.
-- Каждая новая Review record и соответствующая task version/history event
-  сохраняются атомарно. Идемпотентный повтор не создаёт новую версию.
+  меняет workflow status. Запись и чтение Review history подчиняются lock
+  ownership; non-owner не получает Review data заблокированной задачи.
+- Каждая новая Review record, revision_count, task version/history event и
+  snapshot сохраняются атомарно. Идемпотентный повтор не создаёт новую версию.
 - `revision_count` хранится в состоянии задачи и возвращается в task response.
   Он увеличивается ровно на один для каждой новой записи `changes_requested`;
   комментарии внутри одной записи не увеличивают счётчик. Счётчик, Review record,
@@ -392,7 +394,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 5. Heartbeat продлевает lease; истёкший lock нельзя продлить.
 6. Recovery создаёт новую fencing generation; прежний владелец не может продолжить работу.
 7. Недопустимый status transition отклоняется Todoing и не обходится Manifest.
-8. Reviewer changes_requested создаёт запись review history Manifest и увеличивает revision_count ровно на один; число версий Todoing не используется как счётчик.
+8. Reviewer changes_requested создаёт в Todoing Review record и увеличивает revision_count ровно на один; число версий Todoing не используется как счётчик.
 9. Reviewer approved переводит задачу в Verified; итоговая проверка переводит в Completed.
 10. Отмена возможна только после пользовательского подтверждения; фиксируется outcome cancelled и архивируется связанный OpenSpec change, основные спецификации не меняются.
 11. Git SHA связывается с задачей, но не считается доказательством завершения.
