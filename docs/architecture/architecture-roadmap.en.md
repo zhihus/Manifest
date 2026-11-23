@@ -4,7 +4,7 @@
 **Status:** working edition  
 **Purpose:** separate the MVP scope from the subsequent development
 stages of Manifest; record the MVP preconditions and unresolved
-technical questions. Sources: `architecture-brief.ru.md` v0.4.0
+technical questions. Sources: `architecture-brief.ru.md` v0.4.2
 (§12, §13), `architecture-decisions.ru.md` (§11, §12), the 2026-11-22
 protocol (`architecture-session-2026-11-22.ru.md`),
 `workflow/roadmap.en.md` v1.1.0. This document introduces no new
