@@ -101,22 +101,19 @@ Manifest-specific or OpenSpec-specific fields or rules.
 
 **External references**
 
-- `task.external-ref.add`: accepts `task_id`, `namespace`, `value`, and
-  `relation`, creating a typed link to an external artifact. All four fields are
-  required; string values must be non-empty and bounded.
+- `task.external-ref.add`: accepts `task_id`, `namespace`, `value`, `relation`,
+  and `scope` (`task` or `project`; default `task`). String fields are required,
+  non-empty, and bounded.
 - `task.external-ref.list`: accepts `task_id` and returns the task's active references.
 - `task.external-ref.remove`: accepts `task_id` and `reference_id`.
   It removes an active link through an append-only event,
   preserving history and versions.
-- An active `namespace + value` pair MUST be unique within one project store.
-  Todoing does not interpret the namespace. Add/remove requires the owner's lock,
-  creates a task version and history event; adding an existing active link is a no-op.
-- Adding an identical active reference is a no-op; a conflicting namespace/value
-  pair with a different link is rejected. Removing an inactive reference again is
-  a no-op; an unknown reference_id returns external_ref_not_found.
-- External-reference reads obey lock read-exclusion; a non-owner cannot read data
-  from a locked task.
-- External references are included in task responses and immutable version snapshots.
+- With scope `task`, a `namespace + value` pair is unique within one task. With
+  scope `project`, the pair is unique across the project store and conflicts with
+  any other active reference using that pair. Todoing does not interpret namespace
+  or relation; it only enforces the requested scope.
+- Add/remove requires the owner's lock and creates a task version and history
+  event; adding an identical active reference is a no-op.
 
 **Review records**
 
@@ -528,8 +525,8 @@ recovery. It MUST NOT claim cross-system atomicity.
     are released.
 15. Critical errors are handled by error code; store/history corruption stops
     mutations.
-16. An active namespace/value external-reference pair is unique within a store;
-    removal preserves its history.
+16. A project-scoped namespace/value pair is unique within the store; a task-scoped
+    pair is unique within one task. Removal preserves its history.
 17. Repeating a review_id with the same payload creates no version and does not
     increment revision_count; a different payload is rejected.
 18. Repeating the same final SHA is idempotent; replacement is allowed only after
