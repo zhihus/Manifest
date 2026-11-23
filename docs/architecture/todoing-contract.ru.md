@@ -75,19 +75,18 @@ Manifest-specific или OpenSpec-specific поля и правила.
 
 **External references**
 
-- `task.external-ref.add`: принимает `task_id`, `namespace`, `value` и
-  `relation`; создаёт типизированную ссылку на внешний артефакт. Все четыре поля
-  обязательны; строковые значения должны быть непустыми и ограниченными по длине.
+- `task.external-ref.add`: принимает `task_id`, `namespace`, `value`, `relation`
+  и `scope` (`task` или `project`; по умолчанию `task`). Строковые поля обязательны,
+  непусты и ограничены по длине.
 - `task.external-ref.list`: принимает `task_id` и возвращает активные ссылки задачи.
 - `task.external-ref.remove`: принимает `task_id` и `reference_id`, удаляет активную связь append-only событием,
   сохраняя историю и версии.
-- Уникальность активной связи в пределах `namespace + value` обеспечивает
-  эксклюзивность связи в одном project store; Todoing не интерпретирует namespace.
-  Добавление/удаление требует lock владельца, создаёт новую версию задачи и
-  запись истории; повторное добавление активной связи — no-op.
-- Добавление уже существующей идентичной активной ссылки — no-op; конфликт namespace/value с иной связью отклоняется. Повторное удаление неактивной ссылки — no-op; неизвестный reference_id возвращает external_ref_not_found.
-- Чтение списка ссылок подчиняется lock read-exclusion; внешний клиент не получает данные заблокированной задачи.
-- Внешние ссылки входят в task response и immutable task version snapshots.
+- В scope `task` пара `namespace + value` уникальна внутри задачи. В scope
+  `project` эта пара уникальна во всём project store; project scope конфликтует
+  с любой другой активной ссылкой той же пары. Todoing не интерпретирует namespace
+  или relation, а только обеспечивает заданный scope.
+- Добавление/удаление требует lock владельца, создаёт новую версию задачи и
+  запись истории; повторное добавление идентичной активной ссылки — no-op.
 
 **Review records**
 
@@ -289,7 +288,7 @@ revision_count — количество Review records с outcome changes_reques
 - task.version.approve задаёт baseline существующей версии и не создаёт новую.
 - Git-связь каждого существенного изменения добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Итоговый merge commit назначается отдельно через task.commit.finalize. Обе ссылки — метаданные прослеживаемости, не доказательство выполнения критериев.
 - Политика веток, review, merge и определение итогового коммита принадлежат Manifest.
-- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing. Для OpenSpec используется namespace `openspec.change`, value равен ID каталога change, relation — `implements`. Для одной задачи Manifest допускает не более одной активной ссылки этого namespace; один change ID глобально привязан не более чем к одной задаче. При отмене ссылка сохраняется для аудита. Task snapshots сохраняют ссылки и final commit marker на момент версии.
+- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing. Для OpenSpec используется namespace `openspec.change`, value равен ID каталога change, relation — `implements`, scope — `project`. Для одной задачи Manifest допускает не более одной активной ссылки этого namespace; один change ID глобально привязан не более чем к одной задаче. При отмене ссылка сохраняется для аудита. Task snapshots сохраняют ссылки и final commit marker на момент версии.
 
 ## 6. Зависимости
 
@@ -407,7 +406,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 13. Сбой между Todoing и OpenSpec/Git обнаруживается и обрабатывается recovery workflow; ложная атомарность между системами не предполагается.
 14. Snapshot не создаётся при активной блокировке; после освобождения блокировок проходит verify.
 15. Все критические ошибки обрабатываются по error code; повреждение store/history приводит к остановке мутаций.
-16. Активная external reference пара namespace/value уникальна в пределах store; удаление сохраняет историческую запись.
+16. Project-scoped external reference пара namespace/value уникальна в пределах store; task-scoped пара уникальна внутри задачи; удаление сохраняет историческую запись.
 17. Повторный review_id с тем же payload не создаёт новую версию и не увеличивает revision_count; другой payload отклоняется.
 18. Повторная установка того же final SHA идемпотентна; замена допускается только после явного reopen задачи и фиксируется новой версией/history event.
 
