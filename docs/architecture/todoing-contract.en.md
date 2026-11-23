@@ -178,6 +178,83 @@ is a project file. Manifest MUST install it through a separate controlled operat
 and MUST NOT modify SQLite directly. The installation mechanism and protection of
 user changes are detailed in Manifest implementation design.
 
+
+Recommended Todoing configuration fragment:
+
+```toml
+format_version = 1
+
+[locking]
+lease_seconds = 300
+heartbeat_seconds = 60
+recovery_grace_seconds = 60
+
+[[statuses]]
+id = "backlog"
+label = "Backlog"
+enabled = true
+
+[[statuses]]
+id = "ready"
+label = "Ready"
+enabled = true
+
+[[statuses]]
+id = "in_progress"
+label = "In Progress"
+enabled = true
+
+[[statuses]]
+id = "review"
+label = "In Review"
+enabled = true
+
+[[statuses]]
+id = "verified"
+label = "Verified"
+enabled = true
+
+[[statuses]]
+id = "completed"
+label = "Completed"
+enabled = true
+outcome = "completed"
+
+[[transitions]]
+from = "backlog"
+to = "ready"
+
+[[transitions]]
+from = "ready"
+to = "in_progress"
+
+[[transitions]]
+from = "in_progress"
+to = "review"
+
+[[transitions]]
+from = "review"
+to = "verified"
+
+[[transitions]]
+from = "review"
+to = "in_progress"
+
+[[transitions]]
+from = "verified"
+to = "completed"
+
+[[transitions]]
+from = "completed"
+to = "verified"
+```
+
+The `completed → verified` transition is permitted only through `task.reopen`,
+not ordinary status changes. If a user-provided config.toml already exists,
+Manifest never replaces it; it checks for the required IDs, outcome mapping, and
+transitions. An incompatible configuration blocks integration until explicitly
+resolved.
+
 The status-to-outcome mapping is explicit in Todoing configuration; Todoing MUST
 NOT infer it from a status ID or display label. Manifest proposes mapping
 `completed` to outcome `completed`. A terminal outcome requires explicit reopen
