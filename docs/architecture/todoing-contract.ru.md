@@ -407,7 +407,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 2. **Outcome mapping:** completed отображается в outcome completed; отмена фиксируется как outcome cancelled без изменения workflow status, согласно Todoing task-status-configuration.
 3. **Универсальные API-расширения Todoing:** утвердить схему external references, Review records, final commit marker, идемпотентность review_id и миграцию SQLite schema; расширение не должно содержать терминов или правил Manifest/OpenSpec.
 4. **Утверждение baseline:** Manifest вызывает task.version.approve после того, как пользователь сам переводит задачу из Backlog в Ready; baseline фиксирует текущую версию задачи.
-5. **Project ID и actor ID:** Project ID — UUIDv4, создаётся один раз и сохраняется в стабильной конфигурации Manifest; actor_id — стабильный идентификатор роли/сессии длиной не более 128 символов. Эти значения являются атрибуцией/изоляцией, не аутентификацией.
+5. **Project ID и actor ID:** предлагается создавать Project ID как UUIDv4 один раз и сохранять в стабильной конфигурации Manifest; actor_id — стабильный идентификатор роли/сессии длиной не более 128 символов. Формат Project ID требует подтверждения. Эти значения обеспечивают изоляцию/атрибуцию, не аутентификацию.
 
 До утверждения этого документа он остаётся проектом решения. Реализация Manifest integration начинается после утверждения; универсальные расширения Todoing могут выполняться отдельной задачей на основании этой спецификации.
 
