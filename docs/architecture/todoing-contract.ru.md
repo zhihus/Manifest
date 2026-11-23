@@ -11,7 +11,7 @@
 
 **Основа:** Todoing zhihus/todoing-x main @ 947048d3864e99c7d0dfcc48889a084e0a99e42d; Manifest feature/todoing-contract-spec.
 
-> Эта редакция заменяет прежнюю целевую модель CLI + файловый WAL. Она описывает потребление существующего Todoing JSON API v1 и не является заданием на изменение Todoing. Исторические редакции v2–v6 сохранены отдельными файлами в Git.
+> Эта редакция заменяет прежнюю целевую модель CLI + файловый WAL. Она описывает целевое потребление Todoing JSON API v1 и включает требования к универсальным расширениям Todoing, необходимым для сохранения ранее утверждённых решений Manifest. Исторические редакции v2–v6 сохранены отдельными файлами в Git.
 
 ## 1. Архитектурный принцип и границы ответственности
 
@@ -81,7 +81,7 @@ Manifest-specific или OpenSpec-specific поля и правила.
 - `task.external-ref.remove`: удаляет активную связь append-only событием,
   сохраняя историю и версии.
 - Уникальность активной связи в пределах `namespace + value` обеспечивает
-  эксклюзивность связи; Todoing не интерпретирует namespace.
+  эксклюзивность связи в одном project store; Todoing не интерпретирует namespace.
 - Внешние ссылки входят в snapshots и immutable task versions.
 
 **Review records**
@@ -268,7 +268,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 
 ### Не входит
 
-- Универсальные расширения Todoing для external references и Review records; Manifest-specific поля и операции в Todoing.
+- Manifest-specific поля и операции в Todoing; универсальные расширения external references, Review records и final commit marker входят в интеграционное предусловие MVP.
 - Todoing capabilities discovery API.
 - Todoing lifecycle events/hooks как условие корректности.
 - Произвольные внешние ссылки без типизированного generic reference contract.
@@ -316,7 +316,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 
 1. **Конфигурация статусов:** подтвердить предложенные IDs/labels и граф переходов; отдельно определить механизм безопасной установки и обновления config.toml, поскольку API v1 не предоставляет операции изменения конфигурации.
 2. **Outcome mapping:** подтвердить, что completed status отображается в outcome completed; определить пользовательское отображение отменённой задачи, поскольку отмена — outcome, а не отдельный workflow status.
-3. **Универсальные API-расширения Todoing:** утвердить схему external references, Review records, идемпотентность review_id и миграцию SQLite schema; расширение не должно содержать терминов или правил Manifest/OpenSpec.
+3. **Универсальные API-расширения Todoing:** утвердить схему external references, Review records, final commit marker, идемпотентность review_id и миграцию SQLite schema; расширение не должно содержать терминов или правил Manifest/OpenSpec.
 4. **Утверждение baseline:** определить, на каком пользовательском gate Manifest вызывает task.version.approve и какие версии требуют baseline.
 5. **Project ID и actor ID:** закрепить формат и источник стабильных идентификаторов в Manifest.
 
