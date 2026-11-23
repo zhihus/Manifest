@@ -112,7 +112,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
   Todoing does not interpret the namespace. Add/remove requires the owner's lock,
   creates a task version and history event; adding an existing active link is a no-op.
 - Adding an identical active reference is a no-op; a conflicting namespace/value
-  pair with a different link is rejected.
+  pair with a different link is rejected. Removing an inactive reference again is
+  a no-op; an unknown reference_id returns external_ref_not_found.
 - External-reference reads obey lock read-exclusion; a non-owner cannot read data
   from a locked task.
 - External references are included in task responses and immutable version snapshots.
@@ -414,6 +415,7 @@ extension and are absent from the current implementation.
 | `task_archived` | Do not mutate until explicit restore |
 | `dependency_cycle` | Reject dependency change and report the cycle |
 | `external_ref_conflict` | Do not overwrite the active link; report namespace/value conflict |
+| `external_ref_not_found` | Do not mutate the task; report unknown reference_id |
 | `review_id_conflict` | Do not change Review history; require a new review_id |
 | `review_version_not_found` | Reject Review when the reviewed version does not exist |
 
