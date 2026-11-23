@@ -323,6 +323,9 @@ this restriction by reading the database or using a snapshot.
 - Before submission, Manifest moves the task to `review` and provides the Reviewer
   with artifacts through its own workflow.
 - The Reviewer independently checks the result.
+- Manifest calls `task.review.add` with review_id, the reviewed version number,
+  reviewer label, outcome, and ordered comments. Envelope actor_id identifies the
+  Reviewer agent.
 - On approval, Todoing stores a structured Review record with outcome `approved`;
   Manifest moves the task to `verified`.
 - When changes are requested, Todoing atomically stores a Review record with
@@ -366,14 +369,16 @@ cancelled task requires an explicit decision and `task.reopen`.
   and `task.version.compare` for audit and comparison.
 - `task.version.approve` sets the baseline to an existing version and creates no
   new version.
-- A Git reference is added through `task.commit.add`; Todoing resolves the
-  revision to a full SHA. The final reference is set separately through
+- Each significant change is linked through `task.commit.add`; Todoing resolves the
+  revision to a full SHA. The final merge commit is set separately through
   `task.commit.finalize`. Neither reference proves that acceptance criteria passed.
 - Branch, review, merge, and final-commit policy belong to Manifest.
 - OpenSpec change IDs and other external identifiers MUST NOT be stored as Git
-  commit references. Manifest links them to Task IDs through Todoing's generic
-  external-reference API. Task snapshots preserve external references and the final
-  commit marker as they existed at that version.
+  commit references. Manifest links them through Todoing's generic external-reference
+  API using namespace `openspec.change`, value equal to the change directory ID, and
+  relation `implements`. Manifest allows at most one active link in this namespace
+  per task; one change ID links to at most one task. Cancellation retains the link
+  for audit. Task snapshots preserve references and the final commit marker.
 
 ## 6. Dependencies
 
@@ -505,8 +510,11 @@ recovery. It MUST NOT claim cross-system atomicity.
 5. Heartbeat renews a lease; an expired lease cannot be renewed.
 6. Recovery creates a new fencing generation; the former owner cannot continue.
 7. Todoing rejects an invalid status transition; Manifest does not bypass it.
-8. Reviewer `changes_requested` creates one Todoing Review record and increments
-   `revision_count` exactly once; task-version count is not used as the counter.
+8. Reviewer `changes_requested` creates a Todoing Review record linked to the
+   reviewed version and increments `revision_count` exactly once; task-version
+   count is not used as the counter.
+12. An OpenSpec change is linked to its Todoing task using namespace
+   `openspec.change`; cancellation retains the link.
 9. Reviewer approval moves the task to Verified; final checks move it to Completed.
 10. Cancellation requires user approval, records outcome `cancelled`, and archives
     the linked OpenSpec change without changing base specifications.
