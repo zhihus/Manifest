@@ -514,23 +514,23 @@ recovery. It MUST NOT claim cross-system atomicity.
 8. Reviewer `changes_requested` creates a Todoing Review record linked to the
    reviewed version and increments `revision_count` exactly once; task-version
    count is not used as the counter.
-12. An OpenSpec change is linked to its Todoing task using namespace
-   `openspec.change`; cancellation retains the link.
 9. Reviewer approval moves the task to Verified; final checks move it to Completed.
 10. Cancellation requires user approval, records outcome `cancelled`, and archives
     the linked OpenSpec change without changing base specifications.
 11. A Git SHA is linked to a task but is not treated as proof of completion.
-12. A failure between Todoing and OpenSpec/Git is detected and handled by recovery;
+12. An OpenSpec change is linked to its Todoing task using namespace
+    `openspec.change`; cancellation retains the link.
+13. A failure between Todoing and OpenSpec/Git is detected and handled by recovery;
     no false cross-system atomicity is assumed.
-13. Snapshot is rejected while a lock is active and passes verification after locks
+14. Snapshot is rejected while a lock is active and passes verification after locks
     are released.
-14. Critical errors are handled by error code; store/history corruption stops
+15. Critical errors are handled by error code; store/history corruption stops
     mutations.
-15. An active namespace/value external-reference pair is unique within a store;
+16. An active namespace/value external-reference pair is unique within a store;
     removal preserves its history.
-16. Repeating a review_id with the same payload creates no version and does not
+17. Repeating a review_id with the same payload creates no version and does not
     increment revision_count; a different payload is rejected.
-17. Repeating the same final SHA is idempotent; replacement is allowed only after
+18. Repeating the same final SHA is idempotent; replacement is allowed only after
     an explicit task reopen and creates a new version/history event.
 
 ## 13. Decisions required before approval
