@@ -4,7 +4,7 @@
 > **Status: approved**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-22**  
+> **Updated: 2026-11-23**  
 
 # Description
 The single source listing the external binary tools that Manifest
@@ -32,6 +32,7 @@ this file is its translation.
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
+| `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
