@@ -80,8 +80,9 @@ Manifest не читает SQLite напрямую и не дублирует wo
 3. **revision_count:** persisted task metadata; увеличивается ровно на один для
    каждой новой записи changes_requested; несколько comments в одной записи
    считаются одним review cycle; повторный идентичный review_id идемпотентен.
-4. **Final commit marker:** отдельная операция, сохраняющая один resolved full SHA,
-   независимо от обычного набора commit references.
+4. **Final commit marker:** отдельная операция, сохраняющая один текущий resolved
+   full SHA независимо от обычных commit references; замена допускается после
+   явного reopen и сохраняет прежнее значение в истории/версиях.
 
 Эти возможности отсутствуют на базовом HEAD и не должны описываться как уже
 реализованные.
