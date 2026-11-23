@@ -136,6 +136,82 @@ Manifest поставляет рекомендуемый .todoing/config.toml. �
 
 В API v1 нет операции изменения config.toml. Рекомендуемая конфигурация является файлом проекта; Manifest должен управлять её установкой отдельной контролируемой операцией, не изменяя SQLite напрямую. Способ установки и защита пользовательских изменений уточняются в спецификации и реализации Manifest.
 
+
+Рекомендуемый конфигурационный фрагмент Todoing:
+
+```toml
+format_version = 1
+
+[locking]
+lease_seconds = 300
+heartbeat_seconds = 60
+recovery_grace_seconds = 60
+
+[[statuses]]
+id = "backlog"
+label = "Backlog"
+enabled = true
+
+[[statuses]]
+id = "ready"
+label = "К выполнению"
+enabled = true
+
+[[statuses]]
+id = "in_progress"
+label = "Выполняется"
+enabled = true
+
+[[statuses]]
+id = "review"
+label = "На проверке"
+enabled = true
+
+[[statuses]]
+id = "verified"
+label = "Проверено"
+enabled = true
+
+[[statuses]]
+id = "completed"
+label = "Завершено"
+enabled = true
+outcome = "completed"
+
+[[transitions]]
+from = "backlog"
+to = "ready"
+
+[[transitions]]
+from = "ready"
+to = "in_progress"
+
+[[transitions]]
+from = "in_progress"
+to = "review"
+
+[[transitions]]
+from = "review"
+to = "verified"
+
+[[transitions]]
+from = "review"
+to = "in_progress"
+
+[[transitions]]
+from = "verified"
+to = "completed"
+
+[[transitions]]
+from = "completed"
+to = "verified"
+```
+
+Переход `completed → verified` разрешён только операцией `task.reopen`, а не
+обычной сменой статуса. Если пользовательский config.toml уже существует,
+Manifest не заменяет его; он проверяет наличие необходимых IDs, outcome mapping
+и переходов. Несовместимая конфигурация блокирует интеграцию до явного решения.
+
 Связь status ID с outcome задаётся явно в конфигурации Todoing: Todoing не выводит её из имени или отображаемой метки статуса. Для Manifest предлагается связать completed с outcome completed. Терминальный outcome требует явного reopen перед дальнейшим изменением. Отмена выполняется отдельной операцией task.cancel и не требует отдельного workflow status.
 
 ### 3.3. Status, outcome и archive — разные измерения
