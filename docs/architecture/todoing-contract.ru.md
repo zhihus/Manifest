@@ -77,38 +77,40 @@ Manifest-specific или OpenSpec-specific поля и правила.
 
 - `task.external-ref.add`: принимает `task_id`, `namespace`, `value` и
   `relation`; создаёт типизированную ссылку на внешний артефакт.
-- `task.external-ref.list`: возвращает ссылки задачи.
-- `task.external-ref.remove`: удаляет активную связь append-only событием,
+- `task.external-ref.list`: принимает `task_id` и возвращает активные ссылки задачи.
+- `task.external-ref.remove`: принимает `task_id` и `reference_id`, удаляет активную связь append-only событием,
   сохраняя историю и версии.
 - Уникальность активной связи в пределах `namespace + value` обеспечивает
   эксклюзивность связи в одном project store; Todoing не интерпретирует namespace.
   Добавление/удаление требует lock владельца, создаёт новую версию задачи и
   запись истории; повторное добавление активной связи — no-op.
-- Внешние ссылки входят в snapshots и immutable task versions.
+- Добавление уже существующей идентичной активной ссылки — no-op; конфликт namespace/value с иной связью отклоняется.
+- Внешние ссылки входят в task response и immutable task version snapshots.
 
 **Review records**
 
 - `task.review.add`: принимает `task_id`, `review_id`, `version_no`,
   `reviewer`, `outcome` (`approved` или `changes_requested`) и массив `comments`.
   `actor_id` envelope фиксирует технического актора, `reviewer` — роль/имя Reviewer.
-- `task.review.list`: возвращает append-only историю Review с пагинацией.
+- `task.review.list`: принимает `task_id`, необязательный cursor и limit; возвращает append-only историю Review с пагинацией.
 - Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
   payload отклоняется.
 - Review привязан к существующей immutable version. Добавление записи не
   меняет workflow status.
 - Каждая новая Review record и соответствующая task version/history event
   сохраняются атомарно. Идемпотентный повтор не создаёт новую версию.
-- `revision_count` хранится в состоянии задачи и увеличивается ровно на один
-  для каждой новой записи `changes_requested`; комментарии внутри одной записи
-  не увеличивают счётчик. Счётчик, Review record, task version и history event
-  обновляются атомарно.
+- `revision_count` хранится в состоянии задачи и возвращается в task response.
+  Он увеличивается ровно на один для каждой новой записи `changes_requested`;
+  комментарии внутри одной записи не увеличивают счётчик. Счётчик, Review record,
+  task version и history event обновляются атомарно.
 
 **Final commit reference**
 
 - `task.commit.finalize` принимает `task_id` и Git revision, разрешает его
   в полный SHA и назначает единственную итоговую commit reference.
 - Операция требует активную блокировку владельца; изменение отражается в
-  immutable version и append-only history.
+  immutable version и append-only history. Повтор того же SHA — no-op; попытка
+  назначить другой SHA при уже заполненном marker отклоняется без изменения задачи.
 - Обычные commit references остаются отдельными traceability references.
 
 ## 3. Модель задачи и статусов
@@ -203,7 +205,7 @@ revision_count — количество Review records с outcome changes_reques
 - task.version.approve задаёт baseline существующей версии и не создаёт новую.
 - Git-связь добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Итоговая ссылка назначается отдельно через task.commit.finalize. Обе ссылки — метаданные прослеживаемости, не доказательство выполнения критериев.
 - Политика веток, review, merge и определение итогового коммита принадлежат Manifest.
-- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing.
+- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing. Task snapshots должны сохранять ссылки и final commit marker на момент версии.
 
 ## 6. Зависимости
 
@@ -228,6 +230,10 @@ Manifest обрабатывает стабильные коды ошибок API
 | task_terminal | Требуется явное решение о reopen; не повторять мутацию автоматически |
 | task_archived | Не выполнять мутации до явного restore |
 | dependency_cycle | Отклонить изменение зависимостей и сообщить о цикле |
+| external_ref_conflict | Не перезаписывать активную ссылку; сообщить о конфликте namespace/value |
+| review_id_conflict | Не изменять Review history; запросить новый review_id |
+| review_version_not_found | Отклонить Review, если проверяемая версия отсутствует |
+| final_commit_conflict | Не заменять ранее установленный final commit marker |
 | store_corrupt / history_record_failed | Fail closed: остановить мутации и эскалировать пользователю |
 | store_busy | Повтор допустим только при retryable=true и с ограниченной политикой повторов |
 | invalid_request / unsupported_api_version | Считать ошибкой интеграции; не повторять без изменения запроса/совместимости |
@@ -315,6 +321,9 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 12. Сбой между Todoing и OpenSpec/Git обнаруживается и обрабатывается recovery workflow; ложная атомарность между системами не предполагается.
 13. Snapshot не создаётся при активной блокировке; после освобождения блокировок проходит verify.
 14. Все критические ошибки обрабатываются по error code; повреждение store/history приводит к остановке мутаций.
+15. Активная external reference пара namespace/value уникальна в пределах store; удаление сохраняет историческую запись.
+16. Повторный review_id с тем же payload не создаёт новую версию и не увеличивает revision_count; другой payload отклоняется.
+17. Final commit marker устанавливается один раз; повтор того же SHA идемпотентен, другой SHA не заменяет его.
 
 ## 13. Вопросы, требующие решения до утверждения
 
