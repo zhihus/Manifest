@@ -1,104 +1,111 @@
-# Матрица соответствия: контракт Todoing ↔ реализация todoing-x
+# Матрица соответствия: целевой контракт Todoing ↔ todoing-x
 
-**Версия:** 1.0.0
-**Статус:** рабочая редакция
-**Назначение:** отделить подтверждённые факты реализации `todoing-x` от
-требований целевого контракта (`todoing-contract.ru.md`) и нерешённых
-вопросов. Документ не ставит задачу на реализацию Todoing.
+**Версия:** 2.0.0-draft  
+**Статус:** рабочая редакция  
+**Назначение:** зафиксировать соответствие целевого контракта todoing-contract.ru.md
+текущей реализации Todoing и определить блокирующие расширения перед интеграцией
+Manifest.
 
-**Метод проверки фактов:** прямой осмотр исходного кода `todoing-x`
-(main, HEAD `a008836`): `src/main.rs` (475 строк), `src/lib.rs` (1486 строк).
-Дата проверки: 2026-11-23.
+**Базовая версия Todoing:** zhihus/todoing-x main @
+947048d3864e99c7d0dfcc48889a084e0a99e42d.
 
-## Легенда статусов
-
-- **реализовано** — подтверждено кодом;
-- **частично** — есть близкий механизм, но не по контракту;
-- **не реализовано** — в коде отсутствует;
-- **несовместимо** — текущее поведение противоречит контракту.
+**Метод:** использован опубликованный отчёт исходного аудита
+todoing-implementation-audit.ru.md и выполнена повторная документальная
+сверка с API operations/schema, consumer contract и OpenSpec specifications.
+Это не повторный полный аудит исходников и не независимое внешнее ревью кода.
 
 ## 1. Сводная матрица
 
-| # | Пункт контракта (§) | Статус в todoing-x | Комментарий |
-|---|---------------------|--------------------|-------------|
-| 1 | Версия контракта, `contract_version` в каждом JSON (§3.1) | не реализовано | `--json` есть, но конверта с `contract_version`/`project_id` нет |
-| 2 | Capabilities-список (§3.1) | не реализовано | — |
-| 3 | Project ID: `init --project`, валидация `--project` (§4.2) | не реализовано | — |
-| 4 | Команды CLI §3.3 | частично | Есть: `add`, `ls`, `see`, `body`, `append`, `status`, `label`, `commit`, `delete`. Нет: `lock`, `heartbeat`, `unlock`, `restore`, `approve`, `bind`, `unbind`, `final-commit`, `history`, `dependency-*`, `review-note`, `status-add/remove/list`, `contract` |
-| 5 | Формат ответа-конверта (§3.4) | не реализовано | Команды выводят объекты напрямую |
-| 6 | Каталог кодов ошибок (§3.5) | частично | Ошибки — текст в stderr; структурированных кодов нет |
-| 7 | Поля задачи: `dependencies`, `revision_count`, `review_history`, `final_commit`, `openspec_change`, `deleted`, `control_version` (§3.6) | не реализовано | Факт (`src/lib.rs:219`): `id, title, added_at, status, labels, body, commits` |
-| 8 | Скрытие чужих задач в `ls` (§3.7, П7) | не реализовано | Блокировок нет |
-| 9 | Настраиваемые статусы, `statuses.json` (§4.1) | не реализовано | Статусы — enum из 4 значений |
-| 10 | История версий, append-only JSONL (§4.3) | не реализовано | — |
-| 11 | CLI `history` с пагинацией (§4.3.1) | не реализовано | — |
-| 12 | Контрольная версия, `approve` (§4.3, П3) | не реализовано | — |
-| 13 | Счётчик ID, монотонность, rebase (§4.4) | частично/несовместимо | Факт: `next_id` = max по файлам + 1; контракту противоречит отсутствие counter.json и rebase |
-| 14 | WAL, commit-lock, fail-closed, fsync-порядок (§4.5) | не реализовано | Есть только `atomic_write` целевых файлов |
-| 15 | Хуки-валидаторы + outbox-события (§4.5.6) | частично | Факт: `hooks`/`__hook`, `before-done-git`, `before-done-openspec` — вызываются при завершении задачи; это не хуки-валидаторы и не события |
-| 16 | Soft-delete + restore (§4.6, П4) | несовместимо | Факт: `delete --force` физически удаляет задачу (`src/main.rs:429-455`) |
-| 17 | Блокировки: `lock`/`unlock`/`heartbeat`, UUIDv4 owner, per-task guard (§4.7, П1, П2, D1) | не реализовано | — |
-| 18 | Системные операции автоматически (§4.8) | частично | Версионирование/история отсутствуют, метаданные `added_at` проставляются |
-| 19 | OpenSpec-связь: `bind`/`unbind`, 1:1-инвариант (§4.9, D3, D5) | частично/несовместимо | Факт: hook `before-done-openspec` читает `openspec/changes` напрямую — нарушает П8 («Todoing не зависит от OpenSpec») |
-| 20 | Зависимости задач (§4.10) | не реализовано | — |
-| 21 | Review history, `review-note` (§4.11) | не реализовано | — |
+| # | Требование | Текущая реализация | Целевой статус |
+|---|---|---|---|
+| 1 | Версионируемый JSON API v1, envelope, error codes | Реализовано | Поддерживается |
+| 2 | Project ID и project-local store | Реализовано | Поддерживается; Manifest хранит стабильный ID |
+| 3 | Создание, чтение, изменение, статусы и outcomes | Реализовано | Поддерживается |
+| 4 | Конфигурируемые статусы и переходы | Реализовано через .todoing/config.toml | Поддерживается |
+| 5 | Immutable task versions и append-only operation history | Реализовано | Поддерживается |
+| 6 | Approval baseline | Реализовано | Поддерживается |
+| 7 | Exclusive locks, heartbeat, recovery, fencing | Реализовано | Поддерживается |
+| 8 | Dependencies и cycle prevention | Реализовано | Поддерживается |
+| 9 | Archive/restore без физического удаления | Реализовано | Поддерживается |
+| 10 | Git commit references (full SHA) | Реализовано | Поддерживается для обычных refs |
+| 11 | Отдельный final commit marker | Отсутствует | Требуется универсальное расширение Todoing |
+| 12 | Generic external references | Отсутствует | Требуется универсальное расширение Todoing |
+| 13 | Structured Review history | Отсутствует | Требуется универсальное расширение Todoing |
+| 14 | revision_count с атомарным increment | Отсутствует | Требуется универсальное расширение Todoing |
+| 15 | Generic lifecycle events/hooks | Не предоставляется SQLite backend | Отложено; Manifest не зависит |
+| 16 | Runtime capabilities discovery | Отсутствует | Не блокирует MVP |
+| 17 | Verify, migrate, verified snapshot | Реализовано | Поддерживается |
 
-## 2. Подтверждённые факты о текущей реализации
+## 2. Подтверждённые границы интеграции
 
-- Команды (`src/main.rs:27`): `add, ls, see, edit, body, append, status, label,
-  commit, delete, reindex, version, hooks, __hook`.
-- Структура задачи (`src/lib.rs:219`): `id, title, added_at, status, labels,
-  body, commits`.
-- Хранилище: `.todoing/tasks/{id}.md` + перестраиваемый `index.json`
-  (`reindex`); атомарная запись целевых файлов.
-- Статусы: enum из 4 (`todo, in_progress, done, cancelled`).
-- ID: `next_id` = максимум по числовым именам файлов + 1.
-- `delete --force` — физическое удаление файла задачи.
-- Хуки завершения: опциональная установка `before-done-git` /
-  `before-done-openspec` (в комплекте, Windows/Unix), вызываются на переходах в
-  `done`; openspec-хук проверяет `openspec/changes` напрямую.
-- Глобальный флаг `--json` даёт машинный вывод отдельных объектов без конверта.
+### 2.1. Todoing
 
-## 3. Ключевые несовместимости (требуют решения архитектора)
+Todoing отвечает за:
 
-1. **Физическое удаление** (`delete --force`) противоречит контракту (П4,
-   §4.6). Нужно решение: убрать команду, оставить как явно вне-контрактный
-   режим, или ввести soft-delete. Вариант «(б) политика + confirm» был
-   предпочтён в аудите интеграции, но не согласован окончательно.
-2. **Зашитые правила Manifest/OpenSpec в хуках** (`before-done-*` проверяют
-   git/OpenSpec напрямую) противоречат П8 и контракту хуков (§4.5.6). Нужно
-   решение о переносе в конфигурируемые хуки-валидаторы (T-1 аудита).
-3. **Статусы**: enum из 4 против настраиваемых статусов (§4.1) и 6 статусов
-   Brief. Нужно решение о модели миграции.
-4. **Схема вывода JSON**: текущий вывод без конверта несовместим с §3.4;
-   обратно совместимой эволюцией не является — Manifest может
-   проектироваться только относительно целевого конверта.
+- project-local SQLite task store;
+- task state, configurable status/outcome, dependencies;
+- immutable versions, append-only operation history, approval baseline;
+- exclusive locks, leases, recovery и fencing;
+- archive/restore;
+- обычные Git commit references;
+- JSON API v1, migration, verify и snapshot.
 
-## 4. Предположения и нерешённые вопросы
+Todoing не аутентифицирует actor_id, не определяет consumer roles и не управляет
+OpenSpec/Git workflow.
 
-Предположения (проверить при реализации):
+### 2.2. Manifest
 
-- Гарантии durability (fsync каталога и эквиваленты на Windows) не проверены
-  ни на одной целевой платформе/ФС — контракт это фиксирует как открытый
-  вопрос (§9.5 контракта).
-- Верхняя граница `--limit` для `history` — выбор реализации (метаданные
-  capability или документация CLI).
-- Формат `review_id` — только «непрозрачный, уникальный, стабильный»; конкретный
-  формат не выбран.
-- Точная форма метаданных capability в ответе `contract` не специфицирована.
+Manifest отвечает за:
 
-Отложено за пределы MVP (по контракту §5/§9.5):
+- стабильный Project ID и его передачу в каждом API request;
+- выбор конфигурации статусов и её безопасную установку до store.init;
+- user approval, actor trust, роли и оркестрацию;
+- OpenSpec workflow и трактовку generic external references;
+- Git branch/review/merge policy;
+- проверку согласованности Todoing ↔ OpenSpec ↔ Git;
+- snapshot destination, retention и backup policy.
 
-- архивирование как функция Todoing;
-- экспорт/импорт, GUI, резервное копирование;
-- SQLite — предварительное направление, требующее отдельного обоснования.
+Manifest не читает SQLite напрямую и не дублирует workflow status/outcome.
 
-Вопросы, требующие архитектурного решения (не закрывались с v2):
+## 3. Обязательные расширения Todoing
 
-- Порядок внедрения: контракт целиком или поэтапно S1–S7 (§6 контракта)?
-- Политика обратной совместимости переходного периода: пока todoing-x
-  реализует прототип, Manifest не может опираться на `contract_version`;
-  нужен явный маркер «контракт 2.2.0 ещё не доступен» в Preflight Manifest.
-- Куда отнести текущие `before-done-*` хуки после появления хуков-валидаторов:
-  удалить, переименовать или оставить как стандартные опциональные хуки вне
-  контрактного механизма.
+Следующие требования ранее утверждены архитектурой Manifest и должны быть
+реализованы в Todoing универсально, без Manifest/OpenSpec-specific semantics.
+
+1. **External references:** типизированные связи namespace + value + relation,
+   уникальность активной пары в пределах project store, add/list/remove,
+   lock enforcement, immutable snapshots и operation history.
+2. **Review history:** append-only Review records, ссылка на существующую immutable
+   task version, reviewer label, outcome, comments, actor attribution и timestamp.
+3. **revision_count:** persisted task metadata; увеличивается ровно на один для
+   каждой новой записи changes_requested; несколько comments в одной записи
+   считаются одним review cycle; повторный идентичный review_id идемпотентен.
+4. **Final commit marker:** отдельная операция, сохраняющая один resolved full SHA,
+   независимо от обычного набора commit references.
+
+Эти возможности отсутствуют на базовом HEAD и не должны описываться как уже
+реализованные.
+
+## 4. Не является блокером MVP
+
+- Capabilities discovery API: отсутствует; интеграция фиксирует минимальную версию
+  Todoing и использует документированный API contract.
+- Generic hooks/events: SQLite backend не исполняет legacy Markdown hooks;
+  delivery/retry/order semantics не обещаны. Manifest выполняет собственные checks.
+- Произвольная логика OpenSpec/Git в Todoing: запрещена архитектурным принципом
+  независимого универсального инструмента.
+
+## 5. Вывод
+
+Базовая инфраструктура Todoing API v1 покрывает задачи, статусы, outcomes, версии,
+историю, baseline, блокировки, зависимости, архивирование и store lifecycle.
+Механически переносить старый файловый WAL-контракт Manifest в текущий Todoing
+не требуется.
+
+Интеграция Manifest блокируется не базовым API v1, а четырьмя универсальными
+возможностями: external references, Review history, revision_count и final commit
+marker. Они описаны в целевой спецификации и должны быть реализованы отдельным
+OpenSpec change в репозитории Todoing.
+
+После реализации расширений требуется повторная проверка исходников и тестов,
+а затем сквозная приёмка Manifest ↔ Todoing ↔ OpenSpec ↔ Git.
