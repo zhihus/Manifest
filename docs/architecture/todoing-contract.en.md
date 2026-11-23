@@ -107,14 +107,16 @@ Manifest-specific or OpenSpec-specific fields or rules.
 - `task.external-ref.remove`: removes an active link through an append-only event,
   preserving history and versions.
 - An active `namespace + value` pair MUST be unique within one project store.
-  Todoing does not interpret the namespace.
+  Todoing does not interpret the namespace. Add/remove requires the owner's lock,
+  creates a task version and history event; adding an existing active link is a no-op.
 - External references are included in task snapshots and immutable versions.
 
 **Review records**
 
-- `task.review.add`: accepts `task_id`, `review_id`, `version_no`,
+- `task.review.add`: accepts `task_id`, `review_id`, `version_no`, `reviewer`,
   `outcome` (`approved` or `changes_requested`), and a `comments` array.
-  The reviewer is attributed through envelope `actor_id`.
+  Envelope `actor_id` records the technical actor; `reviewer` is the reviewer's
+  role or display name.
 - `task.review.list`: returns append-only review history with pagination.
 - Repeating a `review_id` with the same payload is idempotent. Reusing it with a
   different payload is rejected.
@@ -122,8 +124,10 @@ Manifest-specific or OpenSpec-specific fields or rules.
   change workflow status.
 - Each new review record, task version, and history event MUST be committed
   atomically. An idempotent repeat MUST NOT create another version.
-- `revision_count` is the derived count of review records with outcome
-  `changes_requested`; no duplicate mutable counter is stored.
+- `revision_count` is stored in task state and increases by exactly one for each
+  new `changes_requested` record. Multiple comments in one record do not increase
+  it. The counter, Review record, task version, and history event are committed
+  atomically.
 
 **Final commit reference**
 
@@ -144,8 +148,11 @@ not replace Todoing status.
 
 ### 3.2. Recommended Manifest configuration
 
-Manifest supplies a recommended `.todoing/config.toml`; it does not change the
-configuration without an explicit initialization action or another approved process.
+Manifest supplies a recommended `.todoing/config.toml`. Before `store.init`, it
+creates `.todoing/` and atomically creates the config only if the file does not
+exist. An existing file is never overwritten: Manifest validates it and stops
+initialization with diagnostics if it is incompatible. Todoing `store.init`
+validates and preserves an existing `config.toml`.
 
 | ID | Display name | Purpose |
 |---|---|---|
@@ -194,8 +201,8 @@ mechanism. Base OpenSpec specifications remain unchanged.
 1. Manifest determines and stores a stable Project ID.
 2. Manifest calls `store.init` with that ID.
 3. Manifest verifies the result through `store.info` and `store.verify`.
-4. Manifest installs the recommended status configuration only through an explicit,
-   confirmed setup operation.
+4. Manifest atomically installs the recommended config only when the file is absent;
+   `store.init` then validates and preserves it.
 5. If legacy Markdown data exists, Manifest MUST NOT run `store.init` over it.
    Migration is a separate `store.migrate` procedure after reviewing its report.
 
@@ -419,24 +426,27 @@ recovery. It MUST NOT claim cross-system atomicity.
 
 ## 13. Decisions required before approval
 
-1. **Status configuration:** confirm the proposed IDs, labels, and transition graph;
-   define safe installation and update of `config.toml`, since API v1 has no
-   configuration-write operation.
-2. **Outcome mapping:** confirm mapping `completed` status to outcome
-   `completed`; define the user-facing representation of cancellation, since
-   cancellation is an outcome, not a separate workflow status.
+1. **Status configuration:** the proposed IDs, labels, and transition graph follow
+   the six approved statuses in Architecture Brief §7. Manifest creates the config
+   only when absent and never overwrites a user-provided file.
+2. **Outcome mapping:** `completed` maps to outcome `completed`; cancellation is
+   recorded as outcome `cancelled` without changing workflow status, consistent
+   with Todoing's task-status-configuration specification.
 3. **Universal Todoing API extensions:** approve external-reference and Review
    record schemas, final commit marker, `review_id` idempotency, and SQLite schema
    migration. These extensions MUST NOT contain Manifest/OpenSpec terminology or
    policy.
-4. **Baseline approval:** define the user-approval gate at which Manifest calls
-   `task.version.approve` and which versions require a baseline.
-5. **Project ID and actor ID:** define stable identifier formats and their sources
-   in Manifest.
+4. **Baseline approval:** Manifest calls `task.version.approve` after the user
+   personally moves the task from Backlog to Ready; the baseline is the current
+   task version.
+5. **Project ID and actor ID:** Project ID is a UUIDv4 generated once and stored
+   in Manifest's stable configuration. actor_id is a stable role/session identifier
+   of no more than 128 characters. These values provide attribution/isolation,
+   not authentication.
 
-Until these questions are resolved, this document remains a draft and Manifest
-integration implementation MUST NOT begin. The universal Todoing extensions may
-be developed separately if they do not introduce Manifest-specific semantics.
+Until this document is approved, it remains a draft. Manifest integration
+implementation starts after approval; universal Todoing extensions may be developed
+as a separate task based on this specification.
 
 ## 14. Sources and limitations
 
