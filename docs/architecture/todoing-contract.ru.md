@@ -76,7 +76,8 @@ Manifest-specific или OpenSpec-specific поля и правила.
 **External references**
 
 - `task.external-ref.add`: принимает `task_id`, `namespace`, `value` и
-  `relation`; создаёт типизированную ссылку на внешний артефакт.
+  `relation`; создаёт типизированную ссылку на внешний артефакт. Все четыре поля
+  обязательны; строковые значения должны быть непустыми и ограниченными по длине.
 - `task.external-ref.list`: принимает `task_id` и возвращает активные ссылки задачи.
 - `task.external-ref.remove`: принимает `task_id` и `reference_id`, удаляет активную связь append-only событием,
   сохраняя историю и версии.
@@ -92,7 +93,8 @@ Manifest-specific или OpenSpec-specific поля и правила.
 - `task.review.add`: принимает `task_id`, `review_id`, `version_no`,
   `reviewer`, `outcome` (`approved` или `changes_requested`) и массив `comments`.
   `actor_id` envelope фиксирует технического актора, `reviewer` — роль/имя Reviewer.
-- `task.review.list`: принимает `task_id`, необязательный cursor и limit; возвращает append-only историю Review с пагинацией.
+- `task.review.list`: принимает `task_id`, необязательный `before_review_record_id`
+  и `limit`; возвращает append-only историю Review с пагинацией.
 - Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
   payload отклоняется.
 - Review привязан к существующей immutable version. Добавление записи не
@@ -106,7 +108,7 @@ Manifest-specific или OpenSpec-specific поля и правила.
 
 **Final commit reference**
 
-- `task.commit.finalize` принимает `task_id` и Git revision, разрешает его
+- `task.commit.finalize` принимает `task_id` и `revision`, разрешает Git revision
   в полный SHA и назначает единственную итоговую commit reference.
 - Операция требует активную блокировку владельца; изменение отражается в
   immutable version и append-only history. Повтор того же SHA — no-op; попытка
@@ -294,7 +296,7 @@ Manifest управляет зависимостями через task.dependenc
 
 ## 7. Ошибки и восстановление
 
-Manifest обрабатывает стабильные коды ошибок API v1 по их машинным значениям, а не по тексту message.
+Manifest обрабатывает стабильные коды ошибок API v1 по их машинным значениям, а не по тексту message. Коды external_ref_conflict, review_id_conflict, review_version_not_found и final_commit_conflict относятся к целевому расширению API и отсутствуют в текущей реализации.
 
 | Ситуация | Поведение Manifest |
 |---|---|
