@@ -141,10 +141,11 @@ Manifest-specific or OpenSpec-specific fields or rules.
 **Final commit reference**
 
 - `task.commit.finalize` accepts `task_id` and `revision`, resolves the Git
-  revision to a full SHA, and sets the single final commit reference.
+  revision to a full SHA, and sets or updates the single current final commit reference.
 - The operation requires the current owner's active lock and creates an immutable
-  version and append-only history event. Repeating the same SHA is a no-op; trying
-  to assign a different SHA when a marker already exists is rejected without change.
+  version and append-only history event. Repeating the same SHA is a no-op. A new
+  SHA may replace the previous marker only for an active (reopened) task; the old
+  value remains in prior immutable versions and history.
 - Ordinary commit references remain separate traceability references.
 
 ## 3. Task and status model
@@ -415,7 +416,7 @@ extension and are absent from the current implementation.
 | `external_ref_conflict` | Do not overwrite the active link; report namespace/value conflict |
 | `review_id_conflict` | Do not change Review history; require a new review_id |
 | `review_version_not_found` | Reject Review when the reviewed version does not exist |
-| `final_commit_conflict` | Do not replace an existing final commit marker |
+
 | `store_corrupt` / `history_record_failed` | Fail closed: stop mutations and escalate |
 | `store_busy` | Retry only when `retryable=true`, under a bounded retry policy |
 | `invalid_request` / `unsupported_api_version` | Integration error; change request/version |
@@ -529,8 +530,8 @@ recovery. It MUST NOT claim cross-system atomicity.
     removal preserves its history.
 16. Repeating a review_id with the same payload creates no version and does not
     increment revision_count; a different payload is rejected.
-17. The final commit marker is set once; the same SHA is idempotent and a different
-    SHA cannot replace it.
+17. Repeating the same final SHA is idempotent; replacement is allowed only after
+    an explicit task reopen and creates a new version/history event.
 
 ## 13. Decisions required before approval
 
