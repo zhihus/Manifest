@@ -85,7 +85,7 @@ Manifest-specific или OpenSpec-specific поля и правила.
   эксклюзивность связи в одном project store; Todoing не интерпретирует namespace.
   Добавление/удаление требует lock владельца, создаёт новую версию задачи и
   запись истории; повторное добавление активной связи — no-op.
-- Добавление уже существующей идентичной активной ссылки — no-op; конфликт namespace/value с иной связью отклоняется.
+- Добавление уже существующей идентичной активной ссылки — no-op; конфликт namespace/value с иной связью отклоняется. Повторное удаление неактивной ссылки — no-op; неизвестный reference_id возвращает external_ref_not_found.
 - Чтение списка ссылок подчиняется lock read-exclusion; внешний клиент не получает данные заблокированной задачи.
 - Внешние ссылки входят в task response и immutable task version snapshots.
 
@@ -315,6 +315,7 @@ Manifest обрабатывает стабильные коды ошибок API
 | task_archived | Не выполнять мутации до явного restore |
 | dependency_cycle | Отклонить изменение зависимостей и сообщить о цикле |
 | external_ref_conflict | Не перезаписывать активную ссылку; сообщить о конфликте namespace/value |
+| external_ref_not_found | Не изменять задачу; сообщить об неизвестном reference_id |
 | review_id_conflict | Не изменять Review history; запросить новый review_id |
 | review_version_not_found | Отклонить Review, если проверяемая версия отсутствует |
 
