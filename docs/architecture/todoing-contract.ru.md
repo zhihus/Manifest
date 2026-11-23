@@ -65,6 +65,48 @@ Manifest использует только публичный JSON API v1 чер
 
 Manifest опирается на API v1 и его нормативные схемы/операции. Нельзя определять поддержку операции пробным изменяющим вызовом. Перед использованием интеграция проверяет доступность бинарного файла и совместимость API; runtime capabilities discovery в Todoing отсутствует и для MVP не требуется.
 
+
+### 2.4. Обязательные универсальные расширения API v1
+
+Текущая реализация Todoing API v1 не предоставляет все ранее утверждённые
+возможности. До интеграции Manifest Todoing должен расширить API и SQLite schema
+следующими универсальными механизмами. Расширения не должны содержать
+Manifest-specific или OpenSpec-specific поля и правила.
+
+**External references**
+
+- `task.external-ref.add`: принимает `task_id`, `namespace`, `value` и
+  `relation`; создаёт типизированную ссылку на внешний артефакт.
+- `task.external-ref.list`: возвращает ссылки задачи.
+- `task.external-ref.remove`: удаляет активную связь append-only событием,
+  сохраняя историю и версии.
+- Уникальность активной связи в пределах `namespace + value` обеспечивает
+  эксклюзивность связи; Todoing не интерпретирует namespace.
+- Внешние ссылки входят в snapshots и immutable task versions.
+
+**Review records**
+
+- `task.review.add`: принимает `task_id`, `review_id`, `version_no`,
+  `outcome` (`approved` или `changes_requested`) и массив `comments`.
+  Reviewer атрибутируется через envelope `actor_id`.
+- `task.review.list`: возвращает append-only историю Review с пагинацией.
+- Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
+  payload отклоняется.
+- Review привязан к существующей immutable version. Добавление записи не
+  меняет workflow status.
+- Каждая новая Review record и соответствующая task version/history event
+  сохраняются атомарно. Идемпотентный повтор не создаёт новую версию.
+- `revision_count` — вычисляемое количество Review records с outcome
+  `changes_requested`; отдельный дублирующий счётчик не хранится.
+
+**Final commit reference**
+
+- `task.commit.finalize` принимает `task_id` и Git revision, разрешает его
+  в полный SHA и назначает единственную итоговую commit reference.
+- Операция требует активную блокировку владельца; изменение отражается в
+  immutable version и append-only history.
+- Обычные commit references остаются отдельными traceability references.
+
 ## 3. Модель задачи и статусов
 
 ### 3.1. Источник истины
@@ -155,13 +197,13 @@ revision_count — количество Review records с outcome changes_reques
 - Каждое успешное сохранение состояния задачи в Todoing создаёт неизменяемую версию и запись истории в одной транзакции; no-op не создаёт новую версию.
 - Manifest использует task.history.list, task.version.list, task.version.get и task.version.compare для аудита и сопоставления.
 - task.version.approve задаёт baseline существующей версии и не создаёт новую.
-- Git-связь добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Ссылка — метаданные прослеживаемости, не доказательство выполнения критериев.
+- Git-связь добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Итоговая ссылка назначается отдельно через task.commit.finalize. Обе ссылки — метаданные прослеживаемости, не доказательство выполнения критериев.
 - Политика веток, review, merge и определение итогового коммита принадлежат Manifest.
 - OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing.
 
 ## 6. Зависимости
 
-Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list. Целевой контракт также требует универсальные операции task.external-ref.add/list/remove и task.review.add/list; они отсутствуют в текущем API и должны быть реализованы в Todoing без Manifest-specific semantics.
+Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list. Связи с внешними артефактами и Review records хранятся в Todoing через универсальные API-операции, определённые в §2.4; они отсутствуют в текущей реализации и должны быть реализованы в Todoing без Manifest-specific semantics.
 
 - Зависимость означает, что задача не должна начинаться до выполнения prerequisite согласно политике Manifest.
 - Todoing проверяет существование задач и запрещает циклы, но не решает, когда зависимость считается выполненной для workflow Manifest.
@@ -245,10 +287,10 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 | Baseline утверждения | task.version.approve | Todoing; разрешение — Manifest/user | Поддерживается |
 | Блокировки и fencing | task.lock.* | Todoing; token custody — Manifest | Поддерживается |
 | Зависимости | task.dependency.* | Todoing; gate выполнения — Manifest | Поддерживается |
-| Git SHA | task.commit.add | Todoing | Поддерживается |
-| OpenSpec Task link | Manifest-owned mapping | Manifest | Требует реализации Manifest |
-| Reviewer remarks/history | Manifest-owned review record | Manifest | Требует реализации Manifest |
-| revision_count | Счётчик циклов changes_requested | Manifest | Требует реализации Manifest |
+| Git SHA и итоговый commit | task.commit.add, task.commit.finalize | Todoing | Частично; final marker требует расширения |
+| OpenSpec Task link | Generic external references | Todoing API extension; semantics — Manifest | Требует универсального расширения Todoing |
+| Reviewer remarks/history | Generic review records | Todoing API extension; policy — Manifest | Требует универсального расширения Todoing |
+| revision_count | Count of changes_requested review records | Todoing API extension | Требует универсального расширения Todoing |
 | Cross-system consistency | Consumer checks/workflow | Manifest | Требует реализации Manifest |
 | Capabilities discovery | Не используется в MVP | — | Отложено |
 | Generic hooks/events | Не используются для корректности | — | Отложено |
@@ -278,7 +320,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 4. **Утверждение baseline:** определить, на каком пользовательском gate Manifest вызывает task.version.approve и какие версии требуют baseline.
 5. **Project ID и actor ID:** закрепить формат и источник стабильных идентификаторов в Manifest.
 
-До разрешения этих вопросов документ остаётся проектом решения. Нельзя начинать реализацию интеграции на основании неподтверждённых деталей.
+До разрешения этих вопросов документ остаётся проектом решения. Реализация интеграции Manifest не начинается; отдельно может выполняться универсальное расширение Todoing по утверждённым требованиям, если оно не вводит Manifest-specific semantics.
 
 ## 14. Источники и ограничения
 
