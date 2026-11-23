@@ -102,7 +102,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
 **External references**
 
 - `task.external-ref.add`: accepts `task_id`, `namespace`, `value`, and
-  `relation`, creating a typed link to an external artifact.
+  `relation`, creating a typed link to an external artifact. All four fields are
+  required; string values must be non-empty and bounded.
 - `task.external-ref.list`: accepts `task_id` and returns the task's active references.
 - `task.external-ref.remove`: accepts `task_id` and `reference_id`.
   It removes an active link through an append-only event,
@@ -120,8 +121,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
   `outcome` (`approved` or `changes_requested`), and a `comments` array.
   Envelope `actor_id` records the technical actor; `reviewer` is the reviewer's
   role or display name.
-- `task.review.list`: accepts `task_id`, an optional cursor, and limit; returns
-  append-only review history with pagination.
+- `task.review.list`: accepts `task_id`, optional `before_review_record_id`, and
+  `limit`; returns append-only review history with pagination.
 - Repeating a `review_id` with the same payload is idempotent. Reusing it with a
   different payload is rejected.
 - A review references an existing immutable task version. Adding a review does not
@@ -135,8 +136,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
 
 **Final commit reference**
 
-- `task.commit.finalize` accepts `task_id` and a Git revision, resolves it to a
-  full SHA, and sets the single final commit reference.
+- `task.commit.finalize` accepts `task_id` and `revision`, resolves the Git
+  revision to a full SHA, and sets the single final commit reference.
 - The operation requires the current owner's active lock and creates an immutable
   version and append-only history event. Repeating the same SHA is a no-op; trying
   to assign a different SHA when a marker already exists is rejected without change.
@@ -388,7 +389,9 @@ Todoing without Manifest-specific semantics.
 ## 7. Errors and recovery
 
 Manifest handles stable API v1 error codes by their machine values, not by message
-text.
+text. The codes `external_ref_conflict`, `review_id_conflict`,
+`review_version_not_found`, and `final_commit_conflict` belong to the target API
+extension and are absent from the current implementation.
 
 | Situation | Manifest behavior |
 |---|---|
