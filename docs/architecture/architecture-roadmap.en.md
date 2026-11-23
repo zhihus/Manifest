@@ -29,10 +29,10 @@ authoritative; this is its English translation.
 7. Installing Git hooks and control scripts.
 8. Integration of the Todoing and OpenSpec processes, including task
    cancellation: any agent may recommend cancelling with a rationale,
-   only the user confirms the cancellation, the orchestrator changes
-   the status in Todoing and archives the OpenSpec change via the
-   standard Archive mechanism without updating the main
-   specifications (decided 2026-11-22).
+   only the user confirms the cancellation, the orchestrator records outcome `cancelled` through the Todoing API
+   (workflow status remains unchanged) and archives the OpenSpec change via
+   the standard Archive mechanism without updating the main specifications
+   (decided 2026-11-22).
 9. Consistency control for Todoing ↔ OpenSpec ↔ Git.
 10. Connecting `context-files-guard`.
 11. Support of new and existing Git projects with a missing or
@@ -44,9 +44,10 @@ inclusion in the MVP is unresolved** — requires a user decision
 
 ### 1.2. MVP precondition
 
-The minimal Todoing contract (decision status — preliminary): link
-fields to OpenSpec/Git, contract version, history, task versions,
-exclusive locks.
+The base Todoing JSON API v1 is implemented and has passed the documentary audit.
+The integration prerequisite is universal Todoing extensions for external
+references, Review records with `revision_count`, and a final commit marker;
+Manifest-specific logic in Todoing is prohibited.
 
 ### 1.3. Not part of the MVP (recorded)
 
@@ -82,7 +83,7 @@ is fixed:
 
 Workflow level (see `workflow/roadmap.en.md` v1.1.0):
 
-- the `commit-msg` hook (commit message validation);
+- the `commit-msg` hook (commit message validation) — implemented; see `workflow/roadmap.en.md` §1.4;
 - parser extensions: directory walk, scheduled runs;
 - rules for documentation projects: filling in
   `doc-content-rules.template.md`, git workflow for doc projects;
@@ -96,7 +97,7 @@ The full register — `architecture-decisions.ru.md` §12 and
 
 | Question | Blocks |
 | --- | --- |
-| Minimal Todoing contract | §1.2 — MVP precondition |
+| Universal Todoing API extensions (external references, Review records, final commit marker) | §1.2 — MVP integration precondition |
 | Configuration file format and flag schema | manifest-init
   (`.manifest` and a separate file defined 2026-11-22) |
 | Git initialization of a new project without a repository | manifest-init |
