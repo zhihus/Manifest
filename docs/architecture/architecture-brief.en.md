@@ -331,9 +331,11 @@ tasks.
 ### Task cancellation
 
 Any agent may recommend cancelling a task with a rationale (decided
-2026-11-22). Only the user confirms the cancellation. After confirmation, the orchestrator records outcome `cancelled` in Todoing
+2026-11-22). Only the user confirms cancellation. After confirmation, the
+orchestrator records outcome `cancelled` in Todoing
 through `task.cancel` (workflow status remains unchanged) and archives the
-related OpenSpec change through the standard Archive mechanism. The main OpenSpec specifications are not updated.
+related OpenSpec change through the standard Archive mechanism. The main
+OpenSpec specifications are not updated.
 Archiving an OpenSpec change is the OpenSpec Archive mechanism,
 unrelated to the archive of disabled templates (§4).
 
