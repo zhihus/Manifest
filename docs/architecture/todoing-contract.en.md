@@ -104,7 +104,8 @@ Manifest-specific or OpenSpec-specific fields or rules.
 - `task.external-ref.add`: accepts `task_id`, `namespace`, `value`, and
   `relation`, creating a typed link to an external artifact.
 - `task.external-ref.list`: accepts `task_id` and returns the task's active references.
-- `task.external-ref.remove`: accepts `task_id` and `reference_id`, removing an active link through an append-only event,
+- `task.external-ref.remove`: accepts `task_id` and `reference_id`.
+  It removes an active link through an append-only event,
   preserving history and versions.
 - An active `namespace + value` pair MUST be unique within one project store.
   Todoing does not interpret the namespace. Add/remove requires the owner's lock,
@@ -405,7 +406,7 @@ text.
 | `final_commit_conflict` | Do not replace an existing final commit marker |
 | `store_corrupt` / `history_record_failed` | Fail closed: stop mutations and escalate |
 | `store_busy` | Retry only when `retryable=true`, under a bounded retry policy |
-| `invalid_request` / `unsupported_api_version` | Treat as integration error; do not retry unchanged |
+| `invalid_request` / `unsupported_api_version` | Integration error; change request/version |
 
 After lease expiry, Todoing does not transfer ownership automatically. Manifest may
 call `task.lock.recover` only when Todoing's recovery conditions are met. Recovery
@@ -473,17 +474,17 @@ recovery. It MUST NOT claim cross-system atomicity.
 
 | Manifest requirement | Mechanism | Owner | Status |
 |---|---|---|---|
-| Tasks and statuses | task.create, task.status.set, config.toml | Todoing; policy — Manifest | Supported |
-| Complete/cancel outcome | task.complete, task.cancel, task.reopen | Todoing; approval — Manifest | Supported |
+| Tasks/statuses | task.create, task.status.set, config.toml | Todoing; policy — Manifest | Yes |
+| Complete/cancel | task.complete, task.cancel, task.reopen | Todoing; approval — Manifest | Yes |
 | History and versions | task.history.list, task.version.* | Todoing | Supported |
 | Approval baseline | task.version.approve | Todoing; authorization — Manifest/user | Supported |
 | Locks and fencing | task.lock.* | Todoing; token custody — Manifest | Supported |
 | Dependencies | task.dependency.* | Todoing; execution gate — Manifest | Supported |
-| Git SHA and final commit | task.commit.add, task.commit.finalize | Todoing | Partial; final marker required |
-| OpenSpec task link | Generic external references | Todoing API extension; semantics — Manifest | Todoing extension required |
-| Reviewer remarks/history | Generic review records | Todoing API extension; policy — Manifest | Todoing extension required |
-| revision_count | Count of changes_requested review records | Todoing API extension | Todoing extension required |
-| Cross-system consistency | Consumer checks/workflow | Manifest | Manifest implementation required |
+| Git refs/final marker | task.commit.add, task.commit.finalize | Todoing | Partial |
+| OpenSpec link | Generic external refs | Todoing API; meaning — Manifest | Extension required |
+| Review history | Generic review records | Todoing API; policy — Manifest | Extension required |
+| revision_count | Count of changes_requested reviews | Todoing API | Extension required |
+| Cross-system consistency | Consumer checks/workflow | Manifest | Manifest work required |
 | Capabilities discovery | Not used in MVP | — | Deferred |
 | Generic hooks/events | Not used for correctness | — | Deferred |
 
