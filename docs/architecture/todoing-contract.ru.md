@@ -23,10 +23,11 @@ Todoing — самостоятельный универсальный инстр
 - настраиваемые статусы и разрешённые переходы;
 - создание, чтение, изменение, завершение, отмену, архивирование и восстановление задач;
 - зависимости задач с защитой от циклов;
-- неизменяемые версии и append-only историю операций;
+- универсальные внешние ссылки на связанные артефакты;
+- неизменяемые версии, append-only историю операций и структурированную историю Review;
 - baseline утверждённой версии;
 - эксклюзивные блокировки с lease, heartbeat, recovery и fencing generation;
-- ссылки на Git-коммиты в виде полных SHA;
+- ссылки на Git-коммиты в виде полных SHA с различением обычного и итогового commit reference;
 - CLI и версионируемый JSON API v1;
 - проверку, миграцию и создание проверенных снимков хранилища.
 
@@ -35,14 +36,14 @@ Todoing — самостоятельный универсальный инстр
 - стабильный Project ID, выбор и инициализацию хранилища проекта;
 - оркестрацию, роли, последовательность и назначение агентов;
 - пользовательские согласования и правила завершения проекта;
-- workflow OpenSpec и связь Task ID с OpenSpec change;
-- политику Git: ветки, коммиты, review и merge;
-- цикл Review, замечания Reviewer и revision_count;
+- workflow OpenSpec и интерпретацию универсальных внешних ссылок как OpenSpec change;
+- политику Git: ветки, review и merge;
+- цикл Review и полномочия Reviewer;
 - согласованность Todoing ↔ OpenSpec ↔ Git;
 - аутентификацию акторов и безопасное хранение lock token;
 - резервирование, место хранения и срок хранения snapshot.
 
-Todoing не парсит OpenSpec, не проверяет Git workflow, не аутентифицирует actor и не обеспечивает ролевую политику потребителя.
+Todoing не парсит OpenSpec и не проверяет Git workflow: он хранит только универсальные ссылки и commit references. Он не аутентифицирует actor и не обеспечивает ролевую политику потребителя.
 
 ## 2. Версия и транспорт API
 
@@ -129,11 +130,11 @@ Manifest не трактует archive как отмену и не исполь�
 
 - Перед передачей результата Manifest переводит задачу в review и передаёт Reviewer необходимые артефакты через собственный workflow.
 - Reviewer независимо проверяет результат.
-- При одобрении Manifest фиксирует результат проверки в собственной review-истории и переводит задачу в verified.
-- При запросе изменений Manifest фиксирует замечания и ссылку на проверяемую версию в собственной review-истории, увеличивает revision_count на один и возвращает задачу в in_progress.
-- Повторные циклы не создают отдельные Todoing статусы.
+- При одобрении Todoing сохраняет структурированную запись Review с outcome approved; Manifest переводит задачу в verified.
+- При запросе изменений Todoing атомарно сохраняет запись Review с outcome changes_requested и увеличивает revision_count ровно на один; Manifest возвращает задачу в in_progress.
+- Повторная отправка того же review_id с идентичным содержимым идемпотентна; тот же ID с другим содержимым отклоняется. Review record ссылается на конкретную immutable version задачи. Запись Review не меняет workflow status. Повторные циклы не создают отдельные Todoing статусы.
 
-revision_count — число завершённых циклов Review с результатом changes_requested, а не число версий Todoing и не число правок. Оно хранится и изменяется только Manifest. Review history Manifest должна содержать как минимум стабильный review ID, reviewer/actor, timestamp, outcome, замечания и номер версии Todoing, к которой относится проверка. Конкретное место хранения и формат этой истории должны быть определены в архитектуре Manifest до реализации.
+revision_count — количество Review records с outcome changes_requested, а не количество версий или комментариев. Todoing хранит Review history и revision_count как универсальные данные задачи; Manifest определяет, когда Reviewer вправе создать такую запись и какие действия следуют из её outcome.
 
 ### 4.5. Итоговое завершение
 
@@ -156,11 +157,11 @@ revision_count — число завершённых циклов Review с ре
 - task.version.approve задаёт baseline существующей версии и не создаёт новую.
 - Git-связь добавляется через task.commit.add; Todoing разрешает revision в полный SHA. Ссылка — метаданные прослеживаемости, не доказательство выполнения критериев.
 - Политика веток, review, merge и определение итогового коммита принадлежат Manifest.
-- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Их связь с Todoing Task ID принадлежит Manifest.
+- OpenSpec change ID и другие внешние идентификаторы не помещаются в Git commit references. Manifest связывает их с Task ID через универсальный API external references Todoing.
 
 ## 6. Зависимости
 
-Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list.
+Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list. Целевой контракт также требует универсальные операции task.external-ref.add/list/remove и task.review.add/list; они отсутствуют в текущем API и должны быть реализованы в Todoing без Manifest-specific semantics.
 
 - Зависимость означает, что задача не должна начинаться до выполнения prerequisite согласно политике Manifest.
 - Todoing проверяет существование задач и запрещает циклы, но не решает, когда зависимость считается выполненной для workflow Manifest.
@@ -219,16 +220,16 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 6. Dependencies.
 7. История, версии, version compare и user-approved baseline.
 8. Git commit references.
-9. Manifest-side OpenSpec links, Review history и revision_count.
+9. Todoing-side generic external references, Review history и revision_count; Manifest-side workflow policy.
 10. Manifest-side проверки согласованности и восстановление частичных операций.
 11. Проверка store и создание snapshot по запросу.
 
 ### Не входит
 
-- Изменение Todoing API или добавление Manifest-specific функций в Todoing.
+- Универсальные расширения Todoing для external references и Review records; Manifest-specific поля и операции в Todoing.
 - Todoing capabilities discovery API.
 - Todoing lifecycle events/hooks как условие корректности.
-- Произвольные внешние ссылки в Todoing.
+- Произвольные внешние ссылки без типизированного generic reference contract.
 - GUI Todoing, multi-project dashboard.
 - Реализация удалённого backup, репликации и политики хранения snapshot.
 - Автоматическая синхронизация конфигурации статусов без явного действия.
@@ -273,7 +274,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 
 1. **Конфигурация статусов:** подтвердить предложенные IDs/labels и граф переходов; отдельно определить механизм безопасной установки и обновления config.toml, поскольку API v1 не предоставляет операции изменения конфигурации.
 2. **Outcome mapping:** подтвердить, что completed status отображается в outcome completed; определить пользовательское отображение отменённой задачи, поскольку отмена — outcome, а не отдельный workflow status.
-3. **Хранение Manifest-side данных:** определить постоянное место и формат хранения OpenSpec links, Review history и revision_count с учётом правил владения файлами.
+3. **Универсальные API-расширения Todoing:** утвердить схему external references, Review records, идемпотентность review_id и миграцию SQLite schema; расширение не должно содержать терминов или правил Manifest/OpenSpec.
 4. **Утверждение baseline:** определить, на каком пользовательском gate Manifest вызывает task.version.approve и какие версии требуют baseline.
 5. **Project ID и actor ID:** закрепить формат и источник стабильных идентификаторов в Manifest.
 
