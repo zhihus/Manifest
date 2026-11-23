@@ -318,8 +318,9 @@ Manifest manages the sequence of stages and agent assignment.
 
 When the Reviewer has findings, the task returns to "In Progress".
 
-No separate rework statuses are introduced. A `revision_count`
-counter and a findings history are provided.
+No separate rework statuses are introduced. Todoing stores Review history and
+`revision_count`: the counter increases exactly once for each Review with outcome
+`changes_requested`, regardless of the number of comments or task versions.
 
 The user sets the priority and order of tasks. By default tasks are
 executed in numbering order unless the user says otherwise.
@@ -330,10 +331,9 @@ tasks.
 ### Task cancellation
 
 Any agent may recommend cancelling a task with a rationale (decided
-2026-11-22). Only the user confirms the cancellation. After the
-confirmation the orchestrator changes the task status in Todoing and
-archives the related OpenSpec change via the standard Archive
-mechanism. The main OpenSpec specifications are not updated.
+2026-11-22). Only the user confirms the cancellation. After confirmation, the orchestrator records outcome `cancelled` in Todoing
+through `task.cancel` (workflow status remains unchanged) and archives the
+related OpenSpec change through the standard Archive mechanism. The main OpenSpec specifications are not updated.
 Archiving an OpenSpec change is the OpenSpec Archive mechanism,
 unrelated to the archive of disabled templates (§4).
 
@@ -347,10 +347,11 @@ consistency of Todoing, OpenSpec and Git.
   direct reading of the storage is forbidden.
 - Statuses are configured by the user; Manifest provides a
   recommended configuration without imposing it.
-- Dependencies, operation history, versions and exclusive task locks
-  are mandatory.
-- History is immutable and append-only; every successful save creates
-  a task version.
+- Dependencies, operation history, versions, Review history with `revision_count`,
+  generic external references and exclusive task locks are mandatory.
+- History is immutable and append-only; every successful save creates a task
+  version. A new Review record creates a version and history event atomically;
+  repeating the same `review_id` with identical content is idempotent.
 - Locking is exclusive for the whole agent session, including
   blocking reads by other clients; automatic expiry on agent crash is
   provided.
@@ -360,12 +361,14 @@ consistency of Todoing, OpenSpec and Git.
   remain readable and restorable.
 - Hooks/events are universal and optional; Todoing contains no
   knowledge of Manifest or OpenSpec.
-- SQLite is a preliminary storage choice; the final decision requires
-  a technical study.
+- The current Todoing implementation uses SQLite. This is an internal Todoing
+  implementation choice; Manifest depends only on the CLI and JSON API and does
+  not prescribe the storage engine.
 - Import/export and backup are follow-up tasks; backup is provided by
   Manifest, Git is not a backup.
-- Project ID is mandatory at the integration boundary; the transfer
-  mechanism is yet to be designed.
+- Project ID is mandatory at the integration boundary; Manifest creates a stable
+  UUIDv4 once, stores it in its own configuration, and passes it in every API
+  request envelope. Project ID is not a credential.
 
 ## 8. OpenSpec
 
@@ -375,6 +378,9 @@ automatic Manifest operations.
 The relation between Todoing and OpenSpec:
 
 **One Todoing global task = one OpenSpec global task.**
+
+The Task ID ↔ OpenSpec change link is stored in Todoing as a generic external
+reference. Its namespace and relation contain no OpenSpec-specific logic.
 
 OpenSpec provides the internal elaboration of the task:
 
