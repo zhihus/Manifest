@@ -531,10 +531,11 @@ recovery. It MUST NOT claim cross-system atomicity.
 4. **Baseline approval:** Manifest calls `task.version.approve` after the user
    personally moves the task from Backlog to Ready; the baseline is the current
    task version.
-5. **Project ID and actor ID:** Project ID is a UUIDv4 generated once and stored
-   in Manifest's stable configuration. actor_id is a stable role/session identifier
-   of no more than 128 characters. These values provide attribution/isolation,
-   not authentication.
+5. **Project ID and actor ID:** the proposal is to generate a UUIDv4 Project ID
+   once and store it in Manifest's stable configuration; actor_id is a stable
+   role/session identifier of no more than 128 characters. The Project ID format
+   requires confirmation. These values provide isolation/attribution, not
+   authentication.
 
 Until this document is approved, it remains a draft. Manifest integration
 implementation starts after approval; universal Todoing extensions may be developed
