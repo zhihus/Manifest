@@ -67,7 +67,9 @@ RU_COMPLETION=$(mktemp)
 EN_COMPLETION=$(mktemp)
 RU_RECOVERY=$(mktemp)
 EN_RECOVERY=$(mktemp)
-trap 'rm -f "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY"' EXIT
+RU_CANCELLATION=$(mktemp)
+EN_CANCELLATION=$(mktemp)
+trap 'rm -f "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY" "$RU_CANCELLATION" "$EN_CANCELLATION"' EXIT
 
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$RU" > "$RU_COMPLETION"
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$EN" > "$EN_COMPLETION"
