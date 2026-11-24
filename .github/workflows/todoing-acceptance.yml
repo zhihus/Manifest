@@ -72,6 +72,8 @@ jobs:
           node-version: 24
       - name: Install OpenSpec CLI
         run: npm install --global @fission-ai/openspec@1.16.0
+      - name: Validate active OpenSpec changes
+        run: openspec validate --all
       - name: Archive verified change
         run: openspec archive implement-todoing-manifest-workflow --yes
       - name: Validate archived specifications
