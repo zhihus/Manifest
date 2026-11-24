@@ -39,13 +39,13 @@
   Stop: every destination is classified as create / identical / merge-required / conflict / omit; no target file is written.
 
 - [ ] fr-4.3-install-and-verify-manifest-hooks
-  After separate user approval, install the approved hook files and validation script, validate their syntax and behavior, and configure `core.hooksPath=.manifest/hooks`. Do not activate hooks before the approved files pass verification.
+  First present the exact files to create or change, their diffs, hook behavior, and the proposed `core.hooksPath` change; obtain a separate explicit user approval for this stage. Only then install the approved hook files and validation script, validate their syntax and behavior, and configure `core.hooksPath=.manifest/hooks`. Do not treat approval of another migration stage as authorization for this stage, and do not activate hooks before the approved files pass verification.
   Stop: both hooks and validation script pass their checks, `core.hooksPath` points to the verified directory, and the verification output is recorded.
 
 ## 5. Project Identity and Todoing bootstrap
 
 - [ ] fr-5.1-create-or-validate-project-id
-  After re-audit and user approval, reuse an existing valid Project ID or create a UUIDv4 in `.manifest/project-id` using atomic creation. Never overwrite an existing value.
+  Re-audit the target path and determine whether a valid Project ID already exists. If creation or repair is required, present the exact operation and target path and obtain separate explicit user approval for this stage. Then reuse an existing valid Project ID or create a UUIDv4 in `.manifest/project-id` using atomic creation. Never overwrite an existing value. Approval of hook installation or another stage does not authorize this write.
   Stop: exactly one valid stable Project ID is present and its value is verified against the Todoing validation contract.
 
 - [ ] fr-5.2-verify-todoing-prerequisites
@@ -53,7 +53,7 @@
   Stop: prerequisites are classified as ready / user action required / blocked, with evidence; no Todoing data is created or changed.
 
 - [ ] fr-5.3-bootstrap-todoing-without-overwrite
-  Only after separate user approval and successful prerequisite checks, create `.todoing/config.toml` without overwriting existing content and initialize the store only when absent and no legacy migration is required. Use the local CLI JSON API; do not configure a network endpoint.
+  After successful prerequisite checks, present the exact config content, store initialization operation, and affected paths; obtain separate explicit user approval for this stage. Only then create `.todoing/config.toml` without overwriting existing content and initialize the store only when absent and no legacy migration is required. Use the local CLI JSON API; do not configure a network endpoint. Approval of Project ID creation or another stage does not authorize this bootstrap.
   Stop: config and store are initialized or a precise non-destructive blocker is reported; existing data remains unchanged.
 
 ## 6. Final verification and registry
@@ -63,5 +63,5 @@
   Stop: an evidence-based report records pass/fail/skipped for each check and lists remaining risks.
 
 - [ ] fr-6.2-reconcile-connected-project-registry
-  After all required checks pass and the user approves the registry update, change the connected-project registry status/version to match verified reality. If any required integration remains blocked, do not mark the project fully active.
+  After all required checks pass, present the exact registry diff and obtain separate explicit user approval for this registry update. Only then change the connected-project registry status/version to match verified reality. If any required integration remains blocked, do not mark the project fully active.
   Stop: registry state matches the verification report, or the discrepancy is explicitly retained and reported.
