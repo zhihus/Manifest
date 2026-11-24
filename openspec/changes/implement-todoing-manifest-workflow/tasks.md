@@ -18,7 +18,7 @@ Maps to scenarios: all scenarios in manifest-todoing-runbook.
 
 - [x] FR 2.1 add-runbook-regression-test
 
-Create a regression test that checks both runbook editions for mandatory API operations, dependency gating, status transitions, explicit archive flags, user approval gates, 720-second lease, token custody, recovery reconciliation, and completion/cancellation ordering. Include negative checks for unsafe automatic initialization and lock release without ownership confirmation.
+Create regression tests that check both runbook editions for mandatory API operations, dependency gating, status transitions, explicit archive flags, user approval gates, 720-second lease, token custody, recovery reconciliation, and completion/cancellation ordering. Parse both TOML examples, require them to be identical, and validate the approved status graph and lock settings. Include negative checks for unsafe automatic initialization and lock release without ownership confirmation.
 Stop criterion: the test exits 0 for the completed runbook and fails when any required invariant is removed from a fixture copy.
 Maps to scenarios: all scenarios in manifest-todoing-runbook.
 
