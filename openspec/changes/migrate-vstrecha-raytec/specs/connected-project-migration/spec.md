@@ -4,7 +4,7 @@
 
 Defines a controlled, non-destructive migration process for existing repositories registered or intended to be connected to Manifest.
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Migration starts with a read-only inventory
 
