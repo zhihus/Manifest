@@ -271,10 +271,11 @@ to = "completed"
 
 Оркестратор — единственный владелец Todoing API и lock token:
 1. Перед работой вызовите `task.lock.acquire`; сохраните `owner_id`, `lock_token`, `fencing_generation`, `expires_at` в защищённом состоянии основной сессии.
-2. Перед каждым блокирующим запуском субагента выполните `task.lock.heartbeat`. Lease 720 секунд покрывает hard timeout 600 секунд и запас 120 секунд.
-3. Во время выполнения субагента heartbeat не отправляется. Субагент не получает token и не вызывает Todoing.
-4. Все owner-запросы передают token в envelope и актуальные `owner_id`/generation в args. При `stale_lock` прекратите операции со старым token.
-5. После завершения задачи или подтверждённой отмены освободите lock через `task.lock.release`.
+2. Сразу после acquire переведите задачу `ready → in_progress` через `task.status.set`, передав token в envelope.
+3. Перед каждым блокирующим запуском субагента выполните `task.lock.heartbeat`. Lease 720 секунд покрывает hard timeout 600 секунд и запас 120 секунд.
+4. Во время выполнения субагента heartbeat не отправляется. Субагент не получает token и не вызывает Todoing.
+5. Все owner-запросы передают token в envelope и актуальные `owner_id`/generation в args. При `stale_lock` прекратите операции со старым token.
+6. После завершения задачи или подтверждённой отмены освободите lock через `task.lock.release`.
 
 ### 6.4. Статусы и Review
 
