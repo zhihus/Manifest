@@ -1,90 +1,82 @@
 # Design
 
-## Context
+## Контекст
 
-Target project: `C:\\WorkProjects\\vstrecha-raytec`.
+Целевой проект: `C:\WorkProjects\vstrecha-raytec`. Основание — read-only аудит от 2026-11-24. Аудит выявил:
 
-This design is based on the read-only audit report supplied on 2026-11-24. The audit found:
+- Git: ветка `master`, HEAD `368c390b03b99165efebc2fa02240c75e1c3a0a6`, чистое рабочее дерево, 189 локальных коммитов, remote/upstream отсутствуют.
+- Manifest: `.manifest/hooks/` существует, но пуст; Project ID, validation script и оба hook отсутствуют; `core.hooksPath` не задан. Корневой `commit-rules.md` — v1.0.0, дистрибутив Manifest содержит v1.0.1.
+- OpenSpec: каталог исключён из Git через `.gitignore`; обнаружены 19 активных changes, 6 archived changes и 3 specs. 13 завершённых changes не архивированы, 6 не завершены. Архивация `fix-run-59-defects` блокируется отсутствующими целевыми specs.
+- Todoing: `.todoing/config.toml` и store отсутствуют; бинарный файл не найден в PATH.
+- Registry помечает проект как active, хотя установка неполная.
+- Версии Manifest расходятся: `VERSION=0.1.0`, installer distribution 1.1.0, registry 1.0.0.
 
-- Git branch `master`, HEAD `368c390b03b99165efebc2fa02240c75e1c3a0a6`, clean working tree, 189 local commits, no remotes/upstream, no tags or stashes.
-- `.manifest/hooks/` exists and is empty; Project ID, validation script, both hooks, and `core.hooksPath` are absent.
-- Existing root `commit-rules.md` is v1.0.0; the current Manifest distribution contains v1.0.1. Other project context files are present and must be preserved.
-- `openspec/` is ignored by `.gitignore`; it contains 19 active changes, 6 archived changes, and 3 specs. Thirteen completed changes remain unarchived; six changes are unfinished. Archiving `fix-run-59-defects` currently fails because referenced target specs are missing.
-- `.todoing/config.toml` and the Todoing store are absent; the Todoing binary was not found on PATH. No Project ID exists.
-- The registry lists the project as active even though installation is incomplete.
-- Manifest version references conflict (project `VERSION=0.1.0`, installer distribution 1.1.0, registry 1.0.0); the effective installed version is not established by the audit.
+Аудит не сравнивал локальную историю с remote, не запускал тесты проекта, не выполнял полный поиск Todoing по диску и не установил авторитетную версию Manifest. Эти факты нельзя считать проверенными.
 
-The audit did not compare the local commit graph with a remote, run project tests, inspect every disk location for Todoing, or establish the authoritative Manifest version. Those are not assumed facts.
+## Решения
 
-## Decisions
+### D1. Повторный аудит перед изменениями
 
-### D1. Re-audit before mutation
+Предоставленный аудит — исходная точка, но не разрешение на изменение проекта. Перед реализацией повторно проверить Git, файлы, ignore rules, OpenSpec, Manifest installer и Todoing. При существенном расхождении остановиться и обновить план миграции.
 
-The supplied audit is a baseline, not authorization to modify the project. Before implementation, rerun the relevant read-only checks and compare the current branch, HEAD, working tree, file inventory, ignore rules, OpenSpec inventory, and Manifest installer distribution. Stop if the project has drifted materially from the baseline.
+### D2. Сохранение Git-истории и отдельное решение по remote
 
-### D2. Preserve Git history and require a remote decision
+Существующий commit graph сохраняется. Запрещены переписывание истории, reset, squash, force-push и несанкционированная смена ветки.
 
-The 189 local commits are the only known history. The migration MUST NOT rewrite, reset, squash, replace, or force-push that history.
+Remote/upstream отсутствуют. До любых публикаций пользователь должен выбрать стратегию резервирования и синхронизации. Без отдельного разрешения нельзя создавать hosting repository, добавлять remote, настраивать upstream или выполнять push. При выборе local-only миграция может продолжаться, но итоговый отчёт обязан отметить отсутствие удалённой копии и недоступность remote CI/PR workflow.
 
-No remote currently exists. The migration MUST present the user with the verified repository/remote options and their consequences. It MUST NOT create a hosting repository, add a remote, push, or configure upstream without separate explicit approval. If the user chooses to remain local-only, the migration may proceed but the final report MUST state that the history has no remote backup/upstream and remote CI/PR workflows are unavailable.
+### D3. OpenSpec — существующие пользовательские данные
 
-A remote decision is a gate before any operation that would publish or synchronize Git history; it does not authorize publication by itself.
+До изменения `.gitignore` проверить точные ignore rules, результаты `git check-ignore -v`, полный перечень tracked/untracked/ignored файлов OpenSpec и содержимое changes/specs. Подготовить перечень файлов для Git и исключений; проверить его на секреты, generated и local-only данные.
 
-### D3. Treat OpenSpec as existing user data
+Не выполнять слепой `git add -f openspec/`. Добавлять OpenSpec в Git можно только после согласования точного состава файлов.
 
-Before changing `.gitignore`, inspect the exact ignore rule, `git check-ignore -v` results, all tracked/untracked/ignored OpenSpec files, and the contents of the 19 active, 6 archived, and 3 specification entries. Do not assume the audit counts remain current.
+Завершённые changes автоматически не архивировать. Для каждого проверить delta specs, зависимости и предусловия archive. Известную блокировку `fix-run-59-defects` вынести в отдельную задачу исправления; не обходить её удалением ссылок или созданием фиктивных specs.
 
-Do not use `git add -f openspec/` as a blind migration shortcut. Prepare a proposed tracking set and review exclusions for secrets, generated files, private material, and local-only state. Add OpenSpec to Git only after the user approves the exact scope.
+### D4. Согласование Manifest-файлов без перезаписи
 
-Completed changes are not automatically archived. First inspect each change's delta specs, dependencies, validation result, and archive prerequisites. The known `fix-run-59-defects` blocker must be reported and handled as a separate approved OpenSpec repair; it must not be bypassed by deleting references or fabricating specs.
+Перед установкой подтвердить авторитетную версию Manifest и проверить содержимое installer distribution, validation script и hooks. Несовпадение версий из аудита должно быть разрешено.
 
-### D4. Reconcile Manifest installation without overwriting project context
+Для каждого существующего целевого файла выполнить сравнение. В частности, `commit-rules.md` v1.0.0 нельзя автоматически заменить на v1.0.1: требуется diff, сохранение проектных правил и согласование итогового варианта. По умолчанию сохраняются `AGENTS.md`, `llms.txt`, `.llmignore`, README, LICENSE, THIRD-PARTY, tests, pipeline и остальные файлы проекта.
 
-Use the current `manifest-init/dist/` and its verification script as the installer source of truth only after confirming the exact version and artifact contents. The audit's version mismatch must be resolved before installation.
+Hooks устанавливать и активировать только после проверки их содержимого и отдельного разрешения пользователя. `core.hooksPath=.manifest/hooks` задавать после установки и успешной проверки обоих hooks.
 
-For every existing destination, compare source and target. In particular, do not overwrite `commit-rules.md` v1.0.0 with v1.0.1 automatically. Produce a diff and preserve project-specific rules; install a merged result only after review and approval. Preserve `AGENTS.md`, `llms.txt`, `.llmignore`, README, LICENSE, THIRD-PARTY, tests, pipeline files, and all other project files unless a separately approved change specifies otherwise.
+### D5. Стабильный Project ID
 
-Install hooks only after their contents have been inspected and the user approves enabling them. Set `core.hooksPath=.manifest/hooks` only after the hooks are present and verified.
+Создавать `.manifest/project-id` только после подтверждения целевого проекта и только если файл отсутствует. Использовать UUIDv4 и атомарную запись. Обнаруженный существующий валидный ID повторно использовать; автоматически не заменять.
 
-### D5. Keep Project Identity stable
+### D6. Todoing через локальный CLI
 
-Create `.manifest/project-id` only if it is absent and after confirming that the project is the intended Manifest connection. Generate a UUIDv4, validate it, and write it atomically. Never replace an existing valid Project ID automatically. If an ID is discovered during re-audit, validate and reuse it; do not generate another.
+Todoing устанавливает пользователь либо отдельная согласованная процедура. Manifest вызывает JSON API через локальную команду `todoing api --json` (stdin/stdout); сетевого API endpoint нет.
 
-### D6. Todoing is a local CLI integration
+Перед bootstrap проверить бинарный файл и версию Todoing, контракт API, наличие config/database/legacy Markdown. Не перезаписывать существующие данные. Создавать `.todoing/config.toml` без overwrite и инициализировать store только при отсутствии существующего store и legacy-данных. Если Todoing недоступен, остановиться на этом этапе и сообщить точную причину.
 
-Todoing is installed by the user or through a separately approved installation process. Manifest communicates through `todoing api --json` using stdin/stdout; there is no network API endpoint to configure.
+### D7. Этапы и границы разрешений
 
-Before creating `.todoing/config.toml` or initializing a store, verify the installed Todoing version and supported API contract, check for existing config/database/legacy Markdown data, and inspect the target paths. Preserve any existing data. Create the configuration without overwrite; initialize only when the store is absent and no legacy migration is required. If Todoing is unavailable, stop at this gate and report the exact prerequisite.
+1. Read-only повторный аудит.
+2. Решения пользователя: Git remote, состав OpenSpec для Git, конфликты файлов.
+3. Согласованные изменения Git hygiene и OpenSpec tracking.
+4. Сверка и установка Manifest; отдельное подтверждение активации hooks.
+5. Project Identity и Todoing bootstrap.
+6. Проверка результата и сверка registry.
 
-### D7. Separate migration stages and approvals
+Одобрение этой спецификации разрешает только подготовку плана. Оно не разрешает изменения целевого проекта, создание remote, push, активацию hooks, замену файлов, OpenSpec archive или установку Todoing.
 
-The migration is staged:
+### D8. Статус подключения в registry
 
-1. Read-only re-audit and baseline report.
-2. Decision gates: Git remote strategy, OpenSpec tracking scope, and any conflicting files.
-3. Repository hygiene changes explicitly approved by the user.
-4. Manifest installation reconciliation and hook activation.
-5. Project Identity and Todoing bootstrap.
-6. Verification and registry status correction.
+Проект нельзя считать fully active, пока обязательные артефакты Manifest и hooks не прошли проверку, а состояние OpenSpec/Todoing не отражено достоверно. Если registry поддерживает промежуточный статус, использовать его. Иначе не менять запись до итоговой проверки и отдельного согласования.
 
-Approval of this specification authorizes preparation of the migration design only. It does not authorize any target-project mutation, remote creation, push, hook activation, file replacement, OpenSpec archive, or Todoing installation.
+### D9. Доказательная финальная проверка
 
-### D8. Registry status reflects verified reality
+Итоговый отчёт содержит branch/HEAD/status, remote/upstream, сохранность истории, Project ID, версии Manifest-файлов, состояние hooks и `core.hooksPath`, OpenSpec tracking/validation, Todoing binary/API/config/store и оставшиеся блокеры.
 
-The registry MUST NOT describe the project as fully active until required Manifest artifacts and enabled hooks pass verification and the selected Todoing/OpenSpec integration state is reported accurately. If the registry schema supports intermediate states, use one. Otherwise retain the existing entry and record the discrepancy until the final verified update is approved.
+Запускать только проверки, необходимые для миграции. Полный набор тестов приложения не запускать без отдельного решения. Любая пропущенная или неуспешная проверка явно отражается в отчёте.
 
-### D9. Final verification is evidence-based
+## Риски
 
-The final report records exact branch and HEAD, working-tree status, remote/upstream state, Project ID validation, installed Manifest artifact versions, hook path and hook verification, OpenSpec tracking and validation results, Todoing binary/API/store/config status, and unresolved warnings.
-
-Do not run the project's full test suite as an incidental part of migration. Run only checks directly required by the migration; broader tests require a separate decision. A failed or skipped check is reported as such.
-
-## Risks and Mitigations
-
-- **Unbacked-up local history:** no remote exists. Do not publish without approval; explicitly report backup risk.
-- **Accidental OpenSpec exposure:** inspect ignore rules and contents before tracking; user approves exact file scope.
-- **Loss of project-specific rules:** diff and merge rather than overwrite.
-- **Broken or unexpected hooks:** inspect scripts, validate syntax and behavior, then activate only after approval.
-- **Identity mismatch:** reuse a valid existing ID; never regenerate automatically.
-- **Legacy Todoing data:** inspect before initialization; never overwrite or migrate automatically.
-- **False connected status:** update registry only after evidence-based verification.
+- Нет удалённой копии локальной Git-истории — требуется решение пользователя по резервированию.
+- OpenSpec может содержать local-only или чувствительные данные — до tracking проверяется каждый путь.
+- Перезапись проектных правил — предотвращается diff и согласованием merge.
+- Неработающие hooks — предотвращаются проверкой до активации.
+- Потеря Project ID или Todoing-данных — предотвращается запретом автоматической замены и bootstrap поверх существующих данных.
+- Ложный статус active — предотвращается обновлением registry только по результатам проверок.
