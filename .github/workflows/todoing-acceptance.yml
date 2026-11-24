@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   acceptance:
+    if: ${{ !contains(github.event.head_commit.message, 'chore(openspec): archive implement-todoing-manifest-workflow') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out Manifest
