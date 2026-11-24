@@ -67,9 +67,13 @@ for file in "$RU" "$EN"; do
   require_text "$file" "openspec archive <change-id> --yes --skip-specs" "cancel archive mode"
 done
 require_text "$RU" "только Todoing SQLite" "snapshot restore boundary"
+require_text "$RU" "только по явному разрешению пользователя" "explicit restore approval"
+require_text "$RU" "expected_sha256" "restore checksum binding"
 require_text "$RU" "safety snapshot" "pre-restore safety snapshot"
 require_text "$RU" "при активных task locks" "snapshot lock guard"
 require_text "$EN" "only Todoing SQLite" "snapshot restore boundary"
+require_text "$EN" "only with explicit user approval" "explicit restore approval"
+require_text "$EN" "expected_sha256" "restore checksum binding"
 require_text "$EN" "safety snapshot" "pre-restore safety snapshot"
 require_text "$EN" "while task locks are active" "snapshot lock guard"
 
