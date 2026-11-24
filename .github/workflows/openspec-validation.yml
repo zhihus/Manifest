@@ -34,5 +34,8 @@ jobs:
       - name: Install OpenSpec CLI
         run: npm install --global @fission-ai/openspec@1.16.0
 
+      - name: Check bilingual Todoing runbook contract
+        run: bash scripts/test-todoing-runbook.sh
+
       - name: Validate active changes and specs
         run: openspec validate --all
