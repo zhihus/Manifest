@@ -4,7 +4,7 @@
 
 ### Requirement: Safe Todoing bootstrap
 
-The runbook MUST require the Orchestrator to verify the installed Todoing binary and JSON API before bootstrap. It MUST generate a Project ID only when both the ID file and store are absent. It MUST stop if a store exists but the Project ID is missing, if the stored ID differs, or if an existing configuration is incompatible. It MUST NOT overwrite an existing configuration, database, or legacy task data.
+The runbook MUST require the Orchestrator to verify the installed Todoing binary before bootstrap. For an existing store, it MUST verify the JSON API with `store.info` and `store.verify`; for a new store, it MUST verify the API immediately after the single `store.init` call using those operations. It MUST generate a Project ID only when both the ID file and store are absent. It MUST stop if a store exists but the Project ID is missing, if the stored ID differs, or if an existing configuration is incompatible. It MUST NOT overwrite an existing configuration, database, or legacy task data.
 
 #### Scenario: New project bootstrap
 
