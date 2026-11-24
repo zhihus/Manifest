@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# Regression checks for the bilingual Todoing integration runbook.
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+RU="$ROOT/workflow/README.ru.md"
+EN="$ROOT/workflow/README.en.md"
+FAIL=0
+
+fail() {
+  printf 'FAIL %s\n' "$1"
+  FAIL=1
+}
+
+require_text() {
+  local file=$1 needle=$2 label=$3
+  if ! grep -Fq -- "$needle" "$file"; then
+    fail "$label: missing '$needle' in ${file#"$ROOT"/}"
+  fi
+}
+
+require_order() {
+  local file=$1 label=$2
+  shift 2
+  local previous=0 line needle
+  for needle in "$@"; do
+    line=$(grep -nF -- "$needle" "$file" | head -n 1 | cut -d: -f1 || true)
+    if [[ -z $line ]]; then
+      fail "$label: missing '$needle'"
+      return
+    fi
+    if (( line <= previous )); then
+      fail "$label: '$needle' is out of order"
+      return
+    fi
+    previous=$line
+  done
+}
+
+for file in "$RU" "$EN"; do
+  [[ -f $file ]] || { fail "missing runbook: $file"; continue; }
+  for op in \
+    store.init store.info store.verify task.create task.external-ref.add \
+    task.version.approve task.lock.acquire task.lock.heartbeat \
+    task.lock.release task.lock.recover task.status.set task.review.add \
+    task.commit.finalize task.cancel; do
+    require_text "$file" "$op" "API contract"
+  done
+  for value in backlog ready in_progress review verified completed; do
+    require_text "$file" "$value" "status mapping"
+  done
+  require_text "$file" "720" "lease duration"
+  require_text "$file" "180" "heartbeat configuration"
+  require_text "$file" "60" "recovery grace"
+done
+
+require_text "$RU" "только после явного одобрения пользователя" "user approval gate"
+require_text "$RU" "Субагент не получает token" "token custody"
+require_text "$RU" "не перезаписывайте" "no-overwrite rule"
+require_text "$RU" "сначала сверяйте фактические" "reconciliation before retry"
+require_text "$EN" "only after explicit user approval" "user approval gate"
+require_text "$EN" "Never give the token to a role agent" "token custody"
+require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
+require_text "$EN" "first reconcile actual" "reconciliation before retry"
+
+RU_COMPLETION=$(mktemp)
+EN_COMPLETION=$(mktemp)
+RU_RECOVERY=$(mktemp)
+EN_RECOVERY=$(mktemp)
+trap 'rm -f "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY"' EXIT
+
+sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$RU" > "$RU_COMPLETION"
+sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$EN" > "$EN_COMPLETION"
+sed -n '/^### 6\.6\./,$p' "$RU" > "$RU_RECOVERY"
+sed -n '/^### 6\.6\./,$p' "$EN" > "$EN_RECOVERY"
+
+require_order "$RU_COMPLETION" "Russian completion sequence" \
+  "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
+  "task.commit.finalize" "task.status.set" "task.lock.release"
+require_order "$EN_COMPLETION" "English completion sequence" \
+  "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
+  "task.commit.finalize" "task.status.set" "task.lock.release"
+
+require_order "$RU_COMPLETION" "Russian cancellation sequence" \
+  "task.cancel" "без слияния delta specs" "task.lock.release"
+require_order "$EN_COMPLETION" "English cancellation sequence" \
+  "task.cancel" "without merging delta specs" "task.lock.release"
+
+require_order "$RU_RECOVERY" "Russian lost-release recovery" \
+  "task.lock.heartbeat" "успешном подтверждении владения"
+require_order "$EN_RECOVERY" "English lost-release recovery" \
+  "task.lock.heartbeat" "ownership is confirmed"
+
+if (( FAIL )); then
+  exit 1
+fi
+
+echo "PASS bilingual Todoing runbook contract"
