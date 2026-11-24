@@ -63,8 +63,10 @@ Orchestrator heartbeat'ит непосредственно перед запус
 - WHEN ответ на `task.lock.release` потерян и Orchestrator не уверен, что
   lock освобождён
 - THEN Orchestrator проверяет владение через `task.lock.heartbeat`: успех →
-  повторить `task.lock.release`; `stale_lock` → lock уже освобождён, действий
-  нет; `lock_expired` → `task.lock.recover` при необходимости
+  повторить `task.lock.release`; `stale_lock` → token больше не действителен
+  (lock мог быть освобождён либо перехвачен через recovery), старый владелец
+  не выполняет дальнейших операций с этим token; `lock_expired` → явный
+  `task.lock.recover` после grace при необходимости
 
 ### Requirement: Recovery после истечения lease
 

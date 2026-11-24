@@ -131,8 +131,10 @@ Final Commit SHA — маркер трассируемости, а не дока
    после установки терминального outcome: `task.lock.release` проверяет только
    lock record (state, owner, token, expiry), а не outcome задачи. Если ответ
    на release потерян — проверить владение через `task.lock.heartbeat`
-   (успех → повторить release; `stale_lock` → lock уже освобождён;
-   `lock_expired` → recovery при необходимости).
+   (успех → повторить release; `stale_lock` → token больше не действителен:
+   lock мог быть освобождён либо перехвачен через recovery, старый владелец не
+   выполняет дальнейших операций с этим token; `lock_expired` → явный
+   recovery после grace при необходимости).
 6. External reference сохраняется для аудита.
 
 Отмена не выполняется только переводом статуса или архивированием задачи:

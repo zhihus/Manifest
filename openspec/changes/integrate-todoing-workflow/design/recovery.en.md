@@ -15,8 +15,9 @@
   read-only lock-state operation. The Orchestrator knows it holds the lock
   because it acquired the token itself; the lock's currency is verified by an
   operation that validates the grant (e.g., `task.lock.heartbeat`): success —
-  the lock is active and held by this token, `stale_lock`/`lock_expired` — the
-  lock is lost or expired.
+  the lock is active and held by this token, `stale_lock` — the token is no
+  longer valid (the lock may have been released or taken over by recovery),
+  `lock_expired` — the lease expired.
 
 ## States and their reconciliation
 
@@ -58,11 +59,14 @@
 - Action: the Orchestrator sends `task.lock.heartbeat`:
   - a successful heartbeat confirms a live token (the lock is active and held
     by this token) → perform `task.lock.release`;
-  - `lock_expired` — the lease expired, the token is not renewed → perform
-    `task.lock.recover` (after the grace) if ownership is still needed, or
-    allow it to expire (the lock will be taken over by recovery);
-  - `stale_lock` — the token is invalid (the lock was already released or
-    recovered) → no further action is required.
+  - `lock_expired` — the lease expired, the token is not renewed. Lease
+    expiry does not trigger an automatic takeover: `task.lock.recover` is
+    performed only by an explicit call after the recovery grace. If recovery
+    is not performed, the expired lock record remains until a subsequent
+    explicit recovery;
+  - `stale_lock` — the token is no longer valid: the lock may have been
+    released or taken over by recovery. The old owner does not perform further
+    operations with this token.
 - Prohibition: a repeated `task.lock.release` is not idempotent — it returns
   `stale_lock` (the lock is not held by this token). A repeat is performed
   only after a successful heartbeat confirming ownership.
@@ -96,8 +100,10 @@ archive (delta specs are not merged) → `task.lock.release`.
     `task.cancel`, then `task.lock.release`.
   - If the outcome `cancelled` and the archive are performed but the lock is
     not released — verify ownership through `task.lock.heartbeat` (success →
-    `release`; `stale_lock` → the lock is already released, no action;
-    `lock_expired` → recovery if needed).
+    `release`; `stale_lock` → the token is no longer valid: the lock may have
+    been released or taken over by recovery, the old owner does not perform
+    further operations with this token; `lock_expired` → an explicit recovery
+    after the grace if needed).
 - Prohibition: do not merge the delta specs into permanent specs on
   cancellation; do not repeat `task.cancel` after the outcome is set.
 

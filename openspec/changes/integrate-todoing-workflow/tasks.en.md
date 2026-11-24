@@ -125,8 +125,10 @@
   OpenSpec archive). A repeated `task.lock.release` is not idempotent — it
   returns `stale_lock`. If the response to the release is lost, the
   Orchestrator verifies ownership through `task.lock.heartbeat`: success →
-  repeat the release; `stale_lock` → the lock is already released;
-  `lock_expired` → recovery if needed.
+  repeat the release; `stale_lock` → the token is no longer valid (the lock may
+  have been released or taken over by recovery), the old owner does not
+  perform further operations with this token; `lock_expired` → an explicit
+  recovery after the grace if needed.
   Stop: in the described procedure the release is called after
   `task.status.set` → `completed` and after cancellation; a repeat release is
   performed only after ownership is confirmed by a heartbeat.

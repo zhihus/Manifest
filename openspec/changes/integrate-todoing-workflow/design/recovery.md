@@ -14,8 +14,9 @@
   read-only операции чтения lock-state. Orchestrator знает, что владеет lock,
   потому что сам приобрёл token; актуальность lock проверяется операцией,
   валидирующей grant (например, `task.lock.heartbeat`): успех — lock активен и
-  удерживается этим токеном, `stale_lock`/`lock_expired` — lock потерян или
-  просрочен.
+  удерживается этим токеном, `stale_lock` — token больше не действителен
+  (lock мог быть освобождён либо перехвачен через recovery),
+  `lock_expired` — lease истёк.
 
 ## Состояния и их согласование
 
@@ -57,11 +58,13 @@
 - Действие: Orchestrator отправляет `task.lock.heartbeat`:
   - успешный heartbeat подтверждает действующий token (lock активен и
     удерживается этим токеном) → выполнить `task.lock.release`;
-  - `lock_expired` — lease истёк, token не продлевается → выполнить
-    `task.lock.recover` (после grace), если владение ещё нужно, либо
-    допустить истечение (lock будет захвачен recovery);
-  - `stale_lock` — token недействителен (lock уже освобождён или
-    перезахвачен) → дальнейших действий не требуется.
+  - `lock_expired` — lease истёк, token не продлевается. Истечение lease не
+    запускает автоматический takeover: `task.lock.recover` выполняется только
+    явным вызовом после recovery grace. Если recovery не выполняется, истёкшая
+    запись lock остаётся до последующего явного recovery;
+  - `stale_lock` — token больше не действителен: lock мог быть освобождён либо
+    перехвачен через recovery. Старый владелец не выполняет дальнейших
+    операций с этим token.
 - Запрет: повторный `task.lock.release` не идемпотентен — он возвращает
   `stale_lock` (lock не удерживается этим токеном). Повтор выполняется только
   после успешного heartbeat, подтверждающего владение.
@@ -94,8 +97,10 @@ OpenSpec archive (delta specs не вливаются) → `task.lock.release`.
     затем `task.lock.release`.
   - Если outcome `cancelled` и archive выполнены, но lock не освобождён —
     проверить владение через `task.lock.heartbeat` (успех → `release`;
-    `stale_lock` → lock уже освобождён, действий нет; `lock_expired` →
-    recovery при необходимости).
+    `stale_lock` → token больше не действителен: lock мог быть освобождён
+    либо перехвачен через recovery, старый владелец не выполняет дальнейших
+    операций с этим token; `lock_expired` → явный recovery после grace при
+    необходимости).
 - Запрет: не вливать delta specs в permanent specs при отмене; не повторять
   `task.cancel` после установленного outcome.
 

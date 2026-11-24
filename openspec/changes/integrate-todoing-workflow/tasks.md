@@ -124,7 +124,9 @@
   archive). Повторный `task.lock.release` не идемпотентен — возвращает
   `stale_lock`. Если ответ на release потерян, Orchestrator проверяет
   владение через `task.lock.heartbeat`: успех → повторить release;
-  `stale_lock` → lock уже освобождён; `lock_expired` → recovery при
+  `stale_lock` → token больше не действителен (lock мог быть освобождён либо
+  перехвачен через recovery), старый владелец не выполняет дальнейших операций
+  с этим token; `lock_expired` → явный recovery после grace при
   необходимости.
   Stop: в описанной процедуре release вызывается после `task.status.set` →
   `completed` и после отмены; повтор release выполняется только после

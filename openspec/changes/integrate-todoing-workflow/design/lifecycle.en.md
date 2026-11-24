@@ -135,7 +135,9 @@ completion.
    only the lock record (state, owner, token, expiry), not the task outcome.
    If the response to the release is lost — verify ownership through
    `task.lock.heartbeat` (success → repeat the release; `stale_lock` → the
-   lock is already released; `lock_expired` → recovery if needed).
+   token is no longer valid: the lock may have been released or taken over by
+   recovery, the old owner does not perform further operations with this
+   token; `lock_expired` → an explicit recovery after the grace if needed).
 6. The external reference is preserved for audit.
 
 Cancellation is not performed by merely changing the status or archiving the

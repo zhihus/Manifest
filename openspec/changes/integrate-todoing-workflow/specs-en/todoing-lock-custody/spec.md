@@ -66,8 +66,10 @@ cancellation). A repeated `task.lock.release` is not idempotent — it returns
 - WHEN the response to `task.lock.release` is lost and the Orchestrator is
   unsure whether the lock is released
 - THEN the Orchestrator verifies ownership through `task.lock.heartbeat`:
-  success → repeat `task.lock.release`; `stale_lock` → the lock is already
-  released, no action; `lock_expired` → `task.lock.recover` if needed
+  success → repeat `task.lock.release`; `stale_lock` → the token is no longer
+  valid (the lock may have been released or taken over by recovery), the old
+  owner does not perform further operations with this token; `lock_expired` →
+  an explicit `task.lock.recover` after the grace if needed
 
 ### Requirement: Recovery after lease expiry
 
