@@ -267,10 +267,11 @@ One OpenSpec change maps to one Todoing task:
 
 The Orchestrator is the sole Todoing API client and lock-token custodian:
 1. Before work, call `task.lock.acquire`; keep `owner_id`, `lock_token`, `fencing_generation`, and `expires_at` in protected main-session state.
-2. Call `task.lock.heartbeat` immediately before each blocking subagent run. A 720-second lease covers the 600-second hard timeout plus 120 seconds of margin.
-3. Do not send heartbeats while the subagent is running. Never give the token to a role agent; role agents never call Todoing.
-4. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
-5. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
+2. Immediately after acquisition, move the task `ready → in_progress` with `task.status.set`, supplying the token in the envelope.
+3. Call `task.lock.heartbeat` immediately before each blocking subagent run. A 720-second lease covers the 600-second hard timeout plus 120 seconds of margin.
+4. Do not send heartbeats while the subagent is running. Never give the token to a role agent; role agents never call Todoing.
+5. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
+6. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
 
 ### 6.4. Status and Review
 
