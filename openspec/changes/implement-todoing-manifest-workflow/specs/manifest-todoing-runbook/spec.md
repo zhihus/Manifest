@@ -61,7 +61,7 @@ The runbook MUST define the approved status transitions, the project-scoped `ope
 
 ### Requirement: Verified completion and user-approved cancellation
 
-The runbook MUST define the ordered success sequence: Verified, acceptance checks, OpenSpec archive, Git merge, `task.commit.finalize`, transition to Completed, then lock release. Cancellation MUST require explicit user confirmation, set cancelled outcome, archive the OpenSpec change without merging delta specs, then release the lock. The external reference MUST be retained.
+The runbook MUST define the ordered success sequence: Verified, acceptance checks, `openspec archive <change-id> --yes` (merge delta specs), Git merge, `task.commit.finalize`, transition to Completed, then lock release. Cancellation MUST require explicit user confirmation, set cancelled outcome, archive the OpenSpec change with `openspec archive <change-id> --yes --skip-specs` without merging delta specs, then release the lock. The external reference MUST be retained.
 
 #### Scenario: Successful completion
 
