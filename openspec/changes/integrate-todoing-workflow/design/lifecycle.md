@@ -100,8 +100,19 @@ Project ID — стабильный идентификатор проекта, �
    перемещается в `openspec/changes/archive/`.
 4. Git merge согласно политике Manifest (ветки, review, merge).
 5. `task.commit.finalize` с final merge SHA — маркер трассируемости.
-6. `task.complete` — фиксирует outcome `completed`.
+6. `task.status.set` → `completed` — терминальный переход. Статус `completed`
+   в `config.toml` отображён на outcome `completed`, поэтому переход сам
+   устанавливает и `status_id = completed`, и `outcome = completed`,
+   делая задачу терминальной.
 7. Освобождение lock через `task.lock.release`.
+
+**Семантика терминального вызова.** Переход в статус, отображённый на outcome
+`completed`, сам устанавливает этот outcome; отдельный вызов `task.complete`
+в success-пути не выполняется. Повторный `task.complete` после такого
+перехода отклоняется как `task_terminal` (outcome уже установлен).
+`task.complete` — альтернативный терминальный путь, который устанавливает
+только outcome без смены статуса; он несовместим с одновременным переходом в
+`completed` и в данной модели не используется.
 
 Final Commit SHA — маркер трассируемости, а не доказательство успешной
 приёмки. Наличие commit reference само по себе не означает завершение.

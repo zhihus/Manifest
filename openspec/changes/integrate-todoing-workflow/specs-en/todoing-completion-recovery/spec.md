@@ -13,14 +13,21 @@ transaction; operation retries are idempotent or explicit.
 Successful completion SHALL be performed in the sequence: status `verified`
 (Review approved) → acceptance checks → standard OpenSpec archive → Git merge
 per Manifest policy → `task.commit.finalize` with the final merge SHA →
-`task.complete` → lock release. The Final Commit SHA is a traceability marker,
-not proof of successful acceptance.
+`task.status.set` → `completed` (terminal transition) → lock release. The
+Final Commit SHA is a traceability marker, not proof of successful acceptance.
 
 #### Scenario: Completion sequence
 - WHEN the `verified` status is reached
 - THEN the system performs the acceptance checks, the OpenSpec archive, the
   Git merge, `task.commit.finalize` with the final merge SHA,
-  `task.complete`, and the lock release
+  `task.status.set` → `completed`, and the lock release
+
+#### Scenario: Terminal transition sets the outcome
+- WHEN the system performs `task.status.set` → `completed`
+- THEN the transition itself sets the outcome `completed` (the status is
+  mapped to the outcome in `config.toml`); a separate `task.complete` call is
+  not made in the success path, and a repeated `task.complete` is rejected as
+  `task_terminal`
 
 #### Scenario: Final Commit SHA — marker
 - WHEN the final merge SHA is recorded through `task.commit.finalize`
@@ -74,13 +81,14 @@ Blind retries of non-idempotent operations are forbidden.
 
 The system SHALL provide recovery for the partial-failure scenarios defined in
 `design/recovery.md` (S1–S5): between the OpenSpec archive and the Git merge,
-between the Git merge and `task.commit.finalize`, between `task.complete` and
-the lock release, on lease expiry during the sub-agent, and on cancellation.
+between the Git merge and `task.commit.finalize`, between the transition to
+`completed` and the lock release, on lease expiry during the sub-agent, and on
+cancellation.
 
 #### Scenario: Failure between the archive and the merge
 - WHEN the change is already archived but the Git merge is not performed
 - THEN the system performs the Git merge, then `task.commit.finalize` with
-  the SHA and `task.complete`, without repeating the archive
+  the SHA and `task.status.set` → `completed`, without repeating the archive
 
 #### Scenario: Failure during locking
 - WHEN the lease expired during sub-agent execution

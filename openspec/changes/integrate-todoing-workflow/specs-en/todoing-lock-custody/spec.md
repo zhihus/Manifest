@@ -74,7 +74,15 @@ verifies the current task version before continuing.
 
 #### Scenario: Old token invalid
 - WHEN a recovery is performed
-- THEN the old token becomes invalid and is not used
+- THEN the old token becomes invalid (`stale_lock`) on any operation and is
+  not used
+
+#### Scenario: Competing recovers are atomic
+- WHEN two Orchestrators simultaneously call `task.lock.recover` on the same
+  task
+- THEN only the first succeeds (Exclusive transaction + CAS on
+  `fencing_generation`); the second gets `task_locked` because the fresh
+  expiry is already in the future
 
 #### Scenario: Version check after recovery
 - WHEN the Orchestrator continues working after recovery

@@ -13,14 +13,20 @@
 Успешное завершение SHALL выполняться в последовательности: статус `verified`
 (Review approved) → acceptance checks → штатный OpenSpec archive → Git merge
 по политике Manifest → `task.commit.finalize` с final merge SHA →
-`task.complete` → освобождение lock. Final Commit SHA — маркер
-трассируемости, а не доказательство успешной приёмки.
+`task.status.set` → `completed` (терминальный переход) → освобождение lock.
+Final Commit SHA — маркер трассируемости, а не доказательство приёмки.
 
 #### Scenario: Последовательность завершения
 - WHEN достигнут статус `verified`
 - THEN система выполняет acceptance checks, OpenSpec archive, Git merge,
-  `task.commit.finalize` с final merge SHA, `task.complete` и освобождение
-  lock
+  `task.commit.finalize` с final merge SHA, `task.status.set` → `completed`
+  и освобождение lock
+
+#### Scenario: Терминальный переход устанавливает outcome
+- WHEN система выполняет `task.status.set` → `completed`
+- THEN переход сам устанавливает outcome `completed` (статус отображён на
+  outcome в `config.toml`); отдельный вызов `task.complete` в success-пути не
+  выполняется, повторный `task.complete` отклоняется как `task_terminal`
 
 #### Scenario: Final Commit SHA — маркер
 - WHEN зафиксирован final merge SHA через `task.commit.finalize`
@@ -69,13 +75,13 @@ Orchestrator устанавливает outcome `cancelled` через `task.can
 
 Система SHALL обеспечивать восстановление для сценариев частичного сбоя,
 определённых в `design/recovery.md` (S1–S5): между OpenSpec archive и Git
-merge, между Git merge и `task.commit.finalize`, между `task.complete` и
-освобождением lock, при истечении lease во время субагента, при отмене.
+merge, между Git merge и `task.commit.finalize`, между переходом в `completed`
+и освобождением lock, при истечении lease во время субагента, при отмене.
 
 #### Scenario: Сбой между archive и merge
 - WHEN change уже в архиве, а Git merge не выполнен
 - THEN система выполняет Git merge, затем `task.commit.finalize` с SHA и
-  `task.complete`, не повторяя archive
+  `task.status.set` → `completed`, не повторяя archive
 
 #### Scenario: Сбой при блокировке
 - WHEN lease истёк во время выполнения субагента

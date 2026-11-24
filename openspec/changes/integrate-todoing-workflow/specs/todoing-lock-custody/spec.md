@@ -72,7 +72,15 @@ Orchestrator heartbeat'ит непосредственно перед запус
 
 #### Scenario: Старый token недействителен
 - WHEN выполнен recovery
-- THEN старый token становится недействительным и не используется
+- THEN старый token становится недействительным (`stale_lock`) на любой
+  операции и не используется
+
+#### Scenario: Конкурирующие recover атомны
+- WHEN два Orchestrator одновременно вызывают `task.lock.recover` на одну
+  задачу
+- THEN только первый успешен (Exclusive-транзакция + CAS по
+  `fencing_generation`); второй получает `task_locked`, так как свежий expiry
+  уже в будущем
 
 #### Scenario: Проверка версии после recovery
 - WHEN Orchestrator продолжает работу после recovery

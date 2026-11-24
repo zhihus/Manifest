@@ -103,8 +103,19 @@ Successful completion (a sequence of verifiable steps):
    the change is moved to `openspec/changes/archive/`.
 4. Git merge per Manifest policy (branches, review, merge).
 5. `task.commit.finalize` with the final merge SHA — a traceability marker.
-6. `task.complete` — records the outcome `completed`.
+6. `task.status.set` → `completed` — the terminal transition. The `completed`
+   status is mapped to outcome `completed` in `config.toml`, so the transition
+   itself sets both `status_id = completed` and `outcome = completed`, making
+   the task terminal.
 7. Lock release through `task.lock.release`.
+
+**Terminal-call semantics.** A transition to a status mapped to outcome
+`completed` sets that outcome itself; a separate `task.complete` call is not
+made in the success path. A repeated `task.complete` after such a transition
+is rejected as `task_terminal` (the outcome is already set). `task.complete`
+is an alternative terminal path that sets only the outcome without changing
+the status; it is incompatible with a simultaneous transition to `completed`
+and is not used in this model.
 
 The Final Commit SHA is a traceability marker, not proof of successful
 acceptance. The presence of a commit reference alone does not mean

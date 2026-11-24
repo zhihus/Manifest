@@ -72,8 +72,9 @@ legacy Markdown задачи и `index.json` отклоняются (требу�
 
 Успешное завершение: Review approved → acceptance checks → штатный OpenSpec
 archive → Git merge по политике Manifest → `task.commit.finalize` с final
-merge SHA → `task.complete` → освобождение lock. Final Commit SHA — маркер
-трассируемости, а не доказательство приёмки. Отмену подтверждает только
+merge SHA → `task.status.set` → `completed` (терминальный переход, сам
+устанавливает outcome `completed`) → освобождение lock. Final Commit SHA —
+маркер трассируемости, а не доказательство приёмки. Отмену подтверждает только
 пользователь; при подтверждении Orchestrator устанавливает outcome `cancelled`
 через `task.cancel` и архивирует OpenSpec change штатным механизмом; delta
 specs не вливаются в permanent specs. Подробности — в `design/lifecycle.md`
@@ -86,13 +87,81 @@ Todoing, OpenSpec и Git не образуют транзакции. Каждо�
 повторы non-idempotent операций запрещены. Recovery сверяет фактические
 состояния до повторения операций. Подробности — в `design/recovery.md`.
 
-## Open questions и внешние blockers
+### D8. RU/EN редакции и область валидации
 
-- **Schema parity (внешний blocker, Todoing):** реализация возвращает коды
-  `store_already_initialized` (exit 6) и `migration_required` (exit 2), но
-  `docs/api/v1/response.schema.json` не содержит их в enum. Это не блокирует
-  Manifest-side дизайн, но блокирует валидацию интеграции против схемы до
-  исправления в Todoing. Зафиксировано как prerequisite интеграции.
+OpenSpec CLI (v1.16.0) валидирует только каноническую структуру change:
+`proposal.md`, `design.md`, `tasks.md` и delta-specs в `specs/<capability>/
+spec.md` (6 capability, RU). Валидатор игнорирует топ-уровневые `.en.md`
+файлы и не сканирует `specs-en/`.
+
+- **Валидируется OpenSpec:** `proposal.md`, `design.md`, `tasks.md`,
+  `specs/<capability>/spec.md` (6 RU delta-specs).
+- **Часть change, но вне валидации OpenSpec:** `design/bootstrap.md`,
+  `design/lifecycle.md`, `design/recovery.md` (RU-документы дизайна в
+  подпапке), все `.en.md` переводы, `specs-en/<capability>/spec.md` (6 EN
+  спеков).
+
+Обоснование `specs-en/`: валидатор помечает любой файл в capability-папке с
+контентом `# Spec Delta` + `## ADDED Requirements` как delta-spec; второй
+такой файл в одной папке ломает валидацию. EN-переводы вынесены в параллельную
+`specs-en/`, чтобы не нарушать валидацию. Обход не устраняется, потому что он
+не вызывает провал валидации — он её обеспечивает.
+
+Согласованность RU/EN: RU-редакция авторитетна (пользователь ревьюит RU),
+EN-редакция — верный перевод. Согласованность проверяется по секциям:
+заголовки секций RU и EN должны совпадать по структуре, ключевые термины и
+операции Todoing API — по смыслу. Проверка выполняется вручную при каждом
+изменении RU-редакции (синхронизация EN в том же change) и при финальном
+прохождении `openspec validate --strict`.
+
+### D9. Граница реализации
+
+Manifest — head/meta-проект типа `doc`; программного оркестратора и
+технологического стека в репозитории нет. Оркестрацию выполняет основная
+сессия агента (Main Orchestrator), исполняющая существующий OpenSpec pipeline
+(`workflow/README.ru.md`). Реализация интеграции — это не программа, а
+документированная процедура, которую Main Orchestrator выполняет, вызывая
+публичный JSON API v1 Todoing через CLI `todoing api --json`.
+
+Конкретные артефакты реализации (место, где «реализуется» интеграция):
+
+- **Bootstrap-файлы:** `.manifest/project-id` (UUIDv4, создаётся один раз при
+  bootstrap) и `.todoing/config.toml` (конфигурация Todoing: статусы,
+  отображение на outcome, transitions; создаётся при bootstrap без
+  перезаписи).
+- **Workflow-документация:** процедура интеграции (bootstrap, lock custody,
+  task state, review cycle, completion, recovery) документируется в
+  `workflow/README.ru.md` (или отдельном workflow-документе), который Main
+  Orchestrator исполняет как часть OpenSpec pipeline.
+
+Задачи в `tasks.md` — декомпозиция для последующей реализации; они не
+выполняются в рамках этого change. Каждая задача ссылается на конкретный
+артефакт (bootstrap-файл или workflow-документ) и описывает, что в него
+внести.
+
+## Внешние blockers (Todoing) — не блокируют интеграцию
+
+Оба blocker'а требуют отдельной задачи синхронизации документации/реализации
+Todoing; ни один не блокирует Manifest-side дизайн или реализацию интеграции.
+
+- **Schema parity (не блокирует интеграцию; требуется отдельная Todoing-задача):**
+  реализация возвращает коды `store_already_initialized` (exit 6) и
+  `migration_required` (exit 2), но `docs/api/v1/response.schema.json` не
+  содержит их в enum. Блокирует только валидацию интеграции против схемы до
+  исправления в Todoing; Manifest-side дизайн и реализация не зависят от
+  схемы.
+- **`task.lock.acquire` на expired lock (не блокирует интеграцию; требуется
+  отдельная Todoing-задача):** документация (`docs/api/v1/operations.md`,
+  §task.lock.acquire) обещает, что expired lock до recovery grace возвращает
+  `lock_expired`, а после grace требует явного `task.lock.recover`.
+  Реализация (`src/storage/lock.rs`, acquire) не проверяет `expires_at` и
+  возвращает `task_locked` для любого active lock, включая expired. Manifest
+  не зависит от этого: takeover expired lock выполняется через
+  `task.lock.recover`, а не через `task.lock.acquire` (см. `design/recovery.md`
+  и spec `todoing-lock-custody`).
+
+## Open questions (Manifest-side)
+
 - **Точка установки Todoing:** bootstrap не привязывается к
   `scripts/manifest-init.sh`, пока не подтверждено, что это штатная точка
   установки для пользователей, а не dev-инфраструктура.
