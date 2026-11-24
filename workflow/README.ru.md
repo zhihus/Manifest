@@ -303,7 +303,9 @@ to = "completed"
 ### 6.6. Recovery
 
 После прерывания сначала сверяйте фактические Todoing (status, outcome, versions, history), OpenSpec (change и archive) и Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
-- Если ответ на `task.lock.release` потерян, сначала выполните `task.lock.heartbeat`: повтор release допустим только при успешном подтверждении владения.
+- Если ответ на `task.lock.release` потерян:
+  1. Сначала выполните `task.lock.heartbeat`.
+  2. Повторите release только после успешного подтверждения владения.
 - `lock_expired`: дождитесь lease expiry + 60 секунд grace и вызовите `task.lock.recover`; используйте только новый token и fencing generation.
 - `stale_lock`: старый token больше не использовать.
 - После сбоя между archive и merge не архивируйте повторно; проверьте факты и продолжите с merge.
