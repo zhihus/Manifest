@@ -18,7 +18,9 @@ Entry point: `AGENTS.md`
   `docs/architecture/external-dependencies.ru.md`), the target
   Todoing integration contract (`todoing-contract.ru.md`, historical
   editions `contract-spec-final.ru.md`, `contract-spec-v3.ru.md`,
-  `contract-spec-v4.ru.md`, `contract-spec-v5.ru.md`). Russian editions
+  `contract-spec-v4.ru.md`, `contract-spec-v5.ru.md`), and the
+  Todoing task lifecycle clarification
+  (`todoing-task-lifecycle-clarification.ru.md`). Russian editions
   are authoritative (`*.ru.md`); English versions (`*.en.md`) are
   translations.
   Historical decision records; do not delete.
