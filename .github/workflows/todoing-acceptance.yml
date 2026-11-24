@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: zhihus/todoing-x
-          ref: feature/generic-task-references-review-api
+          ref: bb4d17595ff8a2fce63d365f28df575b40f46577
           path: todoing
 
       - name: Set up Rust
