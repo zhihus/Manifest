@@ -53,6 +53,13 @@ The runbook MUST specify that only the Orchestrator calls Todoing and holds the 
 
 The runbook MUST define the approved status transitions, the project-scoped `openspec.change` external reference, version baseline approval, and append-only Review records bound to the reviewed version. It MUST specify that `changes_requested` increments Todoing `revision_count` once and returns the task to `in_progress`, while `approved` moves it to `verified`.
 
+#### Scenario: Start approved work
+
+- GIVEN the user approved a task and all prerequisites have outcome `completed`
+- WHEN the Orchestrator acquires the task lock
+- THEN it transitions the task from `ready` to `in_progress` before dispatching an implementation agent
+- AND keeps the lock token outside the agent prompt and environment
+
 #### Scenario: Review requests changes
 
 - GIVEN a Reviewer has completed review of a specific task version
