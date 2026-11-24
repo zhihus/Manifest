@@ -352,8 +352,14 @@ to = "completed"
         assert restored["restored"]["integrity_check"] == "ok"
         missing = api(root, "task.get", {"task_id": extra["id"]}, expect_ok=False)
         assert missing["error"]["code"] == "task_not_found"
-        assert api(root, "task.get", {"task_id": task_id})["task"]["final_commit_sha"] == final_sha
-        assert api(root, "task.get", {"task_id": cancel_id})["task"]["outcome"] == "cancelled"
+        restored_main = api(root, "task.get", {"task_id": task_id})["task"]
+        restored_cancel = api(root, "task.get", {"task_id": cancel_id})["task"]
+        assert restored_main["final_commit_sha"] == final_sha
+        assert restored_main["revision_count"] == 1
+        assert restored_main["external_references"][0]["value"] == "acceptance-main"
+        assert len(api(root, "task.review.list", {"task_id": task_id})["reviews"]) == 2
+        assert restored_cancel["outcome"] == "cancelled"
+        assert restored_cancel["external_references"][0]["value"] == "acceptance-cancel"
         api(root, "store.verify", {"deep": True})
 
     print("PASS real Todoing API ↔ Manifest/OpenSpec acceptance lifecycle")
