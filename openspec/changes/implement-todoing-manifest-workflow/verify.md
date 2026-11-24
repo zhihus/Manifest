@@ -19,8 +19,8 @@ Independent review of the bilingual Todoing runbook, its OpenSpec delta, the reg
 
 ## CI Evidence
 
-- Commit: `0f5b0b3eb616c9eb01e82a3f94b49f9466531b9e`
-- GitHub Actions: [run 45425608232](https://github.com/zhihus/Manifest/actions/runs/45425608232)
+- Commit: `fb5801d7848718a0f1ba6011346fffd7bf0b36e6`
+- GitHub Actions: [run 45426335789](https://github.com/zhihus/Manifest/actions/runs/45425608232)
 - Bilingual runbook regression test: passed.
 - Python 3.12 TOML parsing and parity test: passed; both configuration examples match and satisfy the expected status graph and lock values.
 - `openspec validate --all`: passed.
