@@ -11,7 +11,7 @@ A controlled migration is required. A generic fresh-project initializer is insuf
 ## What Changes
 
 - Define a staged, non-destructive migration procedure for the existing project.
-- Require a fresh pre-migration inventory and a user decision at each irreversible or externally visible boundary.
+- Require a fresh pre-migration inventory and separate, explicit, narrowly scoped user approval immediately before every migration stage that mutates the target repository; approval never carries over to a later stage.
 - Preserve the existing Git commit graph; prohibit history rewriting, reset, force-push, and implicit remote creation.
 - Resolve the Git remote/upstream strategy before any push or remote synchronization.
 - Inspect the exact ignore rules and OpenSpec contents before changing Git tracking.
