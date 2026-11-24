@@ -286,7 +286,7 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 Successful completion MUST follow this order:
 1. Review approved; status is `verified`.
 2. Acceptance checks across Todoing, OpenSpec, and Git.
-3. Normal OpenSpec archive (delta specs are merged into permanent specs).
+3. Run `openspec archive <change-id> --yes`; delta specs are merged into permanent specs.
 4. Git merge according to project rules.
 5. `task.commit.finalize` with the final merge commit SHA.
 6. `task.status.set` to `completed` (the transition also sets outcome `completed`).
