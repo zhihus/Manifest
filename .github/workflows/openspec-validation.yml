@@ -8,12 +8,16 @@ on:
     paths:
       - "openspec/**"
       - "openspec-rules.md"
+      - "workflow/README.*"
+      - "scripts/test-todoing-runbook.sh"
       - ".github/workflows/openspec-validation.yml"
   pull_request:
     branches: [develop]
     paths:
       - "openspec/**"
       - "openspec-rules.md"
+      - "workflow/README.*"
+      - "scripts/test-todoing-runbook.sh"
       - ".github/workflows/openspec-validation.yml"
 
 permissions:
