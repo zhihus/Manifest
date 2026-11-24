@@ -289,7 +289,12 @@ Successful completion MUST follow this order:
 6. `task.status.set` to `completed` (the transition also sets outcome `completed`).
 7. `task.lock.release`.
 
-Any agent may recommend cancellation with a reason; only the user may approve it. After approval: `task.cancel` with a reason → OpenSpec archive without merging delta specs → `task.lock.release`. Retain the external reference. Archiving alone is not cancellation.
+Any agent may recommend cancellation with a reason; only the user may approve it. After approval, perform these steps in order:
+1. `task.cancel` with a reason.
+2. OpenSpec archive without merging delta specs.
+3. `task.lock.release`.
+
+Retain the external reference. Archiving alone is not cancellation.
 
 ### 6.6. Recovery
 
