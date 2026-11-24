@@ -75,10 +75,10 @@ require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"
 require_text "$EN" 'outcome `completed`' "dependency readiness gate"
 require_text "$EN" "store already exists but the config is missing, stop" "existing store configuration guard"
-forbid_text "$RU" 'вызовите `store.init` поверх существующего store' "no store overwrite"
-forbid_text "$EN" 'call `store.init` over an existing store' "no store overwrite"
-forbid_text "$RU" 'повторите `task.lock.release` без heartbeat' "no blind lock release"
-forbid_text "$EN" 'retry `task.lock.release` without heartbeat' "no blind lock release"
+forbid_text "$RU" 'автоматически выполните `store.init`' "no store overwrite"
+forbid_text "$EN" 'automatically run `store.init` over an existing store' "no store overwrite"
+forbid_text "$RU" 'выполните `task.lock.release` без проверки владения' "no blind lock release"
+forbid_text "$EN" 'release the lock without confirming ownership' "no blind lock release"
 
 RU_COMPLETION=$(mktemp)
 EN_COMPLETION=$(mktemp)
