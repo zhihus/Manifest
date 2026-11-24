@@ -260,6 +260,8 @@ One OpenSpec change maps to one Todoing task:
 - Add a project-scoped reference with `task.external-ref.add`: namespace `openspec.change`, value equal to the change directory ID, relation `implements`, scope `project`.
 - Allow `backlog → ready` only after explicit user approval. Then record the current version as the baseline with `task.version.approve`.
 - Do not dispatch implementation, acquire a lock, or move the task to `in_progress` before approval.
+- Manage dependencies with `task.dependency.add`, `task.dependency.remove`, and `task.dependency.list`. Before dispatch, verify that every prerequisite task has outcome `completed`. If a dependency is locked or its state cannot be verified, do not start work. Todoing stores dependency edges and prevents cycles; Manifest decides readiness.
+- `actor_id` is attribution, not authentication. The Orchestrator sends every request; for a Review, set the envelope actor ID to the stable identity of the Reviewer role/session.
 
 ### 6.3. Lock custody and execution
 
