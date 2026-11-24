@@ -22,7 +22,7 @@
   Todoing Project ID validation.
   Maps to scenarios: `todoing-project-identity` §Project ID generation.
 
-- [ ] fr-1.2-validate-project-id-on-start
+- [x] fr-1.2-validate-project-id-on-start
   In `workflow/README.ru.md` (section «Bootstrap»), describe the procedure: on
   every integration start the Main Orchestrator reads `.manifest/project-id`,
   validates the value (UUIDv4, 1–128 characters, no whitespace), and, when a
@@ -32,7 +32,7 @@
   four combinations of present/absent file and present/absent store.
   Maps to scenarios: `todoing-project-identity` §Project ID validation.
 
-- [ ] fr-1.3-protect-project-id-from-change
+- [x] fr-1.3-protect-project-id-from-change
   In `workflow/README.ru.md` (section «Bootstrap»), fix the invariant:
   `.manifest/project-id` is never overwritten automatically after creation.
   Change is possible only by explicit user decision with store re-creation.
@@ -43,7 +43,7 @@
 
 ## 2. Store Bootstrap
 
-- [ ] fr-2.1-check-todoing-availability
+- [x] fr-2.1-check-todoing-availability
   In `workflow/README.ru.md` (section «Bootstrap»), describe the check: the
   Main Orchestrator runs `todoing api --json` with a test request
   (`store.info`). If the binary is absent or does not respond — stop with
@@ -58,7 +58,7 @@
   (`backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`),
   mapping `completed` → outcome `completed`, transitions per the model
   `backlog → ready → in_progress → review → verified → completed`.
-  Locking section: `lease_seconds = 720`, `heartbeat_seconds = 60` (Todoing
+  Locking section: `lease_seconds = 720`, `heartbeat_seconds = 180` (Todoing
   validation requires `heartbeat*3 < lease`, i.e. heartbeat < 240 s; 60 s
   passes). Atomic write (write-to-temp + rename) only when the file is absent.
   An existing file is validated: on incompatibility (missing status
@@ -67,7 +67,7 @@
   config stops bootstrap.
   Maps to scenarios: `todoing-store-bootstrap` §Configuration without overwrite.
 
-- [ ] fr-2.3-call-store-init
+- [x] fr-2.3-call-store-init
   In `workflow/README.ru.md` (section «Bootstrap»), describe the call to
   `store.init` with the Project ID from `.manifest/project-id`. The operation
   creates a new store only when the database does not exist. When a store
@@ -76,7 +76,7 @@
   store or legacy data.
   Maps to scenarios: `todoing-store-bootstrap` §Store initialization.
 
-- [ ] fr-2.4-verify-store
+- [x] fr-2.4-verify-store
   In `workflow/README.ru.md` (section «Bootstrap»), describe the
   verification: after `store.init` the Main Orchestrator calls `store.info`
   and `store.verify`. On mismatch — stop with diagnostics.
@@ -86,7 +86,7 @@
 
 ## 3. Lock Custody
 
-- [ ] fr-3.1-acquire-lock-for-approved-task
+- [x] fr-3.1-acquire-lock-for-approved-task
   In `workflow/README.ru.md` (section «Lock custody»), describe: the Main
   Orchestrator calls `task.lock.acquire` for an approved task, receives
   `owner_id`, `lock_token`, `fencing_generation`, `expires_at`, and stores the
@@ -97,7 +97,7 @@
   role sub-agents do not receive the token.
   Maps to scenarios: `todoing-lock-custody` §Lock acquisition.
 
-- [ ] fr-3.2-heartbeat-when-orchestrator-active
+- [x] fr-3.2-heartbeat-when-orchestrator-active
   In `workflow/README.ru.md` (section «Lock custody»), describe: the Main
   Orchestrator extends the lease through `task.lock.heartbeat` only when it is
   itself active (between sub-agent launches, at gates). During blocking
@@ -109,7 +109,7 @@
   launch, not during it.
   Maps to scenarios: `todoing-lock-custody` §Heartbeat only when the Orchestrator is active.
 
-- [ ] fr-3.3-configure-lease-to-cover-hard-timeout
+- [x] fr-3.3-configure-lease-to-cover-hard-timeout
   In `workflow/README.ru.md` (section «Lock custody»), fix: lease = 720 s
   (600 s sub-agent hard timeout per the watchdog in `AGENTS.md` + 120 s
   buffer). The lease covers a full sub-agent run when the Orchestrator
@@ -118,7 +118,7 @@
   (600 + 120).
   Maps to scenarios: `todoing-lock-custody` §Lease covers the hard timeout.
 
-- [ ] fr-3.4-release-lock-on-completion
+- [x] fr-3.4-release-lock-on-completion
   In `workflow/README.ru.md` (section «Completion»), describe: the Main
   Orchestrator calls `task.lock.release` after `task.status.set` → `completed`
   (terminal transition) and after cancellation (after `task.cancel` and the
@@ -134,7 +134,7 @@
   performed only after ownership is confirmed by a heartbeat.
   Maps to scenarios: `todoing-lock-custody` §Lock release.
 
-- [ ] fr-3.5-recover-lock-after-lease-expiry
+- [x] fr-3.5-recover-lock-after-lease-expiry
   In `workflow/README.ru.md` (section «Recovery»), describe: after lease
   expiry and the recovery grace (60 s) the Main Orchestrator calls
   `task.lock.recover`, obtaining a new token and an increased fencing
@@ -149,7 +149,7 @@
 
 ## 4. Task State and External Reference
 
-- [ ] fr-4.1-create-task-and-external-reference
+- [x] fr-4.1-create-task-and-external-reference
   In `workflow/README.ru.md` (section «Task state»), describe: the Main
   Orchestrator creates a Todoing task with status `backlog` and records the
   external reference: namespace `openspec.change`, value — the change
@@ -158,7 +158,7 @@
   reference.
   Maps to scenarios: `todoing-task-state` §Task and external reference creation.
 
-- [ ] fr-4.2-approve-backlog-to-ready-transition
+- [x] fr-4.2-approve-backlog-to-ready-transition
   In `workflow/README.ru.md` (section «Task state»), describe: the
   `backlog → ready` transition is confirmed only by the user. After approval
   Manifest records the baseline through `task.version.approve` when needed.
@@ -166,7 +166,7 @@
   user confirmation.
   Maps to scenarios: `todoing-task-state` §Approval of the backlog → ready transition.
 
-- [ ] fr-4.3-enforce-external-reference-uniqueness
+- [x] fr-4.3-enforce-external-reference-uniqueness
   In `workflow/README.ru.md` (section «Task state»), fix: at most one active
   `openspec.change` reference per task and at most one task per change ID. On
   cancellation the reference is preserved for audit.
@@ -176,7 +176,7 @@
 
 ## 5. Review Cycle
 
-- [ ] fr-5.1-hand-off-to-review
+- [x] fr-5.1-hand-off-to-review
   In `workflow/README.ru.md` (section «Review cycle»), describe: before
   handing off the result the Main Orchestrator moves the task to `review` and
   passes the artifacts to the Reviewer through its own workflow.
@@ -184,7 +184,7 @@
   starts.
   Maps to scenarios: `todoing-review-cycle` §Handoff to review.
 
-- [ ] fr-5.2-record-review
+- [x] fr-5.2-record-review
   In `workflow/README.ru.md` (section «Review cycle»), describe: Manifest
   calls `task.review.add` with `review_id`, `version_no`, the `reviewer`
   label, `outcome` (`approved`/`changes_requested`), and an ordered `comments`
@@ -192,14 +192,14 @@
   Stop: the review record is stored with the correct outcome and comments.
   Maps to scenarios: `todoing-review-cycle` §Review record.
 
-- [ ] fr-5.3-handle-approval
+- [x] fr-5.3-handle-approval
   In `workflow/README.ru.md` (section «Review cycle»), describe: on
   `approved` Todoing stores the review record and Manifest moves the task to
   `verified`.
   Stop: after an approved review the task is in `verified`.
   Maps to scenarios: `todoing-review-cycle` §Handling approval.
 
-- [ ] fr-5.4-handle-changes-requested
+- [x] fr-5.4-handle-changes-requested
   In `workflow/README.ru.md` (section «Review cycle»), describe: on
   `changes_requested` Todoing atomically stores the record and increases
   `revision_count` by exactly one; Manifest returns the task to
@@ -209,7 +209,7 @@
 
 ## 6. Completion and Cancellation
 
-- [ ] fr-6.1-complete-the-task
+- [x] fr-6.1-complete-the-task
   In `workflow/README.ru.md` (section «Completion»), describe: after
   `verified`, acceptance checks, OpenSpec archive, and Git merge the Main
   Orchestrator calls `task.commit.finalize` with the final merge SHA, then
@@ -221,7 +221,7 @@
   commit SHA is recorded, and the lock is released.
   Maps to scenarios: `todoing-completion-recovery` §Successful completion.
 
-- [ ] fr-6.2-cancel-the-task
+- [x] fr-6.2-cancel-the-task
   In `workflow/README.ru.md` (section «Completion»), describe: after user
   confirmation the Main Orchestrator calls `task.cancel` with a reason
   (outcome `cancelled`, terminal; a repeat → `task_terminal`), archives the
@@ -234,7 +234,7 @@
 
 ## 7. Recovery
 
-- [ ] fr-7.1-reconcile-states-before-retry
+- [x] fr-7.1-reconcile-states-before-retry
   In `workflow/README.ru.md` (section «Recovery»), describe: before repeating
   any operation the Main Orchestrator reads the actual state of Todoing,
   OpenSpec, and Git and determines which operations are still pending. Blind
@@ -243,7 +243,7 @@
   reconciliation step.
   Maps to scenarios: `todoing-completion-recovery` §Recovery after partial failure.
 
-- [ ] fr-7.2-handle-partial-failure-scenarios
+- [x] fr-7.2-handle-partial-failure-scenarios
   In `workflow/README.ru.md` (section «Recovery»), describe recovery for the
   scenarios S1–S5 from `design/recovery.md`: (S1) between the OpenSpec archive
   and the Git merge; (S2) between the Git merge and `task.commit.finalize`;
