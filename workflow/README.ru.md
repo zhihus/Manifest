@@ -305,7 +305,7 @@ to = "completed"
 
 ### 6.6. Recovery
 
-После прерывания сначала сверяйте фактические Todoing (status, outcome, versions, history), OpenSpec (change и archive) и Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
+После прерывания сначала сверяйте фактическое состояние: Todoing через `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive); Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
 - Если ответ на `task.lock.release` потерян:
   1. Сначала выполните `task.lock.heartbeat`.
   2. Повторите release только после успешного подтверждения владения.
