@@ -13,6 +13,7 @@ on:
       - "scripts/test-todoing-acceptance.py"
       - "workflow/README.*"
       - "openspec/config.yaml"
+      - "openspec/**"
       - ".github/workflows/todoing-acceptance.yml"
 
 permissions:
@@ -55,3 +56,35 @@ jobs:
         env:
           TODOING_BIN: ${{ github.workspace }}/todoing/target/release/todoing
         run: python scripts/test-todoing-acceptance.py
+
+  archive-completed-change:
+    needs: acceptance
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[archive-openspec]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.16.0
+      - name: Archive verified change
+        run: openspec archive implement-todoing-manifest-workflow --yes
+      - name: Validate archived specifications
+        run: openspec validate --all
+      - name: Commit archive
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- openspec/specs openspec/changes
+          if git diff --cached --quiet; then
+            echo "No OpenSpec archive changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(openspec): archive implement-todoing-manifest-workflow"
+          git push origin "HEAD:${{ github.ref_name }}"
