@@ -181,6 +181,74 @@ Todoing is the source of truth for task state, versions, history, locks, and Rev
 5. Inspect `.todoing/config.toml`. If absent, create it only after confirming there are no legacy Markdown tasks or `index.json`. Never overwrite an existing config; inspect it and stop if it is incompatible.
 6. Recommended configuration: `format_version = 1`; statuses `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; only `completed` maps to `outcome = "completed"`. Allowed transitions: `backlog → ready → in_progress → review`; from `review` to `in_progress` or `verified`; from `verified` to `completed`.
 7. Set `[locking]` to `lease_seconds = 720`, `heartbeat_seconds = 180`, and `recovery_grace_seconds = 60`. These values are required for the lock protocol below.
+
+Recommended `.todoing/config.toml` for a new project:
+
+```toml
+format_version = 1
+
+[locking]
+lease_seconds = 720
+heartbeat_seconds = 180
+recovery_grace_seconds = 60
+
+[[statuses]]
+id = "backlog"
+label = "Backlog"
+enabled = true
+
+[[statuses]]
+id = "ready"
+label = "Ready"
+enabled = true
+
+[[statuses]]
+id = "in_progress"
+label = "In Progress"
+enabled = true
+
+[[statuses]]
+id = "review"
+label = "Review"
+enabled = true
+
+[[statuses]]
+id = "verified"
+label = "Verified"
+enabled = true
+
+[[statuses]]
+id = "completed"
+label = "Completed"
+enabled = true
+outcome = "completed"
+
+[[transitions]]
+from = "backlog"
+to = "ready"
+
+[[transitions]]
+from = "ready"
+to = "in_progress"
+
+[[transitions]]
+from = "in_progress"
+to = "review"
+
+[[transitions]]
+from = "review"
+to = "in_progress"
+
+[[transitions]]
+from = "review"
+to = "verified"
+
+[[transitions]]
+from = "verified"
+to = "completed"
+```
+
+Create this file only when it does not exist. Never apply the snippet automatically over an existing configuration.
 8. For a new project, call `store.init` exactly once with the Project ID. Then verify with `store.info` and `store.verify`. Never call `store.init` over an existing store. Do not migrate legacy data automatically: run a dry run and obtain separate user approval first.
 
 ### 6.2. API contract and task mapping
