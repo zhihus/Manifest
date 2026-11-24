@@ -1,0 +1,53 @@
+name: Todoing Manifest Acceptance
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+    paths:
+      - "scripts/test-todoing-acceptance.py"
+      - "workflow/README.*"
+      - "openspec/config.yaml"
+      - ".github/workflows/todoing-acceptance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Manifest
+        uses: actions/checkout@v4
+
+      - name: Check out Todoing feature branch
+        uses: actions/checkout@v4
+        with:
+          repository: zhihus/todoing-x
+          ref: feature/generic-task-references-review-api
+          path: todoing
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@1.96.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.16.0
+
+      - name: Build Todoing
+        run: cargo build --release --manifest-path todoing/Cargo.toml
+
+      - name: Run real API and OpenSpec acceptance lifecycle
+        env:
+          TODOING_BIN: ${{ github.workspace }}/todoing/target/release/todoing
+        run: python scripts/test-todoing-acceptance.py
