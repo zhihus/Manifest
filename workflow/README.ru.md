@@ -293,7 +293,12 @@ to = "completed"
 6. `task.status.set` → `completed` (переход сам устанавливает outcome `completed`).
 7. `task.lock.release`.
 
-Любой агент может рекомендовать отмену с обоснованием; подтвердить её может только пользователь. После подтверждения: `task.cancel` с причиной → OpenSpec archive без слияния delta specs → `task.lock.release`. Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
+Любой агент может рекомендовать отмену с обоснованием; подтвердить её может только пользователь. После подтверждения выполните строго по порядку:
+1. `task.cancel` с причиной.
+2. OpenSpec archive без слияния delta specs.
+3. `task.lock.release`.
+
+Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
 
 ### 6.6. Recovery
 
