@@ -33,7 +33,9 @@ Maps to scenarios: all scenarios in manifest-todoing-runbook.
 Document `store.snapshot`, `store.snapshot.verify`, and
 `store.snapshot.restore` in both runbook editions. State the active-lock
 guard, same-Project-ID/schema requirement, retained pre-restore safety
-snapshot, and the boundary that restore affects Todoing SQLite only. Extend
-the regression test to check these requirements and recovery-section ordering.
+snapshot, and the boundary that restore affects Todoing SQLite only. Require
+explicit user approval and the retained expected SHA-256 before destructive
+restore. Extend the regression test to check these requirements and
+recovery-section ordering.
 Stop criterion: bilingual runbook and regression test cover the snapshot
 restore safety contract.
