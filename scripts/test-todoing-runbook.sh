@@ -85,9 +85,9 @@ require_order "$EN_COMPLETION" "English completion sequence" \
   "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
   "task.commit.finalize" "task.status.set" "task.lock.release"
 
-require_order "$RU_COMPLETION" "Russian cancellation sequence" \
+require_order "$RU_CANCELLATION" "Russian cancellation sequence" \
   "task.cancel" "без слияния delta specs" "task.lock.release"
-require_order "$EN_COMPLETION" "English cancellation sequence" \
+require_order "$EN_CANCELLATION" "English cancellation sequence" \
   "task.cancel" "without merging delta specs" "task.lock.release"
 
 require_order "$RU_RECOVERY" "Russian lost-release recovery" \
