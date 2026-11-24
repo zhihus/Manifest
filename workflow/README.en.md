@@ -299,7 +299,9 @@ Retain the external reference. Archiving alone is not cancellation.
 ### 6.6. Recovery
 
 After interruption, first reconcile actual Todoing state (status, outcome, versions, history), OpenSpec state (change and archive), and Git state (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
-- If the `task.lock.release` response was lost, call `task.lock.heartbeat` first; retry release only after ownership is confirmed.
+- If the `task.lock.release` response was lost:
+  1. Call `task.lock.heartbeat` first.
+  2. Retry release only after ownership is confirmed.
 - On `lock_expired`, wait for lease expiry plus the 60-second grace period, then call `task.lock.recover`; use only the new token and fencing generation.
 - On `stale_lock`, never use the old token again.
 - After a failure between archive and merge, do not archive again; reconcile and continue with merge.
