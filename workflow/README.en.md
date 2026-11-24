@@ -294,7 +294,7 @@ Successful completion MUST follow this order:
 
 Any agent may recommend cancellation with a reason; only the user may approve it. After approval, perform these steps in order:
 1. `task.cancel` with a reason.
-2. OpenSpec archive without merging delta specs.
+2. Run `openspec archive <change-id> --yes --skip-specs`; the change is archived without modifying permanent specs.
 3. `task.lock.release`.
 
 Retain the external reference. Archiving alone is not cancellation.
