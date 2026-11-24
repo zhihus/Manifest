@@ -1,0 +1,29 @@
+# Tasks: implement-todoing-manifest-workflow
+
+## Wave 1 — normative runbook
+
+- [ ] FR 1.1 write-russian-runbook
+
+Extend `workflow/README.ru.md` with bootstrap, Project ID, configuration validation, task lifecycle, lock custody, review, completion, cancellation, and recovery procedures. Use only operations present in the Todoing API v1 contract. Preserve all approval and no-overwrite invariants.
+Stop criterion: every requirement in `manifest-todoing-runbook/spec.md` is covered by the Russian runbook; no unsupported Todoing operation is named.
+Maps to scenarios: New project bootstrap; Existing store without identity; Unapproved task; Role agent execution; Review requests changes; Successful completion; Cancellation; Lost lock-release response.
+
+- [ ] FR 1.2 write-english-runbook
+
+Extend `workflow/README.en.md` with a semantically equivalent English runbook. Keep operation names, ordering, lease duration, error behavior, and approval gates identical to the Russian version.
+Stop criterion: both language editions describe the same operations and safety invariants.
+Maps to scenarios: all scenarios in manifest-todoing-runbook.
+
+## Wave 2 — mechanical verification
+
+- [ ] FR 2.1 add-runbook-regression-test
+
+Create a regression test that checks both runbook editions for mandatory API operation names, user approval gates, 720-second lease, no-token-to-subagent rule, recovery reconciliation, and required completion/cancellation ordering. Include negative checks for unsafe wording that permits automatic initialization over an existing store or blind lock release.
+Stop criterion: the test exits 0 for the completed runbook and fails when any required invariant is removed from a fixture copy.
+Maps to scenarios: all scenarios in manifest-todoing-runbook.
+
+- [ ] FR 2.2 wire-ci-and-validate
+
+Wire the regression test into the Manifest CI workflow and run OpenSpec validation. Keep CI limited to read-only checks.
+Stop criterion: GitHub Actions reports passing OpenSpec validation and runbook regression jobs on this feature branch; no local-only result is reported as CI evidence.
+Maps to scenarios: all scenarios in manifest-todoing-runbook.
