@@ -4,7 +4,7 @@
 > **Status: draft**  
 > **Type: document**  
 > **Version: 1.1.1**  
-> **Updated: 2026-11-22**  
+> **Updated: 2026-11-24**  
 
 # Description
 Process for working with LLM agents on the OpenSpec pipeline; task
