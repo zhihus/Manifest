@@ -141,28 +141,22 @@ they are not performed within this change. Each task references a concrete
 artifact (a bootstrap file or a workflow document) and describes what to add
 to it.
 
-## External blockers (Todoing) — do not block the integration
+## Alignment with the current Todoing contract
 
-Both blockers require a separate Todoing doc/implementation sync task; neither
-blocks the Manifest-side design or the integration implementation.
+Previously recorded Todoing issues are outdated and have been resolved:
 
-- **Schema parity (does not block the integration; requires a separate
-  Todoing task):** the implementation returns the codes
-  `store_already_initialized` (exit 6) and `migration_required` (exit 2), but
-  `docs/api/v1/response.schema.json` does not include them in the enum. This
-  blocks only validating the integration against the schema until it is fixed
-  in Todoing; the Manifest-side design and implementation do not depend on the
-  schema.
-- **`task.lock.acquire` on an expired lock (does not block the integration;
-  requires a separate Todoing task):** the documentation
-  (`docs/api/v1/operations.md`, §task.lock.acquire) promises that an expired
-  lock before the recovery grace returns `lock_expired`, and after the grace
-  requires an explicit `task.lock.recover`. The implementation
-  (`src/storage/lock.rs`, acquire) does not check `expires_at` and returns
-  `task_locked` for any active lock, including expired ones. The Manifest does
-  not depend on this: takeover of an expired lock is performed through
-  `task.lock.recover`, not through `task.lock.acquire` (see
-  `design/recovery.md` and the `todoing-lock-custody` spec).
+- **Schema parity:** `docs/api/v1/response.schema.json` includes
+  `store_already_initialized` and `migration_required` in the error-code
+  enum.
+- **Expired locks:** `docs/api/v1/operations.md` and the implementation in
+  `src/storage/lock.rs` are aligned. Any existing active lock record blocks
+  a new `task.lock.acquire` with `task_locked`, regardless of lease expiry.
+  There is no implicit takeover. After lease expiry and the recovery grace,
+  only an explicit `task.lock.recover` can acquire ownership.
+
+These issues are no longer Todoing blockers for the Manifest-side integration.
+For future changes, verify this section against the published Todoing sources
+and API contract rather than relying on historical diagnostic reports.
 
 ## Open questions (Manifest-side)
 
