@@ -290,7 +290,7 @@ to = "completed"
 Успешное завершение выполняется строго по порядку:
 1. Review approved, статус `verified`.
 2. Acceptance checks Todoing ↔ OpenSpec ↔ Git.
-3. Штатный OpenSpec archive (delta specs вливаются в permanent specs).
+3. Выполните `openspec archive <change-id> --yes`: delta specs вливаются в permanent specs.
 4. Git merge согласно правилам проекта.
 5. `task.commit.finalize` с SHA итогового merge commit.
 6. `task.status.set` → `completed` (переход сам устанавливает outcome `completed`).
