@@ -4,7 +4,7 @@
 
 - Todoing, OpenSpec, and Git do not form a transaction. Each change is a
   verifiable step with an idempotent retry or an explicit recovery.
-- **No blind retries of non-idempotent operations.** Before repeating an
+- **SQLite restore does not roll back OpenSpec or Git.** A Todoing snapshot restores only the Todoing store; after restore, reconcile all three systems before repeating operations.\n- **No blind retries of non-idempotent operations.** Before repeating an
   operation, the Orchestrator reconciles the actual state of the
   corresponding system.
 - Recovery starts by reading the current state of all three systems (Todoing:
