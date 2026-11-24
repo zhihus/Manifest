@@ -2,7 +2,7 @@
 
 ## Why
 
-The repository `C:\\WorkProjects\\vstrecha-raytec` is listed as an active Manifest-connected project, but the read-only audit on 2026-11-24 found that the connection is incomplete and several project-level decisions are unresolved.
+The repository `C:\WorkProjects\vstrecha-raytec` is listed as an active Manifest-connected project, but the read-only audit on 2026-11-24 found that the connection is incomplete and several project-level decisions are unresolved.
 
 The project has an existing Git history (189 local commits), no remote or upstream, an existing OpenSpec workspace excluded by `.gitignore`, and substantial project-specific context and process documentation. Manifest installation is partial: `.manifest/hooks/` exists but is empty; the required hooks, validation script, and Project ID are absent; `core.hooksPath` is unset; and the existing `commit-rules.md` differs from the current Manifest distribution. Todoing is not initialized.
 
