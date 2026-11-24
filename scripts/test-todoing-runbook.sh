@@ -60,6 +60,7 @@ for file in "$RU" "$EN"; do
   require_text "$file" "180" "heartbeat configuration"
   require_text "$file" "60" "recovery grace"
   require_text "$file" "ready → in_progress" "execution status transition"
+  require_text "$file" "openspec archive <change-id> --yes --skip-specs" "cancel archive mode"
 done
 
 require_text "$RU" "только после явного одобрения пользователя" "user approval gate"
