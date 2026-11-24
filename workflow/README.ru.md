@@ -298,7 +298,7 @@ to = "completed"
 
 Любой агент может рекомендовать отмену с обоснованием; подтвердить её может только пользователь. После подтверждения выполните строго по порядку:
 1. `task.cancel` с причиной.
-2. OpenSpec archive без слияния delta specs.
+2. Выполните `openspec archive <change-id> --yes --skip-specs`: change архивируется без изменения permanent specs.
 3. `task.lock.release`.
 
 Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
