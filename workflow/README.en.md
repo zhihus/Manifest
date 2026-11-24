@@ -299,7 +299,15 @@ Any agent may recommend cancellation with a reason; only the user may approve it
 
 Retain the external reference. Archiving alone is not cancellation.
 
-### 6.6. Recovery
+### 6.6. Snapshot and restore
+
+- Create snapshots with `store.snapshot`; never copy the active SQLite file.
+- Verify a snapshot with `store.snapshot.verify` before transfer or restore; retain its SHA-256.
+- `store.snapshot` and `store.snapshot.restore` are rejected while task locks are active.
+- `store.snapshot.restore` restores only Todoing SQLite, requires the same Project ID and schema, and creates a safety snapshot under `.todoing/backups/`.
+- Restore does not undo Git commits or OpenSpec archives. Reconcile Todoing, OpenSpec, and Git before resuming work.
+
+### 6.7. Recovery
 
 Restoring Todoing from a snapshot rolls back only Todoing's SQLite state; it does not undo OpenSpec archives or Git commits. After restore, reconcile all three systems before repeating any operation.\n\nAfter interruption, first reconcile actual state: Todoing via `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list`, and `task.dependency.list`; OpenSpec (change and archive); Git (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
 - If the `task.lock.release` response was lost:
