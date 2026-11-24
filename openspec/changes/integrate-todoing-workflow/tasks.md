@@ -23,7 +23,7 @@
   проходит валидацию Todoing Project ID.
   Maps to scenarios: `todoing-project-identity` §Генерация Project ID.
 
-- [ ] fr-1.2-validate-project-id-on-start
+- [x] fr-1.2-validate-project-id-on-start
   В `workflow/README.ru.md` (секция «Bootstrap») опишите процедуру: при
   каждом старте интеграции Main Orchestrator читает `.manifest/project-id`,
   валидирует значение (UUIDv4, 1–128 символов, без whitespace) и, если store
@@ -33,7 +33,7 @@
   комбинации presence/absence файла и presence/absence store.
   Maps to scenarios: `todoing-project-identity` §Валидация Project ID.
 
-- [ ] fr-1.3-protect-project-id-from-change
+- [x] fr-1.3-protect-project-id-from-change
   В `workflow/README.ru.md` (секция «Bootstrap») зафиксируйте инвариант:
   `.manifest/project-id` никогда не перезаписывается автоматически после
   создания. Изменение возможно только явным решением пользователя с
@@ -45,7 +45,7 @@
 
 ## 2. Store Bootstrap
 
-- [ ] fr-2.1-check-todoing-availability
+- [x] fr-2.1-check-todoing-availability
   В `workflow/README.ru.md` (секция «Bootstrap») опишите проверку: Main
   Orchestrator выполняет `todoing api --json` с тестовым запросом
   (`store.info`). Если бинарник отсутствует или не отвечает — остановка с
@@ -60,9 +60,9 @@
   (`backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`),
   отображение `completed` → outcome `completed`, transitions по модели
   `backlog → ready → in_progress → review → verified → completed`.
-  Секция `locking`: `lease_seconds = 720`, `heartbeat_seconds = 60`
+  Секция `locking`: `lease_seconds = 720`, `heartbeat_seconds = 180`
   (валидация Todoing требует `heartbeat*3 < lease`, т.е. heartbeat < 240 с;
-  60 с проходит). Атомарная запись (write-to-temp + rename) только при
+  180 с проходит). Атомарная запись (write-to-temp + rename) только при
   отсутствии файла. Существующий файл валидируется: при несовместимости
   (отсутствует статус `completed` или неверное отображение outcome) —
   остановка bootstrap.
@@ -70,7 +70,7 @@
   несовместимый конфиг останавливает bootstrap.
   Maps to scenarios: `todoing-store-bootstrap` §Конфигурация без перезаписи.
 
-- [ ] fr-2.3-call-store-init
+- [x] fr-2.3-call-store-init
   В `workflow/README.ru.md` (секция «Bootstrap») опишите вызов `store.init`
   с Project ID из `.manifest/project-id`. Операция создаёт новое хранилище
   только когда БД не существует. При существующем store — `store.init` не
@@ -79,7 +79,7 @@
   существующего store или legacy данных.
   Maps to scenarios: `todoing-store-bootstrap` §Инициализация store.
 
-- [ ] fr-2.4-verify-store
+- [x] fr-2.4-verify-store
   В `workflow/README.ru.md` (секция «Bootstrap») опишите верификацию: после
   `store.init` Main Orchestrator вызывает `store.info` и `store.verify`.
   При несоответствии — остановка с диагностикой.
@@ -88,7 +88,7 @@
 
 ## 3. Lock Custody
 
-- [ ] fr-3.1-acquire-lock-for-approved-task
+- [x] fr-3.1-acquire-lock-for-approved-task
   В `workflow/README.ru.md` (секция «Lock custody») опишите: Main Orchestrator
   вызывает `task.lock.acquire` для одобренной задачи, получает `owner_id`,
   `lock_token`, `fencing_generation`, `expires_at` и хранит token в
@@ -98,7 +98,7 @@
   ролевые субагенты не получают token.
   Maps to scenarios: `todoing-lock-custody` §Приобретение lock.
 
-- [ ] fr-3.2-heartbeat-when-orchestrator-active
+- [x] fr-3.2-heartbeat-when-orchestrator-active
   В `workflow/README.ru.md` (секция «Lock custody») опишите: Main Orchestrator
   продлевает lease через `task.lock.heartbeat` только когда сам активен
   (между запусками субагентов, на гейтах). Во время блокирующего выполнения
@@ -108,7 +108,7 @@
   активен; heartbeat выполняется перед запуском субагента, а не во время него.
   Maps to scenarios: `todoing-lock-custody` §Heartbeat только при активности Orchestrator.
 
-- [ ] fr-3.3-configure-lease-to-cover-hard-timeout
+- [x] fr-3.3-configure-lease-to-cover-hard-timeout
   В `workflow/README.ru.md` (секция «Lock custody») зафиксируйте: lease = 720 с
   (600 с hard timeout субагента по watchdog из `AGENTS.md` + 120 с запас).
   Lease покрывает полный прогон субагента, если Orchestrator heartbeat'ит
@@ -117,7 +117,7 @@
   (600 + 120).
   Maps to scenarios: `todoing-lock-custody` §Lease покрывает hard timeout.
 
-- [ ] fr-3.4-release-lock-on-completion
+- [x] fr-3.4-release-lock-on-completion
   В `workflow/README.ru.md` (секция «Completion») опишите: Main Orchestrator
   вызывает `task.lock.release` после `task.status.set` → `completed`
   (терминальный переход) и после отмены (после `task.cancel` и OpenSpec
@@ -133,7 +133,7 @@
   подтверждения владения heartbeat'ом.
   Maps to scenarios: `todoing-lock-custody` §Освобождение lock.
 
-- [ ] fr-3.5-recover-lock-after-lease-expiry
+- [x] fr-3.5-recover-lock-after-lease-expiry
   В `workflow/README.ru.md` (секция «Recovery») опишите: после истечения lease
   и recovery grace (60 с) Main Orchestrator вызывает `task.lock.recover`,
   получает новый token и увеличенный fencing generation. Старый token
@@ -147,7 +147,7 @@
 
 ## 4. Task State and External Reference
 
-- [ ] fr-4.1-create-task-and-external-reference
+- [x] fr-4.1-create-task-and-external-reference
   В `workflow/README.ru.md` (секция «Task state») опишите: Main Orchestrator
   создаёт Todoing task со статусом `backlog` и записывает external reference:
   namespace `openspec.change`, value — ID каталога change, relation
@@ -155,7 +155,7 @@
   Stop: в описанной процедуре задача создаётся с external reference.
   Maps to scenarios: `todoing-task-state` §Создание задачи и external reference.
 
-- [ ] fr-4.2-approve-backlog-to-ready-transition
+- [x] fr-4.2-approve-backlog-to-ready-transition
   В `workflow/README.ru.md` (секция «Task state») опишите: переход
   `backlog → ready` подтверждается только пользователем. После одобрения
   Manifest фиксирует baseline через `task.version.approve` при необходимости.
@@ -163,7 +163,7 @@
   пользователя.
   Maps to scenarios: `todoing-task-state` §Одобрение перехода backlog → ready.
 
-- [ ] fr-4.3-enforce-external-reference-uniqueness
+- [x] fr-4.3-enforce-external-reference-uniqueness
   В `workflow/README.ru.md` (секция «Task state») зафиксируйте: не более одной
   активной ссылки `openspec.change` на задачу и не более одной задачи на
   change ID. При отмене ссылка сохраняется для аудита.
@@ -172,14 +172,14 @@
 
 ## 5. Review Cycle
 
-- [ ] fr-5.1-hand-off-to-review
+- [x] fr-5.1-hand-off-to-review
   В `workflow/README.ru.md` (секция «Review cycle») опишите: перед передачей
   результата Main Orchestrator переводит задачу в `review` и передаёт
   артефакты Reviewer через собственный workflow.
   Stop: в описанной процедуре задача в `review` до начала работы Reviewer.
   Maps to scenarios: `todoing-review-cycle` §Передача на review.
 
-- [ ] fr-5.2-record-review
+- [x] fr-5.2-record-review
   В `workflow/README.ru.md` (секция «Review cycle») опишите: Manifest вызывает
   `task.review.add` с `review_id`, `version_no`, меткой `reviewer`, `outcome`
   (`approved`/`changes_requested`) и упорядоченным массивом `comments`.
@@ -187,13 +187,13 @@
   Stop: запись review хранится с правильным outcome и comments.
   Maps to scenarios: `todoing-review-cycle` §Запись review.
 
-- [ ] fr-5.3-handle-approval
+- [x] fr-5.3-handle-approval
   В `workflow/README.ru.md` (секция «Review cycle») опишите: при `approved`
   Todoing хранит запись review, а Manifest переводит задачу в `verified`.
   Stop: после approved review задача в `verified`.
   Maps to scenarios: `todoing-review-cycle` §Обработка approval.
 
-- [ ] fr-5.4-handle-changes-requested
+- [x] fr-5.4-handle-changes-requested
   В `workflow/README.ru.md` (секция «Review cycle») опишите: при
   `changes_requested` Todoing атомарно хранит запись и увеличивает
   `revision_count` ровно на единицу; Manifest возвращает задачу в
@@ -203,7 +203,7 @@
 
 ## 6. Completion and Cancellation
 
-- [ ] fr-6.1-complete-the-task
+- [x] fr-6.1-complete-the-task
   В `workflow/README.ru.md` (секция «Completion») опишите: после `verified`,
   acceptance checks, OpenSpec archive и Git merge Main Orchestrator вызывает
   `task.commit.finalize` с final merge SHA, затем `task.status.set` →
@@ -215,7 +215,7 @@
   SHA записан, lock освобождён.
   Maps to scenarios: `todoing-completion-recovery` §Успешное завершение.
 
-- [ ] fr-6.2-cancel-the-task
+- [x] fr-6.2-cancel-the-task
   В `workflow/README.ru.md` (секция «Completion») опишите: после
   подтверждения пользователем Main Orchestrator вызывает `task.cancel` с
   причиной (outcome `cancelled`, терминальный; повтор → `task_terminal`),
@@ -228,7 +228,7 @@
 
 ## 7. Recovery
 
-- [ ] fr-7.1-reconcile-states-before-retry
+- [x] fr-7.1-reconcile-states-before-retry
   В `workflow/README.ru.md` (секция «Recovery») опишите: перед повтором любой
   операции Main Orchestrator читает фактическое состояние Todoing, OpenSpec и
   Git и определяет, какие операции ещё не выполнены. Слепые повторы
@@ -236,7 +236,7 @@
   Stop: в описанной процедуре нет повора операции без шага сверки состояний.
   Maps to scenarios: `todoing-completion-recovery` §Recovery после частичного сбоя.
 
-- [ ] fr-7.2-handle-partial-failure-scenarios
+- [x] fr-7.2-handle-partial-failure-scenarios
   В `workflow/README.ru.md` (секция «Recovery») опишите recovery для сценариев
   S1–S5 из `design/recovery.md`: (S1) между OpenSpec archive и Git merge;
   (S2) между Git merge и `task.commit.finalize`; (S3) между переходом в
