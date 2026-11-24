@@ -309,7 +309,9 @@ Retain the external reference. Archiving alone is not cancellation.
 
 ### 6.7. Recovery
 
-Restoring Todoing from a snapshot rolls back only Todoing's SQLite state; it does not undo OpenSpec archives or Git commits. After restore, reconcile all three systems before repeating any operation.\n\nAfter interruption, first reconcile actual state: Todoing via `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list`, and `task.dependency.list`; OpenSpec (change and archive); Git (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
+Restoring Todoing from a snapshot rolls back only Todoing's SQLite state; it does not undo OpenSpec archives or Git commits. After restore, reconcile all three systems before repeating any operation.
+
+After interruption, first reconcile actual state: Todoing via `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list`, and `task.dependency.list`; OpenSpec (change and archive); Git (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
 - If the `task.lock.release` response was lost:
   1. Call `task.lock.heartbeat` first.
   2. Retry release only after ownership is confirmed.
