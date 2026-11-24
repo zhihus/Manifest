@@ -28,6 +28,17 @@ The runbook MUST map one OpenSpec change to one Todoing task and MUST preserve t
 - WHEN an agent proposes starting implementation
 - THEN the Orchestrator refuses to acquire a lock or dispatch implementation until the user approves the task
 
+### Requirement: Gate execution on dependencies
+
+The Orchestrator MUST inspect each task's dependencies before dispatch. Every prerequisite MUST have outcome `completed`. If a prerequisite is locked, missing, or cannot be verified, the Orchestrator MUST stop and MUST NOT start implementation. Todoing stores dependency edges and prevents cycles; Manifest owns readiness policy.
+
+#### Scenario: Block work on an incomplete prerequisite
+
+- GIVEN an approved task depends on a task whose outcome is not `completed`
+- WHEN the Orchestrator prepares to dispatch an implementation agent
+- THEN it does not acquire the work lock or dispatch the agent
+- AND it reports the blocking prerequisite
+
 ### Requirement: Orchestrator-owned lock custody
 
 The runbook MUST specify that only the Orchestrator calls Todoing and holds the raw lock token. It MUST specify a 720-second lease, heartbeat immediately before each blocking role-agent run, no heartbeat while that agent is executing, and explicit recovery after lease expiry plus grace. Role agents MUST NOT receive the token.
