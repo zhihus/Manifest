@@ -54,6 +54,9 @@ for file in "$RU" "$EN"; do
     task.history.list task.review.list task.external-ref.list; do
     require_text "$file" "$op" "API contract"
   done
+  for op in store.snapshot store.snapshot.verify store.snapshot.restore; do
+    require_text "$file" "$op" "snapshot API"
+  done
   for value in backlog ready in_progress review verified completed; do
     require_text "$file" "$value" "status mapping"
   done
@@ -63,6 +66,12 @@ for file in "$RU" "$EN"; do
   require_text "$file" "ready → in_progress" "execution status transition"
   require_text "$file" "openspec archive <change-id> --yes --skip-specs" "cancel archive mode"
 done
+require_text "$RU" "только Todoing SQLite" "snapshot restore boundary"
+require_text "$RU" "safety snapshot" "pre-restore safety snapshot"
+require_text "$RU" "при активных task locks" "snapshot lock guard"
+require_text "$EN" "only Todoing SQLite" "snapshot restore boundary"
+require_text "$EN" "safety snapshot" "pre-restore safety snapshot"
+require_text "$EN" "while task locks are active" "snapshot lock guard"
 
 require_text "$RU" "только после явного одобрения пользователя" "user approval gate"
 require_text "$RU" "Субагент не получает token" "token custody"
@@ -91,8 +100,8 @@ trap 'rm -f "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY" "$RU
 
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$RU" > "$RU_COMPLETION"
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$EN" > "$EN_COMPLETION"
-sed -n '/^### 6\.6\./,$p' "$RU" > "$RU_RECOVERY"
-sed -n '/^### 6\.6\./,$p' "$EN" > "$EN_RECOVERY"
+sed -n '/^### 6\.7\./,$p' "$RU" > "$RU_RECOVERY"
+sed -n '/^### 6\.7\./,$p' "$EN" > "$EN_RECOVERY"
 sed -n '/Любой агент может рекомендовать отмену/,$p' "$RU_COMPLETION" > "$RU_CANCELLATION"
 sed -n '/Any agent may recommend cancellation/,$p' "$EN_COMPLETION" > "$EN_CANCELLATION"
 
