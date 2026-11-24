@@ -140,26 +140,21 @@ Manifest — head/meta-проект типа `doc`; программного о�
 артефакт (bootstrap-файл или workflow-документ) и описывает, что в него
 внести.
 
-## Внешние blockers (Todoing) — не блокируют интеграцию
+## Сверка с актуальным контрактом Todoing
 
-Оба blocker'а требуют отдельной задачи синхронизации документации/реализации
-Todoing; ни один не блокирует Manifest-side дизайн или реализацию интеграции.
+Ранее зафиксированные замечания по Todoing устарели и закрыты:
 
-- **Schema parity (не блокирует интеграцию; требуется отдельная Todoing-задача):**
-  реализация возвращает коды `store_already_initialized` (exit 6) и
-  `migration_required` (exit 2), но `docs/api/v1/response.schema.json` не
-  содержит их в enum. Блокирует только валидацию интеграции против схемы до
-  исправления в Todoing; Manifest-side дизайн и реализация не зависят от
-  схемы.
-- **`task.lock.acquire` на expired lock (не блокирует интеграцию; требуется
-  отдельная Todoing-задача):** документация (`docs/api/v1/operations.md`,
-  §task.lock.acquire) обещает, что expired lock до recovery grace возвращает
-  `lock_expired`, а после grace требует явного `task.lock.recover`.
-  Реализация (`src/storage/lock.rs`, acquire) не проверяет `expires_at` и
-  возвращает `task_locked` для любого active lock, включая expired. Manifest
-  не зависит от этого: takeover expired lock выполняется через
-  `task.lock.recover`, а не через `task.lock.acquire` (см. `design/recovery.md`
-  и spec `todoing-lock-custody`).
+- **Schema parity:** `docs/api/v1/response.schema.json` содержит
+  `store_already_initialized` и `migration_required` в enum ошибок.
+- **Expired lock:** контракт `docs/api/v1/operations.md` и реализация
+  `src/storage/lock.rs` согласованы. Любая существующая active lock-запись
+  блокирует повторный `task.lock.acquire` с `task_locked`, независимо от
+  истечения lease. Неявного takeover нет. После истечения lease и recovery
+  grace вызывается только явный `task.lock.recover`.
+
+Эти пункты больше не являются Todoing-блокерами для Manifest-side интеграции.
+При дальнейших изменениях сверять этот раздел с опубликованными исходниками и
+API-контрактом Todoing, а не с историческими диагностическими отчётами.
 
 ## Open questions (Manifest-side)
 
