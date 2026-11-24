@@ -128,7 +128,7 @@ Manifest-specific or OpenSpec-specific fields or rules.
   `outcome` (`approved` or `changes_requested`), and a `comments` array.
   Envelope `actor_id` records the technical actor; `reviewer` is the reviewer's
   role or display name.
-- `task.review.list`: accepts `task_id`, optional `before_review_record_id`, and
+- `task.review.list`: accepts `task_id`, optional `before_record_id`, and
   `limit`; returns append-only review history with pagination.
 - Repeating a `review_id` with the same payload is idempotent. Reusing it with a
   different payload is rejected.
@@ -404,9 +404,9 @@ Todoing without Manifest-specific semantics.
 ## 7. Errors and recovery
 
 Manifest handles stable API v1 error codes by their machine values, not by message
-text. The codes `external_ref_conflict`, `review_id_conflict`,
-`review_version_not_found`, and `final_commit_conflict` belong to the target API
-extension and are absent from the current implementation.
+text. The codes `external_ref_conflict`, `review_id_conflict`, and
+`review_version_not_found` are implemented by Todoing. Replacing the final commit
+reference without explicitly reopening the task returns `task_terminal`.
 
 | Situation | Manifest behavior |
 |---|---|

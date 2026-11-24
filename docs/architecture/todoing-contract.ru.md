@@ -100,7 +100,7 @@ Manifest-specific или OpenSpec-specific поля и правила.
 - `task.review.add`: принимает `task_id`, `review_id`, `version_no`,
   `reviewer`, `outcome` (`approved` или `changes_requested`) и массив `comments`.
   `actor_id` envelope фиксирует технического актора, `reviewer` — роль/имя Reviewer.
-- `task.review.list`: принимает `task_id`, необязательный `before_review_record_id`
+- `task.review.list`: принимает `task_id`, необязательный `before_record_id`
   и `limit`; возвращает append-only историю Review с пагинацией.
 - Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
   payload отклоняется.
@@ -308,7 +308,7 @@ Manifest управляет зависимостями через task.dependenc
 
 ## 7. Ошибки и восстановление
 
-Manifest обрабатывает стабильные коды ошибок API v1 по их машинным значениям, а не по тексту message. Коды external_ref_conflict, review_id_conflict, review_version_not_found и final_commit_conflict относятся к целевому расширению API и отсутствуют в текущей реализации.
+Manifest обрабатывает стабильные коды ошибок API v1 по их машинным значениям, а не по тексту message. Коды external_ref_conflict, review_id_conflict и review_version_not_found реализованы в Todoing. Замена final commit reference без предварительного явного reopen задачи возвращает task_terminal.
 
 | Ситуация | Поведение Manifest |
 |---|---|
