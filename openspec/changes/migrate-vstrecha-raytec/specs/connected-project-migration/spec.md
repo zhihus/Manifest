@@ -6,6 +6,21 @@ Defines a controlled, non-destructive migration process for existing repositorie
 
 ## ADDED Requirements
 
+### Requirement: Every target-project mutation requires separate scoped approval
+
+Approval MUST be obtained immediately before each migration stage that changes the target repository. Approval for one stage MUST NOT authorize any later stage.
+
+#### Scenario: A migration stage is ready to modify the target project
+- **WHEN** a stage has completed its read-only checks and prepared the exact proposed changes
+- **THEN** the user is presented with the stage, exact actions, affected paths, and relevant risks
+- **AND** the stage proceeds only after the user explicitly approves that scope
+- **AND** refusal, ambiguity, or changed preconditions leave the target repository unchanged
+
+#### Scenario: A previously approved stage is complete
+- **WHEN** the next stage is ready
+- **THEN** the previous approval is not treated as authorization for the next stage
+- **AND** a new scoped approval is requested before any new target-project mutation
+
 ### Requirement: Migration starts with a read-only inventory
 
 The migration MUST establish a current read-only baseline before changing the target repository.
