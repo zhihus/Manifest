@@ -50,12 +50,21 @@
 
 ### S3. Сбой между переходом в `completed` и освобождением lock
 
-- Факт: статус `completed`, outcome `completed`, lock ещё активен.
-- Действие: выполнить `task.lock.release`. Повтор `task.lock.release` →
-  `stale_lock` (lock не удерживается этим токеном). Это допустимое конечное
-  состояние: lock уже освобождён или перезахвачен; слепой повтор не
-  выполняется. Публичного способа отличить «я уже отпустил» от «меня
-  перезахватили» нет — клиент опирается на идемпотентную семантику store.
+- Факт: статус `completed`, outcome `completed`, lock ещё активен либо
+  освобождение не подтверждено (ответ на `task.lock.release` потерян).
+- Публичной операции чтения lock-state нет; актуальность владения
+  проверяется операцией, валидирующей grant — `task.lock.heartbeat`.
+- Действие: Orchestrator отправляет `task.lock.heartbeat`:
+  - успешный heartbeat подтверждает действующий token (lock активен и
+    удерживается этим токеном) → выполнить `task.lock.release`;
+  - `lock_expired` — lease истёк, token не продлевается → выполнить
+    `task.lock.recover` (после grace), если владение ещё нужно, либо
+    допустить истечение (lock будет захвачен recovery);
+  - `stale_lock` — token недействителен (lock уже освобождён или
+    перезахвачен) → дальнейших действий не требуется.
+- Запрет: повторный `task.lock.release` не идемпотентен — он возвращает
+  `stale_lock` (lock не удерживается этим токеном). Повтор выполняется только
+  после успешного heartbeat, подтверждающего владение.
 
 ### S4. Сбой при блокировке (lease истёк во время выполнения субагента)
 
@@ -72,11 +81,23 @@
 
 ### S5. Сбой при отмене
 
-- Факт: `task.cancel` выполнен, OpenSpec archive не выполнен (или наоборот).
-- Действие: сверить оба факта. Если outcome `cancelled` — выполнить OpenSpec
-  archive (без вливания delta specs). Если archive выполнен, а outcome не
-  установлен — выполнить `task.cancel`.
-- Запрет: не вливать delta specs в permanent specs при отмене.
+Последовательность отмены: `task.cancel` (outcome `cancelled`) → штатный
+OpenSpec archive (delta specs не вливаются) → `task.lock.release`.
+
+- Факт: одна из операций выполнена, другая нет (например, `task.cancel`
+  выполнен, archive нет; или archive выполнен, lock не освобождён).
+- Действие: сверить факты.
+  - Если outcome `cancelled` установлен — не повторять `task.cancel`
+    (повтор → `task_terminal`); выполнить OpenSpec archive (без вливания
+    delta specs), затем `task.lock.release`.
+  - Если archive выполнен, а outcome не установлен — выполнить `task.cancel`,
+    затем `task.lock.release`.
+  - Если outcome `cancelled` и archive выполнены, но lock не освобождён —
+    проверить владение через `task.lock.heartbeat` (успех → `release`;
+    `stale_lock` → lock уже освобождён, действий нет; `lock_expired` →
+    recovery при необходимости).
+- Запрет: не вливать delta specs в permanent specs при отмене; не повторять
+  `task.cancel` после установленного outcome.
 
 ## Идемпотентность операций
 
@@ -86,7 +107,7 @@
 | `task.status.set` на любой статус после установленного outcome | `task_terminal` |
 | `task.review.add` с тем же `review_id` и payload | no-op |
 | `task.commit.finalize` с тем же SHA | no-op |
-| `task.lock.release` без активного lock (не удерживается этим токеном) | `stale_lock` — допустимое конечное состояние, слепой повтор не выполняется |
+| `task.lock.release` при отсутствии активного lock этого token | `stale_lock` (не идемпотентный успех); повтор только после подтверждения владения heartbeat'ом |
 | `task.complete` после установленного outcome | `task_terminal` |
 | `task.cancel` после `cancelled` | `task_terminal` |
 

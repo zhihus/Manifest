@@ -51,11 +51,20 @@ Orchestrator heartbeat'ит непосредственно перед запус
 ### Requirement: Освобождение lock
 
 Оркестратор SHALL освобождать lock через `task.lock.release` по завершении
-задачи.
+задачи (после `task.status.set` → `completed` или после отмены). Повторный
+`task.lock.release` не идемпотентен — он возвращает `stale_lock`; повтор
+выполняется только после подтверждения владения через `task.lock.heartbeat`.
 
 #### Scenario: Освобождение
 - WHEN задача завершена
 - THEN Orchestrator вызывает `task.lock.release`
+
+#### Scenario: Проверка владения перед повтором release
+- WHEN ответ на `task.lock.release` потерян и Orchestrator не уверен, что
+  lock освобождён
+- THEN Orchestrator проверяет владение через `task.lock.heartbeat`: успех →
+  повторить `task.lock.release`; `stale_lock` → lock уже освобождён, действий
+  нет; `lock_expired` → `task.lock.recover` при необходимости
 
 ### Requirement: Recovery после истечения lease
 

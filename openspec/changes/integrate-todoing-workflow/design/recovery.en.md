@@ -51,13 +51,21 @@
 
 ### S3. Failure between the transition to `completed` and lock release
 
-- Fact: status `completed`, outcome `completed`, the lock is still active.
-- Action: perform `task.lock.release`. A repeat of `task.lock.release` →
-  `stale_lock` (the lock is not held by this token). This is an acceptable
-  end-state: the lock is already released or recovered; a blind retry is not
-  performed. There is no public way to distinguish "I already released it"
-  from "I was recovered" — the client relies on the store's idempotent
-  semantics.
+- Fact: status `completed`, outcome `completed`, the lock is still active or
+  the release is unconfirmed (the response to `task.lock.release` was lost).
+- There is no public lock-state-read operation; the currency of ownership is
+  verified by an operation that validates the grant — `task.lock.heartbeat`.
+- Action: the Orchestrator sends `task.lock.heartbeat`:
+  - a successful heartbeat confirms a live token (the lock is active and held
+    by this token) → perform `task.lock.release`;
+  - `lock_expired` — the lease expired, the token is not renewed → perform
+    `task.lock.recover` (after the grace) if ownership is still needed, or
+    allow it to expire (the lock will be taken over by recovery);
+  - `stale_lock` — the token is invalid (the lock was already released or
+    recovered) → no further action is required.
+- Prohibition: a repeated `task.lock.release` is not idempotent — it returns
+  `stale_lock` (the lock is not held by this token). A repeat is performed
+  only after a successful heartbeat confirming ownership.
 
 ### S4. Failure during locking (the lease expired during sub-agent execution)
 
@@ -74,13 +82,24 @@
 
 ### S5. Failure during cancellation
 
-- Fact: `task.cancel` is performed, the OpenSpec archive is not (or vice
-  versa).
-- Action: reconcile both facts. If the outcome is `cancelled` — perform the
-  OpenSpec archive (without merging the delta specs). If the archive is
-  performed but the outcome is not set — perform `task.cancel`.
+Cancellation sequence: `task.cancel` (outcome `cancelled`) → standard OpenSpec
+archive (delta specs are not merged) → `task.lock.release`.
+
+- Fact: one of the operations is performed, the other is not (for example,
+  `task.cancel` is performed but the archive is not; or the archive is
+  performed but the lock is not released).
+- Action: reconcile the facts.
+  - If the outcome `cancelled` is set — do not repeat `task.cancel` (a repeat
+    → `task_terminal`); perform the OpenSpec archive (without merging the
+    delta specs), then `task.lock.release`.
+  - If the archive is performed but the outcome is not set — perform
+    `task.cancel`, then `task.lock.release`.
+  - If the outcome `cancelled` and the archive are performed but the lock is
+    not released — verify ownership through `task.lock.heartbeat` (success →
+    `release`; `stale_lock` → the lock is already released, no action;
+    `lock_expired` → recovery if needed).
 - Prohibition: do not merge the delta specs into permanent specs on
-  cancellation.
+  cancellation; do not repeat `task.cancel` after the outcome is set.
 
 ## Operation idempotency
 
@@ -90,7 +109,7 @@
 | `task.status.set` to any status after an outcome is set | `task_terminal` |
 | `task.review.add` with the same `review_id` and payload | no-op |
 | `task.commit.finalize` with the same SHA | no-op |
-| `task.lock.release` without an active lock (not held by this token) | `stale_lock` — acceptable end-state, no blind retry |
+| `task.lock.release` without an active lock of this token | `stale_lock` (not an idempotent success); a repeat only after ownership is confirmed by a heartbeat |
 | `task.complete` after an outcome is set | `task_terminal` |
 | `task.cancel` after `cancelled` | `task_terminal` |
 

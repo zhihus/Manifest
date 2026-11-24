@@ -76,9 +76,10 @@ merge SHA → `task.status.set` → `completed` (терминальный пер
 устанавливает outcome `completed`) → освобождение lock. Final Commit SHA —
 маркер трассируемости, а не доказательство приёмки. Отмену подтверждает только
 пользователь; при подтверждении Orchestrator устанавливает outcome `cancelled`
-через `task.cancel` и архивирует OpenSpec change штатным механизмом; delta
-specs не вливаются в permanent specs. Подробности — в `design/lifecycle.md`
-§Completion и `design/recovery.md`.
+через `task.cancel` (терминальный outcome; повтор → `task_terminal`),
+архивирует OpenSpec change штатным механизмом (delta specs не вливаются) и
+освобождает lock через `task.lock.release`. Подробности — в
+`design/lifecycle.md` §Completion и `design/recovery.md`.
 
 ### D7. Нет общей транзакции между системами
 

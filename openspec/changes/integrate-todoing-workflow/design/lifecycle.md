@@ -122,10 +122,18 @@ Final Commit SHA — маркер трассируемости, а не дока
 1. Любой агент может рекомендовать отмену с обоснованием.
 2. Отмену подтверждает только пользователь.
 3. После подтверждения Orchestrator вызывает `task.cancel` с причиной
-   (outcome `cancelled`, workflow status не меняется).
+   (outcome `cancelled`, workflow status не меняется). `task.cancel`
+   устанавливает терминальный outcome; повторный вызов отклоняется как
+   `task_terminal`.
 4. Orchestrator архивирует OpenSpec change штатным механизмом Archive; delta
    specs не вливаются в permanent specs.
-5. External reference сохраняется для аудита.
+5. Orchestrator освобождает lock через `task.lock.release`. Release допустим
+   после установки терминального outcome: `task.lock.release` проверяет только
+   lock record (state, owner, token, expiry), а не outcome задачи. Если ответ
+   на release потерян — проверить владение через `task.lock.heartbeat`
+   (успех → повторить release; `stale_lock` → lock уже освобождён;
+   `lock_expired` → recovery при необходимости).
+6. External reference сохраняется для аудита.
 
 Отмена не выполняется только переводом статуса или архивированием задачи:
 outcome и OpenSpec archive фиксируются отдельными действиями. Повторное

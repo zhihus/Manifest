@@ -120,10 +120,15 @@
 - [ ] fr-3.4-release-lock-on-completion
   В `workflow/README.ru.md` (секция «Completion») опишите: Main Orchestrator
   вызывает `task.lock.release` после `task.status.set` → `completed`
-  (терминальный переход). Повторный `task.lock.release` возвращает
-  `stale_lock` (не идемпотентный успех).
+  (терминальный переход) и после отмены (после `task.cancel` и OpenSpec
+  archive). Повторный `task.lock.release` не идемпотентен — возвращает
+  `stale_lock`. Если ответ на release потерян, Orchestrator проверяет
+  владение через `task.lock.heartbeat`: успех → повторить release;
+  `stale_lock` → lock уже освобождён; `lock_expired` → recovery при
+  необходимости.
   Stop: в описанной процедуре release вызывается после `task.status.set` →
-  `completed`; повторный release не вызывается.
+  `completed` и после отмены; повтор release выполняется только после
+  подтверждения владения heartbeat'ом.
   Maps to scenarios: `todoing-lock-custody` §Освобождение lock.
 
 - [ ] fr-3.5-recover-lock-after-lease-expiry
@@ -211,11 +216,12 @@
 - [ ] fr-6.2-cancel-the-task
   В `workflow/README.ru.md` (секция «Completion») опишите: после
   подтверждения пользователем Main Orchestrator вызывает `task.cancel` с
-  причиной (outcome `cancelled`) и архивирует OpenSpec change штатным
-  механизмом; delta specs не вливаются в permanent specs. External reference
+  причиной (outcome `cancelled`, терминальный; повтор → `task_terminal`),
+  архивирует OpenSpec change штатным механизмом (delta specs не вливаются)
+  и освобождает lock через `task.lock.release`. External reference
   сохраняется для аудита.
   Stop: задача имеет outcome `cancelled`, change архивирован без слияния
-  delta specs, reference сохранён.
+  delta specs, lock освобождён, reference сохранён.
   Maps to scenarios: `todoing-completion-recovery` §Отмена.
 
 ## 7. Recovery

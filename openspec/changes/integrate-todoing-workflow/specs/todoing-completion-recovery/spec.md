@@ -35,14 +35,22 @@ Final Commit SHA — маркер трассируемости, а не дока
 ### Requirement: Отмена
 
 Отмену SHALL подтверждать только пользователь. После подтверждения
-Orchestrator устанавливает outcome `cancelled` через `task.cancel` и
-архивирует OpenSpec change штатным механизмом Archive; delta specs не
-вливаются в permanent specs. External reference сохраняется для аудита.
+Orchestrator устанавливает outcome `cancelled` через `task.cancel`
+(терминальный outcome; повтор → `task_terminal`), архивирует OpenSpec change
+штатным механизмом Archive (delta specs не вливаются в permanent specs) и
+освобождает lock через `task.lock.release`. External reference сохраняется
+для аудита.
 
 #### Scenario: Подтверждённая отмена
 - WHEN пользователь подтверждает отмену
-- THEN Orchestrator вызывает `task.cancel` (outcome `cancelled`) и архивирует
-  OpenSpec change; delta specs не вливаются в permanent specs
+- THEN Orchestrator вызывает `task.cancel` (outcome `cancelled`), архивирует
+  OpenSpec change (без вливания delta specs) и освобождает lock через
+  `task.lock.release`
+
+#### Scenario: Освобождение lock после отмены
+- WHEN outcome `cancelled` установлен и change архивирован
+- THEN Orchestrator освобождает lock через `task.lock.release` (допустимо
+  после терминального outcome)
 
 #### Scenario: Без подтверждения пользователя
 - WHEN пользователь не подтвердил отмену

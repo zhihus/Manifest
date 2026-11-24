@@ -121,10 +121,15 @@
 - [ ] fr-3.4-release-lock-on-completion
   In `workflow/README.ru.md` (section «Completion»), describe: the Main
   Orchestrator calls `task.lock.release` after `task.status.set` → `completed`
-  (terminal transition). A repeated `task.lock.release` returns `stale_lock`
-  (not an idempotent success).
+  (terminal transition) and after cancellation (after `task.cancel` and the
+  OpenSpec archive). A repeated `task.lock.release` is not idempotent — it
+  returns `stale_lock`. If the response to the release is lost, the
+  Orchestrator verifies ownership through `task.lock.heartbeat`: success →
+  repeat the release; `stale_lock` → the lock is already released;
+  `lock_expired` → recovery if needed.
   Stop: in the described procedure the release is called after
-  `task.status.set` → `completed`; a repeated release is not called.
+  `task.status.set` → `completed` and after cancellation; a repeat release is
+  performed only after ownership is confirmed by a heartbeat.
   Maps to scenarios: `todoing-lock-custody` §Lock release.
 
 - [ ] fr-3.5-recover-lock-after-lease-expiry
@@ -217,11 +222,12 @@
 - [ ] fr-6.2-cancel-the-task
   In `workflow/README.ru.md` (section «Completion»), describe: after user
   confirmation the Main Orchestrator calls `task.cancel` with a reason
-  (outcome `cancelled`) and archives the OpenSpec change through the standard
-  mechanism; delta specs are not merged into permanent specs. The external
-  reference is preserved for audit.
+  (outcome `cancelled`, terminal; a repeat → `task_terminal`), archives the
+  OpenSpec change through the standard mechanism (delta specs are not merged
+  into permanent specs), and releases the lock through
+  `task.lock.release`. The external reference is preserved for audit.
   Stop: the task has outcome `cancelled`, the change is archived without
-  merging delta specs, and the reference is preserved.
+  merging delta specs, the lock is released, and the reference is preserved.
   Maps to scenarios: `todoing-completion-recovery` §Cancellation.
 
 ## 7. Recovery

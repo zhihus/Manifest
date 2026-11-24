@@ -36,16 +36,22 @@ Final Commit SHA is a traceability marker, not proof of successful acceptance.
 ### Requirement: Cancellation
 
 Only the user SHALL confirm the cancellation. After confirmation the
-Orchestrator sets the outcome `cancelled` through `task.cancel` and archives
-the OpenSpec change through the standard Archive mechanism; delta specs are
-not merged into permanent specs. The external reference is preserved for
-audit.
+Orchestrator sets the outcome `cancelled` through `task.cancel` (terminal
+outcome; a repeat → `task_terminal`), archives the OpenSpec change through the
+standard Archive mechanism (delta specs are not merged into permanent specs),
+and releases the lock through `task.lock.release`. The external reference is
+preserved for audit.
 
 #### Scenario: Confirmed cancellation
 - WHEN the user confirms the cancellation
-- THEN the Orchestrator calls `task.cancel` (outcome `cancelled`) and
-  archives the OpenSpec change; the delta specs are not merged into permanent
-  specs
+- THEN the Orchestrator calls `task.cancel` (outcome `cancelled`), archives
+  the OpenSpec change (without merging the delta specs), and releases the lock
+  through `task.lock.release`
+
+#### Scenario: Lock release after cancellation
+- WHEN the outcome `cancelled` is set and the change is archived
+- THEN the Orchestrator releases the lock through `task.lock.release`
+  (permitted after the terminal outcome)
 
 #### Scenario: Without user confirmation
 - WHEN the user has not confirmed the cancellation

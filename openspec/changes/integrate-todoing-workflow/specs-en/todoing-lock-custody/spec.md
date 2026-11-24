@@ -53,11 +53,21 @@ when the Orchestrator heartbeats immediately before launch.
 ### Requirement: Lock release
 
 The Orchestrator SHALL release the lock through `task.lock.release` when the
-task is finished.
+task is finished (after `task.status.set` → `completed` or after
+cancellation). A repeated `task.lock.release` is not idempotent — it returns
+`stale_lock`; a repeat is performed only after ownership is confirmed through
+`task.lock.heartbeat`.
 
 #### Scenario: Release
 - WHEN the task is finished
 - THEN the Orchestrator calls `task.lock.release`
+
+#### Scenario: Ownership check before a repeat release
+- WHEN the response to `task.lock.release` is lost and the Orchestrator is
+  unsure whether the lock is released
+- THEN the Orchestrator verifies ownership through `task.lock.heartbeat`:
+  success → repeat `task.lock.release`; `stale_lock` → the lock is already
+  released, no action; `lock_expired` → `task.lock.recover` if needed
 
 ### Requirement: Recovery after lease expiry
 

@@ -76,9 +76,11 @@ with the final merge SHA → `task.status.set` → `completed` (terminal
 transition that sets outcome `completed`) → lock release. The Final Commit
 SHA is a traceability marker, not proof of acceptance. Cancellation is
 confirmed only by the user; upon confirmation the Orchestrator sets the
-outcome `cancelled` through `task.cancel` and archives the OpenSpec change
-through the standard mechanism; delta specs are not merged into permanent
-specs. Details in `design/lifecycle.md` §Completion and `design/recovery.md`.
+outcome `cancelled` through `task.cancel` (terminal outcome; a repeat →
+`task_terminal`), archives the OpenSpec change through the standard mechanism
+(delta specs are not merged), and releases the lock through
+`task.lock.release`. Details in `design/lifecycle.md` §Completion and
+`design/recovery.md`.
 
 ### D7. No cross-system transaction
 

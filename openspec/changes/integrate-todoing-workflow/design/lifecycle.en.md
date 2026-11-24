@@ -126,10 +126,17 @@ completion.
 1. Any agent may recommend cancellation with a justification.
 2. Only the user confirms the cancellation.
 3. After confirmation, the Orchestrator calls `task.cancel` with a reason
-   (outcome `cancelled`, the workflow status does not change).
+   (outcome `cancelled`, the workflow status does not change). `task.cancel`
+   sets a terminal outcome; a repeated call is rejected as `task_terminal`.
 4. The Orchestrator archives the OpenSpec change through the standard Archive
    mechanism; delta specs are not merged into permanent specs.
-5. The external reference is preserved for audit.
+5. The Orchestrator releases the lock through `task.lock.release`. The release
+   is permitted after the terminal outcome is set: `task.lock.release` checks
+   only the lock record (state, owner, token, expiry), not the task outcome.
+   If the response to the release is lost — verify ownership through
+   `task.lock.heartbeat` (success → repeat the release; `stale_lock` → the
+   lock is already released; `lock_expired` → recovery if needed).
+6. The external reference is preserved for audit.
 
 Cancellation is not performed by merely changing the status or archiving the
 task: the outcome and the OpenSpec archive are recorded as separate actions.
