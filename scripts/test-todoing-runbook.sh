@@ -43,7 +43,7 @@ for file in "$RU" "$EN"; do
     store.init store.info store.verify task.create task.external-ref.add \
     task.version.approve task.lock.acquire task.lock.heartbeat \
     task.lock.release task.lock.recover task.status.set task.review.add \
-    task.commit.finalize task.cancel; do
+    task.commit.finalize task.cancel task.dependency.list; do
     require_text "$file" "$op" "API contract"
   done
   for value in backlog ready in_progress review verified completed; do
@@ -52,16 +52,21 @@ for file in "$RU" "$EN"; do
   require_text "$file" "720" "lease duration"
   require_text "$file" "180" "heartbeat configuration"
   require_text "$file" "60" "recovery grace"
+  require_text "$file" "ready → in_progress" "execution status transition"
 done
 
 require_text "$RU" "только после явного одобрения пользователя" "user approval gate"
 require_text "$RU" "Субагент не получает token" "token custody"
 require_text "$RU" "не перезаписывайте" "no-overwrite rule"
 require_text "$RU" "сначала сверяйте фактические" "reconciliation before retry"
+require_text "$RU" "outcome должен быть `completed`" "dependency readiness gate"
+require_text "$RU" "store уже существует, а конфиг отсутствует — остановитесь" "existing store configuration guard"
 require_text "$EN" "only after explicit user approval" "user approval gate"
 require_text "$EN" "Never give the token to a role agent" "token custody"
 require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"
+require_text "$EN" "outcome `completed`" "dependency readiness gate"
+require_text "$EN" "store already exists but the config is missing, stop" "existing store configuration guard"
 
 RU_COMPLETION=$(mktemp)
 EN_COMPLETION=$(mktemp)
