@@ -75,6 +75,8 @@ sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$RU" > "$RU_COMPLETION"
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$EN" > "$EN_COMPLETION"
 sed -n '/^### 6\.6\./,$p' "$RU" > "$RU_RECOVERY"
 sed -n '/^### 6\.6\./,$p' "$EN" > "$EN_RECOVERY"
+sed -n '/Любой агент может рекомендовать отмену/,$p' "$RU_COMPLETION" > "$RU_CANCELLATION"
+sed -n '/Any agent may recommend cancellation/,$p' "$EN_COMPLETION" > "$EN_CANCELLATION"
 
 require_order "$RU_COMPLETION" "Russian completion sequence" \
   "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
