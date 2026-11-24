@@ -1,6 +1,6 @@
 # Tasks: migrate-vstrecha-raytec
 
-> This change specifies a controlled migration. It does not authorize execution in the target repository. Each target-project mutation requires a separate user approval at the applicable gate.
+> This change specifies a controlled migration. It does not authorize execution in the target repository. Every target-project mutation requires a separate user approval immediately before that stage, limited to the exact actions and paths presented. Approval of this change or another stage is not authorization.
 
 ## 1. Re-audit
 
@@ -11,10 +11,10 @@
 ## 2. Git history and remote decision
 
 - [ ] fr-2.1-assess-git-history-and-remote-options
-  Document the 189-commit local history, current branch/HEAD, absence or presence of remote/upstream after re-audit, and viable backup/hosting strategies. Do not create a repository, add a remote, push, change branches, or rewrite history.
-  Stop: options and consequences are presented to the user and the chosen strategy is recorded; no publication action is performed.
+  Document the local history, current branch/HEAD, remotes/upstream after re-audit, and viable backup/hosting strategies. Do not create a repository, add a remote, push, change branches, or rewrite history.
+  Stop: options and consequences are presented to the user and the chosen strategy is recorded; no publication action is performed. Any later remote creation/configuration or push is a separate operation requiring its own exact-scope approval.
 
-## 3. OpenSpec tracking decision
+## 3. OpenSpec tracking
 
 - [ ] fr-3.1-inventory-openspec-and-ignore-rules
   Inspect exact ignore rules and their source locations; enumerate all tracked, untracked, and ignored files under `openspec/`; inspect all active/archived changes and specs, including dependencies and validation status. Identify sensitive/generated/local-only files.
@@ -28,6 +28,10 @@
   For each completed unarchived change, verify delta-spec targets, dependencies, and OpenSpec archive prerequisites. Report the `fix-run-59-defects` missing-spec blocker separately. Do not archive or repair changes in this task.
   Stop: every completed change has a documented archive-ready / blocked / needs-review result; no change is archived.
 
+- [ ] fr-3.4-apply-approved-openspec-tracking-scope
+  After fr-3.1 and fr-3.2 are complete, present the exact ignore-rule diff and exact Git index operations (including every path) to be performed. Obtain a new, explicit approval for this execution task; approval of the proposed scope alone is not execution approval. Apply only the approved ignore-rule changes and tracking operations. Do not archive, edit, rename, or delete OpenSpec content.
+  Stop: `git check-ignore` and Git status/index checks prove that exactly the approved paths are tracked or excluded; record the diff and command results. If the approved scope or repository state changed, stop and request approval again.
+
 ## 4. Manifest artifact reconciliation
 
 - [ ] fr-4.1-confirm-installer-version-and-artifacts
@@ -36,11 +40,15 @@
 
 - [ ] fr-4.2-prepare-non-destructive-file-reconciliation
   Compare each proposed Manifest artifact with existing project files. Produce a conflict report and a reviewed merge proposal for `commit-rules.md` v1.0.0 versus distributed v1.0.1. Preserve all existing context and project files by default.
-  Stop: every destination is classified as create / identical / merge-required / conflict / omit; no target file is written.
+  Stop: every destination is classified as create / identical / merge-required / conflict / omit; exact proposed file contents and diffs are ready; no target file is written.
 
-- [ ] fr-4.3-install-and-verify-manifest-hooks
-  First present the exact files to create or change, their diffs, hook behavior, and the proposed `core.hooksPath` change; obtain a separate explicit user approval for this stage. Only then install the approved hook files and validation script, validate their syntax and behavior, and configure `core.hooksPath=.manifest/hooks`. Do not treat approval of another migration stage as authorization for this stage, and do not activate hooks before the approved files pass verification.
-  Stop: both hooks and validation script pass their checks, `core.hooksPath` points to the verified directory, and the verification output is recorded.
+- [ ] fr-4.3-apply-approved-manifest-artifact-reconciliation
+  After fr-4.1 and fr-4.2 are complete, present the exact files to create/update, complete diffs or new-file contents, and affected paths. Obtain a separate explicit approval for this file-reconciliation stage. Apply only the approved Manifest artifact changes; do not install or activate hooks and do not change `core.hooksPath` in this task. Never overwrite an unapproved or changed destination.
+  Stop: every approved file matches the reviewed content, protected project files remain unchanged, and verification output is recorded. Any changed precondition invalidates approval.
+
+- [ ] fr-4.4-install-and-verify-manifest-hooks
+  After fr-4.3, present exact hook and validation-script contents, diffs, hook behavior, and the proposed `core.hooksPath` change; obtain a new, separate explicit approval for this stage. Only then install the approved hook files and validation script, validate their syntax and behavior, and configure `core.hooksPath=.manifest/hooks`. Do not activate hooks before the approved files pass verification.
+  Stop: both hooks and validation script pass their checks, `core.hooksPath` points to the verified directory, and verification output is recorded.
 
 ## 5. Project Identity and Todoing bootstrap
 
