@@ -27,3 +27,13 @@ Maps to scenarios: all scenarios in manifest-todoing-runbook.
 Wire the regression test into the Manifest CI workflow and run OpenSpec validation. Keep CI limited to read-only checks.
 Stop criterion: GitHub Actions reports passing OpenSpec validation and runbook regression jobs on this feature branch; no local-only result is reported as CI evidence.
 Maps to scenarios: all scenarios in manifest-todoing-runbook.
+
+- [x] FR 2.3 verify-snapshot-restore-runbook-contract
+
+Document `store.snapshot`, `store.snapshot.verify`, and
+`store.snapshot.restore` in both runbook editions. State the active-lock
+guard, same-Project-ID/schema requirement, retained pre-restore safety
+snapshot, and the boundary that restore affects Todoing SQLite only. Extend
+the regression test to check these requirements and recovery-section ordering.
+Stop criterion: bilingual runbook and regression test cover the snapshot
+restore safety contract.
