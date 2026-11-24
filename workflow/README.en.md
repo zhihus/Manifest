@@ -166,3 +166,72 @@ English.
 3. You intervene only when a gate fails to a point the Orchestrator
    routes back to you (scope questions, spec conflicts) or at the
    final verify ✅.
+
+
+## 6. Todoing integration
+
+Todoing is the source of truth for task state, versions, history, locks, and Reviews. Manifest owns OpenSpec, Git, and orchestration policy. The main Orchestrator is the only Todoing API client.
+
+### 6.1. Bootstrap and Project ID
+
+1. Verify that the user-installed binary is available with `todoing version`. Manifest does not install or update Todoing.
+2. If both `.manifest/project-id` and the SQLite store are absent, generate a UUIDv4 and create the file atomically without overwriting an existing file.
+3. If the store exists but the Project ID is missing, stop. Do not generate a replacement ID or call `store.init`.
+4. If the Project ID exists, reuse it unchanged. For an existing store, call `store.info` and `store.verify`; an ID mismatch or integrity failure is a hard stop.
+5. Inspect `.todoing/config.toml`. If absent, create it only after confirming there are no legacy Markdown tasks or `index.json`. Never overwrite an existing config; inspect it and stop if it is incompatible.
+6. Recommended configuration: `format_version = 1`; statuses `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; only `completed` maps to `outcome = "completed"`. Allowed transitions: `backlog → ready → in_progress → review`; from `review` to `in_progress` or `verified`; from `verified` to `completed`.
+7. Set `[locking]` to `lease_seconds = 720`, `heartbeat_seconds = 180`, and `recovery_grace_seconds = 60`. These values are required for the lock protocol below.
+8. For a new project, call `store.init` exactly once with the Project ID. Then verify with `store.info` and `store.verify`. Never call `store.init` over an existing store. Do not migrate legacy data automatically: run a dry run and obtain separate user approval first.
+
+### 6.2. API contract and task mapping
+
+Each call is a separate `todoing api` process: one JSON request on stdin and one JSON response on stdout. The envelope contains `api_version: 1`, `project_id`, `actor_id`, `operation`, and `args`; `lock_token` is supplied only in the envelope of owner requests. Handle errors by machine-readable `code`, never by message text. Never put the token in CLI arguments, a subagent prompt, task content, logs, or Git.
+
+One OpenSpec change maps to one Todoing task:
+- Create the task with `task.create` and status `backlog`.
+- Add a project-scoped reference with `task.external-ref.add`: namespace `openspec.change`, value equal to the change directory ID, relation `implements`, scope `project`.
+- Allow `backlog → ready` only after explicit user approval. Then record the current version as the baseline with `task.version.approve`.
+- Do not dispatch implementation, acquire a lock, or move the task to `in_progress` before approval.
+
+### 6.3. Lock custody and execution
+
+The Orchestrator is the sole Todoing API client and lock-token custodian:
+1. Before work, call `task.lock.acquire`; keep `owner_id`, `lock_token`, `fencing_generation`, and `expires_at` in protected main-session state.
+2. Call `task.lock.heartbeat` immediately before each blocking subagent run. A 720-second lease covers the 600-second hard timeout plus 120 seconds of margin.
+3. Do not send heartbeats while the subagent is running. Never give the token to a role agent; role agents never call Todoing.
+4. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
+5. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
+
+### 6.4. Status and Review
+
+- Before handing work to the Reviewer, move the task to `review` using `task.status.set`.
+- Record the Review with `task.review.add`: stable `review_id`, reviewed `version_no`, `reviewer`, outcome, and ordered `comments` array.
+- On `approved`, move the task to `verified`.
+- On `changes_requested`, Todoing atomically increments `revision_count` once; after recording the Review, return the task to `in_progress`.
+- The same `review_id` and payload is a no-op; a different payload with the same ID is a conflict. Never use the number of task versions as a revision counter.
+
+### 6.5. Completion and cancellation
+
+Successful completion MUST follow this order:
+1. Review approved; status is `verified`.
+2. Acceptance checks across Todoing, OpenSpec, and Git.
+3. Normal OpenSpec archive (delta specs are merged into permanent specs).
+4. Git merge according to project rules.
+5. `task.commit.finalize` with the final merge commit SHA.
+6. `task.status.set` to `completed` (the transition also sets outcome `completed`).
+7. `task.lock.release`.
+
+Any agent may recommend cancellation with a reason; only the user may approve it. After approval: `task.cancel` with a reason → OpenSpec archive without merging delta specs → `task.lock.release`. Retain the external reference. Archiving alone is not cancellation.
+
+### 6.6. Recovery
+
+After interruption, first reconcile actual Todoing state (status, outcome, versions, history), OpenSpec state (change and archive), and Git state (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
+- If the `task.lock.release` response was lost, call `task.lock.heartbeat` first; retry release only after ownership is confirmed.
+- On `lock_expired`, wait for lease expiry plus the 60-second grace period, then call `task.lock.recover`; use only the new token and fencing generation.
+- On `stale_lock`, never use the old token again.
+- After a failure between archive and merge, do not archive again; reconcile and continue with merge.
+- After a merge without a final marker, obtain the actual merge SHA and call `task.commit.finalize`.
+- After `completed`, do not repeat `task.status.set` or `task.complete`; verify state and release the lock only after confirming ownership.
+- During cancellation, do not repeat `task.cancel` if outcome is already `cancelled`; reconcile and perform only the missing steps.
+
+Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the user if state is ambiguous.
