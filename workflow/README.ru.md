@@ -309,6 +309,7 @@ to = "completed"
 - Перед передачей или восстановлением проверьте его через `store.snapshot.verify`; сохраняйте SHA-256.
 - `store.snapshot` и `store.snapshot.restore` запрещены при активных task locks.
 - `store.snapshot.restore` восстанавливает только Todoing SQLite, требует snapshot того же Project ID и схемы, создаёт safety snapshot в `.todoing/backups/`.
+- Restore — разрушающая операция: выполняйте её только по явному разрешению пользователя, передавая сохранённый `expected_sha256`.
 - Restore не отменяет Git commits и OpenSpec archive. После восстановления обязательно сверьте Todoing, OpenSpec и Git до продолжения работы.
 
 ### 6.7. Recovery
