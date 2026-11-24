@@ -96,16 +96,16 @@ sed -n '/Любой агент может рекомендовать отмен�
 sed -n '/Any agent may recommend cancellation/,$p' "$EN_COMPLETION" > "$EN_CANCELLATION"
 
 require_order "$RU_COMPLETION" "Russian completion sequence" \
-  "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
+  "Review approved" "Acceptance checks" "openspec archive <change-id> --yes" "Git merge" \
   "task.commit.finalize" "task.status.set" "task.lock.release"
 require_order "$EN_COMPLETION" "English completion sequence" \
-  "Review approved" "Acceptance checks" "OpenSpec archive" "Git merge" \
+  "Review approved" "Acceptance checks" "openspec archive <change-id> --yes" "Git merge" \
   "task.commit.finalize" "task.status.set" "task.lock.release"
 
 require_order "$RU_CANCELLATION" "Russian cancellation sequence" \
-  "task.cancel" "без слияния delta specs" "task.lock.release"
+  "task.cancel" "openspec archive <change-id> --yes --skip-specs" "task.lock.release"
 require_order "$EN_CANCELLATION" "English cancellation sequence" \
-  "task.cancel" "without merging delta specs" "task.lock.release"
+  "task.cancel" "openspec archive <change-id> --yes --skip-specs" "task.lock.release"
 
 require_order "$RU_RECOVERY" "Russian lost-release recovery" \
   "task.lock.heartbeat" "успешного подтверждения владения"
