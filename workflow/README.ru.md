@@ -264,6 +264,8 @@ to = "completed"
 - Добавьте project-scoped reference через `task.external-ref.add`: namespace `openspec.change`, value — ID каталога change, relation `implements`, scope `project`.
 - Переход `backlog → ready` разрешён только после явного одобрения пользователя. После одобрения зафиксируйте baseline текущей версии через `task.version.approve`.
 - Не запускайте реализацию, не приобретайте lock и не переводите задачу в `in_progress` до одобрения.
+- Зависимости ведите через `task.dependency.add`, `task.dependency.remove`, `task.dependency.list`. Перед запуском проверьте каждую prerequisite-задачу: её outcome должен быть `completed`. Если зависимость заблокирована или её состояние нельзя проверить, работу не начинайте. Todoing хранит связи и запрещает циклы; решение о готовности принимает Manifest.
+- `actor_id` — атрибуция, а не аутентификация. Вызовы отправляет Оркестратор; для Review указывайте стабильный идентификатор роли/сессии Reviewer в envelope.
 
 ### 6.3. Lock custody и исполнение
 
