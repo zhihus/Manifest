@@ -50,7 +50,8 @@ for file in "$RU" "$EN"; do
     store.init store.info store.verify task.create task.external-ref.add \
     task.version.approve task.lock.acquire task.lock.heartbeat \
     task.lock.release task.lock.recover task.status.set task.review.add \
-    task.commit.finalize task.cancel task.dependency.list; do
+    task.commit.finalize task.cancel task.dependency.list task.get task.version.list \
+    task.history.list task.review.list task.external-ref.list; do
     require_text "$file" "$op" "API contract"
   done
   for value in backlog ready in_progress review verified completed; do
