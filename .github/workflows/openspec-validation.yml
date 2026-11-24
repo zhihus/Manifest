@@ -10,6 +10,7 @@ on:
       - "openspec-rules.md"
       - "workflow/README.*"
       - "scripts/test-todoing-runbook.sh"
+      - "scripts/test-todoing-config.py"
       - ".github/workflows/openspec-validation.yml"
   pull_request:
     branches: [develop]
@@ -34,6 +35,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install OpenSpec CLI
         run: npm install --global @fission-ai/openspec@1.16.0
