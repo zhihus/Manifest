@@ -117,4 +117,6 @@ if (( FAIL )); then
   exit 1
 fi
 
+python3 "$ROOT/scripts/test-todoing-config.py"
+
 echo "PASS bilingual Todoing runbook contract"
