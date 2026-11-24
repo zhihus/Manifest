@@ -19,16 +19,32 @@ Independent review of the bilingual Todoing runbook, its OpenSpec delta, the reg
 
 ## CI Evidence
 
-- Commit: `fb5801d7848718a0f1ba6011346fffd7bf0b36e6`
-- GitHub Actions: [run 45426335789](https://github.com/zhihus/Manifest/actions/runs/45425608232)
-- Bilingual runbook regression test: passed.
-- Python 3.12 TOML parsing and parity test: passed; both configuration examples match and satisfy the expected status graph and lock values.
-- `openspec validate --all`: passed.
-- OpenSpec CLI version in CI: 1.16.0.
+- Static runbook/configuration validation: passed on Manifest CI run
+  [45450867441](https://github.com/zhihus/Manifest/actions/runs/45450867441).
+- Real Todoing API + OpenSpec acceptance: passed on run
+  [45451516709](https://github.com/zhihus/Manifest/actions/runs/45451516709).
+- Acceptance used the Todoing feature branch
+  `feature/generic-task-references-review-api`, built from source in the runner.
+- The temporary project exercised bootstrap, Project ID, task creation,
+  project-scoped OpenSpec reference, approval baseline, lock custody, versioned
+  Review, changes_requested idempotency and revision_count, rework, approved
+  Review, final Git SHA, completion, cancellation, normal OpenSpec archive,
+  cancellation archive with `--skip-specs`, snapshot verification, restore,
+  and post-restore data checks.
+- Todoing Windows/Linux CI: run
+  [45451107043](https://github.com/zhihus/todoing-x/actions/runs/45451107043)
+  passed fmt, Clippy, full cargo test, release build, install/smoke tests,
+  SQLite lock spike, OpenSpec validation, and JSON Schema validation.
+- OpenSpec CLI version: 1.16.0; Python: 3.12.16.
 
 ## Limitations
 
-The regression test validates the written contract, not an end-to-end session against a real Todoing project store. Manifest is documentation/orchestration policy rather than a runtime daemon; the first real-project bootstrap and lifecycle run remain an acceptance check when local project access is restored.
+The acceptance test runs in an isolated Linux temporary project. Windows
+coverage is provided by Todoing's full CI matrix; the cross-repository lifecycle
+script itself has not been run on Windows. Manifest remains documentation and
+workflow policy, not a runtime daemon. The acceptance test validates the
+documented consumer procedure through the real Todoing API; it does not create a
+persistent project store or perform actions in a user's working repository.
 
 ## Verdict
 
