@@ -5,7 +5,7 @@
 ## 1. Re-audit
 
 - [ ] fr-1.1-refresh-read-only-baseline
-  Re-run read-only checks in `C:\\WorkProjects\\vstrecha-raytec`: Git branch/HEAD/status/log/remotes, project file inventory, `.gitignore` and `.llmignore`, Manifest installation artifacts, OpenSpec inventory, Todoing paths and binary availability. Compare results with the 2026-11-24 audit and record drift.
+  Re-run read-only checks in `C:\WorkProjects\vstrecha-raytec`: Git branch/HEAD/status/log/remotes, project file inventory, `.gitignore` and `.llmignore`, Manifest installation artifacts, OpenSpec inventory, Todoing paths and binary availability. Compare results with the 2026-11-24 audit and record drift.
   Stop: a timestamped baseline report lists verified facts, unknowns, and all material differences; no target file is changed.
 
 ## 2. Git history and remote decision
