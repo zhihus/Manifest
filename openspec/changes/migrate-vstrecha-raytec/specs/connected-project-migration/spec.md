@@ -8,18 +8,33 @@ Defines a controlled, non-destructive migration process for existing repositorie
 
 ### Requirement: Every target-project mutation requires separate scoped approval
 
-Approval MUST be obtained immediately before each migration stage that changes the target repository. Approval for one stage MUST NOT authorize any later stage.
+Approval MUST be obtained immediately before each migration stage that changes the target repository. Approval for one stage MUST NOT authorize any later stage or actions outside the approved scope.
 
 #### Scenario: A migration stage is ready to modify the target project
 - **WHEN** a stage has completed its read-only checks and prepared the exact proposed changes
 - **THEN** the user is presented with the stage, exact actions, affected paths, and relevant risks
 - **AND** the stage proceeds only after the user explicitly approves that scope
-- **AND** refusal, ambiguity, or changed preconditions leave the target repository unchanged
+- **AND** refusal, ambiguity, changed preconditions, or a changed scope leave the target repository unchanged
 
 #### Scenario: A previously approved stage is complete
 - **WHEN** the next stage is ready
 - **THEN** the previous approval is not treated as authorization for the next stage
 - **AND** a new scoped approval is requested before any new target-project mutation
+
+#### Scenario: A specification is approved
+- **WHEN** the user approves this migration specification
+- **THEN** that approval authorizes planning and specification work only
+- **AND** it does not authorize any target-project mutation
+
+### Requirement: Migration stages have end-to-end traceability
+
+The migration plan MUST define each stage's preparation, approval gate, execution scope, and verification evidence. Every mutating task MUST map to a stage and MUST identify its exact approval boundary.
+
+#### Scenario: Reviewing the migration plan
+- **WHEN** the migration tasks are reviewed against the design
+- **THEN** every designed stage maps to one or more explicit tasks
+- **AND** every mutating task identifies the required prior approval, exact affected scope, and verification evidence
+- **AND** no execution step is implied solely by a preparation or approval task
 
 ### Requirement: Migration starts with a read-only inventory
 
@@ -50,6 +65,7 @@ The migration MUST inspect ignore rules and OpenSpec contents before changing th
 - **THEN** the exact ignore rule and affected files are identified
 - **AND** an explicit tracking scope and exclusions are proposed
 - **AND** files are not force-added or staged before user approval
+- **AND** applying the approved tracking scope is a separate execution task requiring approval of exact ignore/index operations
 
 ### Requirement: OpenSpec changes are not automatically archived
 
@@ -69,6 +85,7 @@ The migration MUST compare proposed Manifest artifacts with existing files and p
 - **WHEN** a destination file exists with different content
 - **THEN** a diff and conflict classification are produced
 - **AND** the destination is not overwritten automatically
+- **AND** applying an approved reconciliation is a separate execution task requiring approval of exact file contents and paths
 
 ### Requirement: Hooks are activated only after verification and approval
 
@@ -78,6 +95,7 @@ The migration MUST verify hook files before configuring Git to execute them.
 - **WHEN** a required hook is missing or validation fails
 - **THEN** the incomplete hook configuration is not activated
 - **AND** missing or failed artifacts are reported
+- **AND** hook installation and activation require approval separate from Manifest file reconciliation
 
 ### Requirement: Project Identity is stable
 
@@ -96,6 +114,7 @@ The migration MUST use the supported local Todoing CLI JSON API and inspect exis
 - **WHEN** the binary is unavailable or existing data requires a separate migration
 - **THEN** bootstrap stops without creating or overwriting Todoing data
 - **AND** reports the exact prerequisite or decision required
+- **AND** bootstrap is performed only after separate approval of exact config/store operations and affected paths
 
 ### Requirement: Connection status reflects verified installation
 
@@ -105,3 +124,4 @@ The connected-project registry MUST NOT represent an incomplete installation as 
 - **WHEN** one or more required checks remain failed or blocked
 - **THEN** the project is not marked fully active
 - **AND** remaining checks and blockers are reported
+- **AND** a registry update is performed only after separate approval of its exact diff
