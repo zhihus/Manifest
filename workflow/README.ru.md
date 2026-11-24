@@ -185,6 +185,74 @@ Todoing — источник истины для состояния задач, 
 5. Проверьте `.todoing/config.toml`. При отсутствии создайте конфигурацию только после проверки, что нет legacy Markdown-задач или `index.json`. Существующий конфиг не перезаписывайте: проверьте его вручную и остановитесь при несовместимости.
 6. Рекомендуемая конфигурация: `format_version = 1`; статусы `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; только `completed` имеет `outcome = "completed"`. Разрешённые переходы: `backlog → ready → in_progress → review`; из `review` — в `in_progress` или `verified`; из `verified` — в `completed`.
 7. В `[locking]` задайте `lease_seconds = 720`, `heartbeat_seconds = 180`, `recovery_grace_seconds = 60`. Значения обязательны для описанного ниже режима блокировки.
+
+Рекомендуемое содержимое `.todoing/config.toml` для нового проекта:
+
+```toml
+format_version = 1
+
+[locking]
+lease_seconds = 720
+heartbeat_seconds = 180
+recovery_grace_seconds = 60
+
+[[statuses]]
+id = "backlog"
+label = "Backlog"
+enabled = true
+
+[[statuses]]
+id = "ready"
+label = "Ready"
+enabled = true
+
+[[statuses]]
+id = "in_progress"
+label = "In Progress"
+enabled = true
+
+[[statuses]]
+id = "review"
+label = "Review"
+enabled = true
+
+[[statuses]]
+id = "verified"
+label = "Verified"
+enabled = true
+
+[[statuses]]
+id = "completed"
+label = "Completed"
+enabled = true
+outcome = "completed"
+
+[[transitions]]
+from = "backlog"
+to = "ready"
+
+[[transitions]]
+from = "ready"
+to = "in_progress"
+
+[[transitions]]
+from = "in_progress"
+to = "review"
+
+[[transitions]]
+from = "review"
+to = "in_progress"
+
+[[transitions]]
+from = "review"
+to = "verified"
+
+[[transitions]]
+from = "verified"
+to = "completed"
+```
+
+Создавайте этот файл только если его ещё нет. При существующем конфиге не применяйте snippet автоматически.
 8. Для нового проекта вызовите `store.init` ровно один раз с Project ID. Затем проверьте `store.info` и `store.verify`. При существующем store повторный `store.init` запрещён. Legacy-данные не мигрируйте автоматически: сначала dry-run и отдельное подтверждение пользователя.
 
 ### 6.2. Контракт API и задача
