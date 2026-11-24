@@ -303,7 +303,15 @@ to = "completed"
 
 Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
 
-### 6.6. Recovery
+### 6.6. Snapshot и восстановление
+
+- Создавайте snapshot через `store.snapshot`, а не копированием активного SQLite-файла.
+- Перед передачей или восстановлением проверьте его через `store.snapshot.verify`; сохраняйте SHA-256.
+- `store.snapshot` и `store.snapshot.restore` запрещены при активных task locks.
+- `store.snapshot.restore` восстанавливает только Todoing SQLite, требует snapshot того же Project ID и схемы, создаёт safety snapshot в `.todoing/backups/`.
+- Restore не отменяет Git commits и OpenSpec archive. После восстановления обязательно сверьте Todoing, OpenSpec и Git до продолжения работы.
+
+### 6.7. Recovery
 
 Восстановление Todoing из snapshot откатывает только SQLite-состояние Todoing; оно не отменяет OpenSpec archive и Git commits. После restore сверяйте все три системы до любых повторных операций.\n\nПосле прерывания сначала сверяйте фактическое состояние: Todoing через `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive); Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
 - Если ответ на `task.lock.release` потерян:
