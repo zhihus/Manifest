@@ -29,7 +29,7 @@ No remote/upstream exists. The user must choose the backup and synchronization s
 
 Before changing `.gitignore`, inspect exact ignore rules, `git check-ignore -v`, and all tracked/untracked/ignored OpenSpec files, changes, and specs. Prepare an exact Git tracking proposal and exclusions; inspect for secrets, generated files, and local-only data.
 
-Do not blindly run `git add -f openspec/`. Add OpenSpec to Git only after the user approves the exact file scope.
+Do not blindly run `git add -f openspec/`. Add OpenSpec to Git only after the user approves the exact file scope. A separate execution task then applies only the approved ignore-rule and tracking changes; no additional files may be included.
 
 Do not automatically archive completed changes. Check each change's delta specs, dependencies, and archive prerequisites. Handle the known `fix-run-59-defects` blocker as a separate approved repair; do not bypass it by deleting references or fabricating specs.
 
@@ -39,7 +39,7 @@ Confirm the authoritative Manifest version and inspect installer distribution, v
 
 Compare every proposed artifact with its destination. In particular, do not replace `commit-rules.md` v1.0.0 with v1.0.1 automatically: produce a diff, preserve project-specific rules, and obtain approval for the result. Preserve `AGENTS.md`, `llms.txt`, `.llmignore`, README, LICENSE, THIRD-PARTY, tests, pipeline, and all other project files by default.
 
-Install and activate hooks only after inspection and separate user approval. Set `core.hooksPath=.manifest/hooks` only after both hooks are installed and verified.
+Applying approved Manifest files is a separate stage: present exact paths and diffs, obtain separate approval, then create/update only approved files and verify them. Hook installation and changing `core.hooksPath` are a subsequent independent stage requiring separate approval. Never activate hooks before successful verification.
 
 ### D5. Keep Project Identity stable
 
@@ -51,16 +51,20 @@ Todoing is installed by the user or through a separately approved procedure. Man
 
 Before bootstrap, verify the binary/version and API contract, and inspect config/database/legacy Markdown data. Never overwrite existing data. Create `.todoing/config.toml` without overwrite and initialize the store only if no store or legacy data exists. If Todoing is unavailable, stop and report the exact prerequisite.
 
-### D7. Stages and approval boundaries
+### D7. End-to-end stages, approvals, and evidence
 
-1. Read-only re-audit.
-2. User decisions: Git remote, OpenSpec tracking scope, and file conflicts.
-3. Approved Git hygiene and OpenSpec tracking changes.
-4. Manifest reconciliation/installation; separate approval to activate hooks.
-5. Project Identity and Todoing bootstrap.
-6. Verification and registry reconciliation.
+Every stage follows four mandatory steps: (1) read-only preparation and exact scope definition; (2) separate explicit user approval of the specific actions and paths; (3) execution of the approved scope only; and (4) result verification with recorded evidence. For read-only stages, mutation approval is not required. If scope or preconditions change after approval, that approval is invalid and must be requested again.
 
-Approval of this specification authorizes preparation of the plan only. It does not authorize target-project changes, remote creation, push, hook activation, file replacement, OpenSpec archive, or Todoing installation.
+| Stage | Tasks | Target-project mutation |
+|---|---|---|
+| 1. Re-audit | fr-1.1 | No |
+| 2. Git remote decision | fr-2.1 | No; remote/publication requires a separate later approval |
+| 3. OpenSpec inventory, scope, archive readiness, and tracking | fr-3.1–fr-3.3 prepare; fr-3.4 applies approved tracking scope | Yes, fr-3.4 only after approval of exact ignore/index operations |
+| 4. Manifest reconciliation | fr-4.1–fr-4.2 prepare; fr-4.3 applies approved Manifest files; fr-4.4 installs/activates hooks | Yes; fr-4.3 and fr-4.4 require two independent approvals |
+| 5. Identity and Todoing | fr-5.1–fr-5.3 | Project ID creation and Todoing bootstrap require separate approvals |
+| 6. Final verification and registry | fr-6.1 verifies; fr-6.2 updates registry | Registry changes only after approval of the exact diff |
+
+Approval of this specification authorizes preparation of the plan only. It authorizes no target-project mutation. Approval for one stage does not authorize another stage or additional actions outside its approved scope.
 
 ### D8. Registry status
 
