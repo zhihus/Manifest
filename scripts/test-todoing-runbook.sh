@@ -91,7 +91,7 @@ require_order "$EN_CANCELLATION" "English cancellation sequence" \
   "task.cancel" "without merging delta specs" "task.lock.release"
 
 require_order "$RU_RECOVERY" "Russian lost-release recovery" \
-  "task.lock.heartbeat" "успешном подтверждении владения"
+  "task.lock.heartbeat" "успешного подтверждения владения"
 require_order "$EN_RECOVERY" "English lost-release recovery" \
   "task.lock.heartbeat" "ownership is confirmed"
 
