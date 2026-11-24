@@ -10,13 +10,13 @@ A controlled migration is required. A generic fresh-project initializer is insuf
 
 ## What Changes
 
-- Define a staged, non-destructive migration procedure for the existing project.
+- Define a staged, non-destructive migration procedure for the existing project, covering preparation, approval, execution, and verification for every stage.
 - Require a fresh pre-migration inventory and separate, explicit, narrowly scoped user approval immediately before every migration stage that mutates the target repository; approval never carries over to a later stage.
 - Preserve the existing Git commit graph; prohibit history rewriting, reset, force-push, and implicit remote creation.
 - Resolve the Git remote/upstream strategy before any push or remote synchronization.
-- Inspect the exact ignore rules and OpenSpec contents before changing Git tracking.
+- Inspect the exact ignore rules and OpenSpec contents before changing Git tracking; execute only the exact approved tracking changes.
 - Preserve all active and archived OpenSpec changes; do not auto-archive completed changes or repair archive blockers during bootstrap.
-- Reconcile Manifest installation artifacts with existing project files by diff and explicit conflict handling.
+- Reconcile Manifest installation artifacts with existing project files by diff, apply only approved file changes, and handle hooks as a separately gated operation.
 - Create the Manifest Project ID and Todoing configuration/store only after their prerequisites and user decisions are satisfied.
 - Verify the final connection and report unresolved items without claiming a complete connection prematurely.
 
