@@ -121,7 +121,6 @@ def main() -> None:
         root = Path(raw)
         (root / ".manifest").mkdir()
         (root / ".manifest" / "project-id").write_text(PROJECT_ID, encoding="utf-8")
-        shutil.copy2(ROOT / "openspec" / "config.yaml", root / "openspec-config.yaml")
         (root / "openspec").mkdir(exist_ok=True)
         shutil.copy2(ROOT / "openspec" / "config.yaml", root / "openspec" / "config.yaml")
 
@@ -218,9 +217,10 @@ to = "completed"
             "scope": "project",
         })
         api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
+        ready_version = api(root, "task.get", {"task_id": task_id})["version_no"]
         api(root, "task.version.approve", {
             "task_id": task_id,
-            "version_no": 2,
+            "version_no": ready_version,
         })
 
         grant = acquire(root, task_id)
