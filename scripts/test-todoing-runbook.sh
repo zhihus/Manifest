@@ -67,7 +67,7 @@ done
 require_text "$RU" "только после явного одобрения пользователя" "user approval gate"
 require_text "$RU" "Субагент не получает token" "token custody"
 require_text "$RU" "не перезаписывайте" "no-overwrite rule"
-require_text "$RU" "сначала сверяйте фактические" "reconciliation before retry"
+require_text "$RU" "сначала сверяйте фактическое состояние" "reconciliation before retry"
 require_text "$RU" 'outcome должен быть `completed`' "dependency readiness gate"
 require_text "$RU" "store уже существует, а конфиг отсутствует — остановитесь" "existing store configuration guard"
 require_text "$EN" "only after explicit user approval" "user approval gate"
