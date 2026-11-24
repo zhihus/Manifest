@@ -1,8 +1,14 @@
 # Tasks: integrate-todoing-workflow
 
 > The integration implementation is performed by a separate decision after
-> approval of this change. The tasks below are a decomposition for the
-> subsequent implementation; they are not performed within this change.
+> approval of this change. The workflow procedures have already been added to
+> `workflow/README.ru.md` in a separately archived change; the corresponding
+> items are checked off against their verifiable acceptance criteria.
+> Tasks `fr-1.1` and `fr-2.2` remain open: they require creating
+> `.manifest/project-id` and `.todoing/config.toml` in the selected connected
+> project. These files must not be created in Manifest because it is a
+> head/meta project. Project connection is a separate step requiring user
+> approval.
 >
 > Architectural boundary (D9): Manifest is a head/meta `doc` project; there is
 > no program orchestrator. The integration implementation is a documented
