@@ -305,6 +305,7 @@ Retain the external reference. Archiving alone is not cancellation.
 - Verify a snapshot with `store.snapshot.verify` before transfer or restore; retain its SHA-256.
 - `store.snapshot` and `store.snapshot.restore` are rejected while task locks are active.
 - `store.snapshot.restore` restores only Todoing SQLite, requires the same Project ID and schema, and creates a safety snapshot under `.todoing/backups/`.
+- Restore is destructive: perform it only with explicit user approval and pass the retained `expected_sha256`.
 - Restore does not undo Git commits or OpenSpec archives. Reconcile Todoing, OpenSpec, and Git before resuming work.
 
 ### 6.7. Recovery
