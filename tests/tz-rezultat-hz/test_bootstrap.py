@@ -485,10 +485,13 @@ if BASH:
     run("sh: вне Linux → понятное сообщение",
         "только Linux" in out_win and "bootstrap.ps1" in out_win)
 
-    r_lin, out_lin = _run_sh({"uname": "#!/bin/sh\necho Linux\n",
-                              "curl": "#!/bin/sh\nexit 1\n"}, args=["--plan"])
-    run("sh: на Linux предохранитель не срабатывает",
-        "только Linux" not in out_lin and r_lin.returncode == 0)
+    if platform.system() == "Linux":
+        r_lin, out_lin = _run_sh({"uname": "#!/bin/sh\necho Linux\n",
+                                  "curl": "#!/bin/sh\nexit 1\n"}, args=["--plan"])
+        run("sh: на Linux предохранитель не срабатывает",
+            "только Linux" not in out_lin and r_lin.returncode == 0)
+    else:
+        print("[SKIP] bootstrap.sh Linux execution path (Windows runner)")
 else:
     print("[SKIP] bootstrap.sh guard: bash отсутствует")
 
