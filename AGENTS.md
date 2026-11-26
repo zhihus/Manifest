@@ -1,3 +1,14 @@
+**Project boundaries and publication.** This repository is an independent
+project. Connected projects remain autonomous; reuse of Manifest is optional
+and does not authorize changing another project to fit Manifest. Read
+`docs/project-boundaries-and-publication.ru.md` before planning publication.
+Local work may use multiple branches and contain local-only support files.
+Only the reviewed, distilled result is integrated into and pushed from
+`develop`. Never publish local working branches, personal/customer data,
+local paths, secrets, temporary files, or unrelated project material. Do not
+create private GitHub mirrors. When unsure whether a file belongs in the
+public product, keep it local and ask the user.
+
 **Language.** Reply to the user in Russian. Default code, identifiers,
 comments, and commit messages to English. Maintain document editions
 in Russian and English: `.ru.md` is authoritative and is the version
