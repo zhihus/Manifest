@@ -1,7 +1,11 @@
 # manifest-todoing-runbook Specification
 
 ## Purpose
-TBD - created by archiving change implement-todoing-manifest-workflow. Update Purpose after archive.
+Governs the Manifest–Todoing integration runbook: how the Main
+Orchestrator bootstraps the Todoing store, holds the task lock, and
+drives each task through approval, dependency gating, review, verified
+completion, and recovery via the Todoing JSON API, with the user
+retaining exclusive authority to approve work.
 
 ## Requirements
 
