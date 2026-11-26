@@ -40,3 +40,9 @@ project gets its `path` updated.
   connected: 2026-11-13
   version: 1.0.0
   status: active
+
+- name: tz-rezultat-hz-private
+  path: C:/WorkProjects/tz-rezultat-hz-private
+  connected: 2026-11-26
+  version: 1.1.0
+  status: active
