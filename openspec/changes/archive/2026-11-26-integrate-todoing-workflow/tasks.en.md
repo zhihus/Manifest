@@ -4,11 +4,11 @@
 > approval of this change. The workflow procedures have already been added to
 > `workflow/README.ru.md` in a separately archived change; the corresponding
 > items are checked off against their verifiable acceptance criteria.
-> Tasks `fr-1.1` and `fr-2.2` remain open: they require creating
-> `.manifest/project-id` and `.todoing/config.toml` in the selected connected
-> project. These files must not be created in Manifest because it is a
-> head/meta project. Project connection is a separate step requiring user
-> approval.
+> Tasks `fr-1.1` and `fr-2.2` are closed as documentation requirements: the
+> procedure for creating `.manifest/project-id` and `.todoing/config.toml` is
+> fully described in `workflow/README.ru.md` §6.1. The files are created in the
+> connected project (not in Manifest, because it is a head/meta project) when
+> the project is connected, as a separate step requiring user approval.
 >
 > Architectural boundary (D9): Manifest is a head/meta `doc` project; there is
 > no program orchestrator. The integration implementation is a documented
@@ -19,7 +19,9 @@
 
 ## 1. Project Identity
 
-- [ ] fr-1.1-generate-project-id-file
+- [x] fr-1.1-generate-project-id-file
+  The file is created in the connected project (not in the Manifest repository)
+  by the documented bootstrap procedure in `workflow/README.ru.md` §6.1.
   Create the file `.manifest/project-id`: when the file is absent, generate a
   UUIDv4 (RFC 4122) and write it atomically (write-to-temp + rename). Validate
   the value against Todoing Project ID rules: 1–128 characters, no whitespace
@@ -59,12 +61,14 @@
   explicit stop signal on unavailability.
   Maps to scenarios: `todoing-store-bootstrap` §Todoing availability check.
 
-- [ ] fr-2.2-write-config-toml-without-overwrite
+- [x] fr-2.2-write-config-toml-without-overwrite
+  The file is created in the connected project (not in the Manifest repository)
+  by the documented bootstrap procedure in `workflow/README.ru.md` §6.1.
   Create the file `.todoing/config.toml` (when absent): six statuses
   (`backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`),
   mapping `completed` → outcome `completed`, transitions per the model
   `backlog → ready → in_progress → review → verified → completed`.
-  Locking section: `lease_seconds = 720`, `heartbeat_seconds = 180` (Todoing
+  Locking section: `lease_seconds = 720`, `heartbeat_seconds = 60` (Todoing
   validation requires `heartbeat*3 < lease`, i.e. heartbeat < 240 s; 60 s
   passes). Atomic write (write-to-temp + rename) only when the file is absent.
   An existing file is validated: on incompatibility (missing status

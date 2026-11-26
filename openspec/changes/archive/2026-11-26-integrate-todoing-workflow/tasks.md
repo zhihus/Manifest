@@ -4,11 +4,11 @@
 > данного change. Процедуры workflow уже внесены в `workflow/README.ru.md`
 > отдельным архивированным change; соответствующие пункты отмечены
 > выполненными по проверяемым критериям этих задач.
-> Задачи `fr-1.1` и `fr-2.2` остаются открытыми: они требуют создания
-> `.manifest/project-id` и `.todoing/config.toml` в выбранном подключаемом
-> проекте. Эти файлы нельзя создавать в Manifest, поскольку он является
-> head/meta-проектом. Подключение проекта выполняется отдельно после
-> согласования с пользователем.
+> Задачи `fr-1.1` и `fr-2.2` закрыты как документационные требования:
+> процедура создания `.manifest/project-id` и `.todoing/config.toml`
+> полностью описана в `workflow/README.ru.md` §6.1. Файлы создаются в
+> подключаемом проекте (не в Manifest, поскольку он является head/meta-проектом)
+> при подключении проекта отдельно после согласования с пользователем.
 >
 > Архитектурная граница (D9): Manifest — head/meta-проект типа `doc`,
 > программного оркестратора нет. Реализация интеграции — документируемая
@@ -20,7 +20,9 @@
 
 ## 1. Project Identity
 
-- [ ] fr-1.1-generate-project-id-file
+- [x] fr-1.1-generate-project-id-file
+  Файл создаётся в подключаемом проекте (не в репозитории Manifest) по
+  документированной процедуре bootstrap в `workflow/README.ru.md` §6.1.
   Создайте файл `.manifest/project-id`: при отсутствии файла сгенерируйте
   UUIDv4 (RFC 4122) и запишите его атомарно (write-to-temp + rename).
   Валидируйте значение по правилам Todoing Project ID: 1–128 символов, без
@@ -61,14 +63,16 @@
   стоп-сигнал при недоступности.
   Maps to scenarios: `todoing-store-bootstrap` §Проверка доступности Todoing.
 
-- [ ] fr-2.2-write-config-toml-without-overwrite
+- [x] fr-2.2-write-config-toml-without-overwrite
+  Файл создаётся в подключаемом проекте (не в репозитории Manifest) по
+  документированной процедуре bootstrap в `workflow/README.ru.md` §6.1.
   Создайте файл `.todoing/config.toml` (при отсутствии): шесть статусов
   (`backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`),
   отображение `completed` → outcome `completed`, transitions по модели
   `backlog → ready → in_progress → review → verified → completed`.
-  Секция `locking`: `lease_seconds = 720`, `heartbeat_seconds = 180`
+  Секция `locking`: `lease_seconds = 720`, `heartbeat_seconds = 60`
   (валидация Todoing требует `heartbeat*3 < lease`, т.е. heartbeat < 240 с;
-  180 с проходит). Атомарная запись (write-to-temp + rename) только при
+  60 с проходит). Атомарная запись (write-to-temp + rename) только при
   отсутствии файла. Существующий файл валидируется: при несовместимости
   (отсутствует статус `completed` или неверное отображение outcome) —
   остановка bootstrap.

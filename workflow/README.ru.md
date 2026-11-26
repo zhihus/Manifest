@@ -184,7 +184,7 @@ Todoing — источник истины для состояния задач, 
 4. Если Project ID существует, используйте его без изменения. После подключения к существующему store вызовите `store.info` и `store.verify`; несовпадение ID или ошибка целостности означает остановку.
 5. Проверьте `.todoing/config.toml`. Если store уже существует, а конфиг отсутствует — остановитесь: не создавайте конфигурацию с неизвестной политикой поверх существующего store. Если store отсутствует, создайте конфигурацию только при отсутствии legacy Markdown-задач и `index.json`: записывайте её атомарно через временный файл и rename, только если целевой файл всё ещё отсутствует. Существующий конфиг не перезаписывайте: проверьте его и остановитесь при несовместимости.
 6. Рекомендуемая конфигурация: `format_version = 1`; статусы `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; только `completed` имеет `outcome = "completed"`. Разрешённые переходы: `backlog → ready → in_progress → review`; из `review` — в `in_progress` или `verified`; из `verified` — в `completed`.
-7. В `[locking]` задайте `lease_seconds = 720`, `heartbeat_seconds = 180`, `recovery_grace_seconds = 60`. Значения обязательны для описанного ниже режима блокировки.
+7. В `[locking]` задайте `lease_seconds = 720`, `heartbeat_seconds = 60`, `recovery_grace_seconds = 60`. Значения обязательны для описанного ниже режима блокировки.
 
 Рекомендуемое содержимое `.todoing/config.toml` для нового проекта:
 
@@ -193,7 +193,7 @@ format_version = 1
 
 [locking]
 lease_seconds = 720
-heartbeat_seconds = 180
+heartbeat_seconds = 60
 recovery_grace_seconds = 60
 
 [[statuses]]

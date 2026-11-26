@@ -180,7 +180,7 @@ Todoing is the source of truth for task state, versions, history, locks, and Rev
 4. If the Project ID exists, reuse it unchanged. For an existing store, call `store.info` and `store.verify`; an ID mismatch or integrity failure is a hard stop.
 5. Inspect `.todoing/config.toml`. If the store already exists but the config is missing, stop; do not create a configuration with unknown policy over an existing store. If the store is absent, create the config only when there are no legacy Markdown tasks or `index.json`. Never overwrite an existing config; inspect it and stop if it is incompatible.
 6. Recommended configuration: `format_version = 1`; statuses `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; only `completed` maps to `outcome = "completed"`. Allowed transitions: `backlog → ready → in_progress → review`; from `review` to `in_progress` or `verified`; from `verified` to `completed`.
-7. Set `[locking]` to `lease_seconds = 720`, `heartbeat_seconds = 180`, and `recovery_grace_seconds = 60`. These values are required for the lock protocol below.
+7. Set `[locking]` to `lease_seconds = 720`, `heartbeat_seconds = 60`, and `recovery_grace_seconds = 60`. These values are required for the lock protocol below.
 
 Recommended `.todoing/config.toml` for a new project:
 
@@ -189,7 +189,7 @@ format_version = 1
 
 [locking]
 lease_seconds = 720
-heartbeat_seconds = 180
+heartbeat_seconds = 60
 recovery_grace_seconds = 60
 
 [[statuses]]

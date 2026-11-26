@@ -3,19 +3,21 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.0.0**  
-> **Updated: 2026-11-23**  
+> **Version: 1.1.0**  
+> **Updated: 2026-11-26**  
 
 # Description
 Целевая спецификация интеграции Manifest с Todoing JSON API v1.
 
-**Основа:** Todoing zhihus/todoing-x main @ 947048d3864e99c7d0dfcc48889a084e0a99e42d; Manifest feature/todoing-contract-spec.
+**Основа:** Todoing zhihus/todoing-x feature/generic-task-references-review-api @ 580370f00e5197e8aae821bb14ef03bb16afe9d5 (пересмотр); Manifest feature/todoing-contract-spec.
 
-> Эта редакция заменяет прежнюю целевую модель CLI + файловый WAL. Она описывает целевое потребление Todoing JSON API v1 и включает требования к универсальным расширениям Todoing, необходимым для сохранения ранее утверждённых решений Manifest. Исторические редакции v2–v6 сохранены отдельными файлами в Git.
+> Эта редакция заменяет прежнюю целевую модель CLI + файловый WAL. Она описывает потребление Manifest от Todoing JSON API v1 и фиксирует универсальные механизмы Todoing (external references, Review records, final commit marker), которые реализованы в Todoing и потребляются Manifest. Исторические редакции v2–v6 сохранены отдельными файлами в Git.
 
 ## 1. Архитектурный принцип и границы ответственности
 
 Todoing — самостоятельный универсальный инструмент управления задачами. Manifest — один из его потребителей. Todoing не зависит от Manifest и не содержит знаний о Manifest, OpenSpec, ролях агентов или политике проекта.
+
+Manifest остаётся проектом типа `doc`: программного оркестратора в репозитории нет, интеграция реализуется документированной процедурой, которую исполняет Main Orchestrator (основная сессия агента). Относящиеся к интеграции артефакты: `.manifest/project-id`, `.todoing/config.toml` и workflow-документация.
 
 ### 1.1. Todoing предоставляет
 
@@ -43,6 +45,8 @@ Todoing — самостоятельный универсальный инстр
 - аутентификацию акторов и безопасное хранение lock token;
 - резервирование, место хранения и срок хранения snapshot.
 
+Взаимодействие с Todoing API выполняется исключительно Main Orchestrator (основная сессия агента): он единственный участник, который вызывает Todoing API и владеет lock token. Ролевые субагенты (Аналитик, Архитектор, Планировщик, Тестировщик, Реализатор, Ревьюэр) не вызывают Todoing API напрямую и не получают lock token; оркестратор передаёт субагенту только артефакты и задачу, а все операции Todoing выполняет сам.
+
 Todoing не парсит OpenSpec и не проверяет Git workflow: он хранит только универсальные ссылки и commit references. Он не аутентифицирует actor и не обеспечивает ролевую политику потребителя.
 
 ## 2. Версия и транспорт API
@@ -58,7 +62,7 @@ Manifest использует только публичный JSON API v1 чер
 - Manifest назначает стабильный Project ID и передаёт его в каждом запросе.
 - Todoing сверяет Project ID с метаданными хранилища. Это защита от обращения не к тому хранилищу, а не аутентификация.
 - actor_id — атрибуция в истории, а не доказательство личности. Manifest формирует actor ID по собственной модели доверия.
-- Lock token — секрет: его нельзя помещать в task body, labels, логи, аргументы командной строки или Git. Manifest хранит его только в защищённом состоянии сессии агента и передаёт в envelope как lock_token.
+- Lock token — секрет: его нельзя помещать в task body, labels, логи, аргументы командной строки или Git. Manifest хранит его только в защищённом состоянии сессии Main Orchestrator и передаёт в envelope как lock_token.
 - Manifest не читает и не изменяет SQLite напрямую.
 
 ### 2.3. Совместимость
@@ -66,27 +70,29 @@ Manifest использует только публичный JSON API v1 чер
 Manifest опирается на API v1 и его нормативные схемы/операции. Нельзя определять поддержку операции пробным изменяющим вызовом. Перед использованием интеграция проверяет доступность бинарного файла и совместимость API; runtime capabilities discovery в Todoing отсутствует и для MVP не требуется.
 
 
-### 2.4. Обязательные универсальные расширения API v1
+### 2.4. Универсальные механизмы API v1
 
-Текущая реализация Todoing API v1 не предоставляет все ранее утверждённые
-возможности. До интеграции Manifest Todoing должен расширить API и SQLite schema
-следующими универсальными механизмами. Расширения не должны содержать
-Manifest-specific или OpenSpec-specific поля и правила.
+Следующие универсальные механизмы реализованы в Todoing API v1 и потребляются
+Manifest. Они не содержат Manifest-specific или OpenSpec-specific полей и правил:
+Todoing хранит только универсальные ссылки, Review-записи и commit references.
 
 **External references**
 
 - `task.external-ref.add`: принимает `task_id`, `namespace`, `value`, `relation`
   и `scope` (`task` или `project`; по умолчанию `task`). Строковые поля обязательны,
   непусты и ограничены по длине.
-- `task.external-ref.list`: принимает `task_id` и возвращает активные ссылки задачи.
+- `task.external-ref.list`: принимает `task_id` и необязательный `include_removed`
+  (по умолчанию false); возвращает активные ссылки задачи в порядке создания,
+  удалённые — только при `include_removed=true`.
 - `task.external-ref.remove`: принимает `task_id` и `reference_id`, удаляет активную связь append-only событием,
   сохраняя историю и версии.
 - В scope `task` пара `namespace + value` уникальна внутри задачи. В scope
   `project` эта пара уникальна во всём project store; project scope конфликтует
   с любой другой активной ссылкой той же пары. Todoing не интерпретирует namespace
   или relation, а только обеспечивает заданный scope.
-- Добавление/удаление требует lock владельца, создаёт новую версию задачи и
-  запись истории; повторное добавление идентичной активной ссылки — no-op.
+- Добавление/удаление уважает lock ownership: незаблокированная задача
+  изменяется без token; заблокированную изменяет только владелец с валидным
+  token. Успешное изменение создаёт новую версию задачи и запись истории.
 - Повторное добавление той же активной ссылки на той же задаче — no-op;
   изменение relation при той же namespace/value паре отклоняется как conflict.
 - Повторное удаление неактивной ссылки — no-op; неизвестный reference_id
@@ -118,10 +124,11 @@ Manifest-specific или OpenSpec-specific поля и правила.
 
 - `task.commit.finalize` принимает `task_id` и `revision`, разрешает Git revision
   в полный SHA и назначает или обновляет единственную текущую итоговую commit reference.
-- Операция требует активную блокировку владельца; изменение отражается в
-  immutable version и append-only history. Повтор того же SHA — no-op. Новый SHA
-  может заменить прежний только для активной (reopened) задачи; прежнее значение
-  сохраняется в предыдущих immutable versions и history.
+- Операция уважает lock ownership: незаблокированная задача изменяется без
+  token; заблокированную marker устанавливает только владелец с валидным token.
+  Изменение отражается в immutable version и append-only history. Повтор того же
+  SHA — no-op. Новый SHA может заменить прежний только для активной (reopened)
+  задачи; прежнее значение сохраняется в предыдущих immutable versions и history.
 - Обычные commit references остаются отдельными traceability references.
 
 ## 3. Модель задачи и статусов
@@ -154,7 +161,7 @@ Manifest поставляет рекомендуемый .todoing/config.toml. �
 format_version = 1
 
 [locking]
-lease_seconds = 300
+lease_seconds = 720
 heartbeat_seconds = 60
 recovery_grace_seconds = 60
 
@@ -218,6 +225,14 @@ from = "completed"
 to = "verified"
 ```
 
+Параметры блокировки: `lease_seconds = 720` покрывает hard timeout выполнения
+ролевого субагента (600 с по watchdog из `AGENTS.md`) с запасом 120 с. Во время
+блокирующего выполнения субагента оркестратор заблокирован и heartbeat не
+отправляет, поэтому lease должен пережить полный 600-секундный run субагента.
+`heartbeat_seconds` и `recovery_grace_seconds` сохраняются без изменений;
+recovery выполняется явной операцией `task.lock.recover` после истечения lease
+и grace.
+
 Переход `completed → verified` разрешён только операцией `task.reopen`, а не
 обычной сменой статуса. Если пользовательский config.toml уже существует,
 Manifest не заменяет его; он проверяет наличие необходимых IDs, outcome mapping
@@ -237,7 +252,7 @@ Manifest не трактует archive как отмену и не исполь�
 
 ### 4.1. Инициализация проекта
 
-1. Manifest определяет и сохраняет стабильный Project ID.
+1. Manifest определяет и сохраняет стабильный Project ID (UUIDv4) в `.manifest/project-id`.
 2. Manifest вызывает store.init с этим ID.
 3. Manifest проверяет результат через store.info и store.verify.
 4. Manifest заранее устанавливает рекомендуемый config.toml атомарной записью без перезаписи существующего файла; затем store.init валидирует и сохраняет его.
@@ -253,11 +268,11 @@ Manifest не трактует archive как отмену и не исполь�
 ### 4.3. Выполнение задачи и блокировка
 
 1. Оркестратор выбирает утверждённую задачу.
-2. Агент получает блокировку через task.lock.acquire.
-3. Manifest сохраняет owner ID, token и fencing generation в защищённом контексте сессии и передаёт token в каждом owner-запросе.
-4. Пока работа продолжается, агент продлевает lease через task.lock.heartbeat.
+2. Оркестратор (Main Orchestrator) получает блокировку через task.lock.acquire.
+3. Manifest сохраняет owner ID, token и fencing generation в защищённом контексте сессии Main Orchestrator и передаёт token в каждом owner-запросе.
+4. Пока работа продолжается, оркестратор продлевает lease через task.lock.heartbeat.
 5. Manifest переводит задачу в in_progress и выполняет разрешённые операции.
-6. По окончании агент освобождает блокировку через task.lock.release.
+6. По окончании оркестратор освобождает блокировку через task.lock.release.
 
 Заблокированная задача недоступна другим клиентам для чтения и изменения. Списки Todoing не раскрывают даже ID заблокированных задач. Manifest не обходит это ограничение чтением БД или snapshot.
 
@@ -299,7 +314,7 @@ revision_count — количество Review records с outcome changes_reques
 
 ## 6. Зависимости
 
-Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list. Связи с внешними артефактами и Review records хранятся в Todoing через универсальные API-операции, определённые в §2.4; они отсутствуют в текущей реализации и должны быть реализованы в Todoing без Manifest-specific semantics.
+Manifest управляет зависимостями через task.dependency.add, task.dependency.remove и task.dependency.list. Связи с внешними артефактами и Review records хранятся в Todoing через универсальные API-операции, определённые в §2.4; они реализованы в Todoing без Manifest-specific semantics.
 
 - Зависимость означает, что задача не должна начинаться до выполнения prerequisite согласно политике Manifest.
 - Todoing проверяет существование задач и запрещает циклы, но не решает, когда зависимость считается выполненной для workflow Manifest.
@@ -369,7 +384,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 
 ### Не входит
 
-- Manifest-specific поля и операции в Todoing; универсальные расширения external references, Review records и final commit marker входят в интеграционное предусловие MVP.
+- Manifest-specific поля и операции в Todoing. Универсальные механизмы external references, Review records и final commit marker реализованы в Todoing и входят в MVP (см. «Входит»).
 - Todoing capabilities discovery API.
 - Todoing lifecycle events/hooks как условие корректности.
 - Произвольные внешние ссылки без типизированного generic reference contract.
@@ -388,10 +403,10 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 | Baseline утверждения | task.version.approve | Todoing; разрешение — Manifest/user | Поддерживается |
 | Блокировки и fencing | task.lock.* | Todoing; token custody — Manifest | Поддерживается |
 | Зависимости | task.dependency.* | Todoing; gate выполнения — Manifest | Поддерживается |
-| Git SHA и итоговый commit | task.commit.add, task.commit.finalize | Todoing | Частично; final marker требует расширения |
-| OpenSpec Task link | Generic external references | Todoing API extension; semantics — Manifest | Требует универсального расширения Todoing |
-| Reviewer remarks/history | Generic review records | Todoing API extension; policy — Manifest | Требует универсального расширения Todoing |
-| revision_count | Count of changes_requested review records | Todoing API extension | Требует универсального расширения Todoing |
+| Git SHA и итоговый commit | task.commit.add, task.commit.finalize | Todoing | Поддерживается |
+| OpenSpec Task link | Generic external references | Todoing; semantics — Manifest | Поддерживается |
+| Reviewer remarks/history | Generic review records | Todoing; policy — Manifest | Поддерживается |
+| revision_count | Count of changes_requested review records | Todoing | Поддерживается |
 | Cross-system consistency | Consumer checks/workflow | Manifest | Требует реализации Manifest |
 | Capabilities discovery | Не используется в MVP | — | Отложено |
 | Generic hooks/events | Не используются для корректности | — | Отложено |
@@ -401,7 +416,7 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 1. Store инициализируется с ожидаемым Project ID; запрос с другим ID отклоняется.
 2. Analyst создаёт задачу в Backlog; пользовательское утверждение переводит её в Ready.
 3. Неутверждённая задача не может быть запущена оркестратором.
-4. Агент получает lock; другой actor не может прочитать или изменить задачу.
+4. Оркестратор получает lock; другой actor не может прочитать или изменить задачу.
 5. Heartbeat продлевает lease; истёкший lock нельзя продлить.
 6. Recovery создаёт новую fencing generation; прежний владелец не может продолжить работу.
 7. Недопустимый status transition отклоняется Todoing и не обходится Manifest.
@@ -421,11 +436,11 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 
 1. **Конфигурация статусов:** предлагаемые IDs/labels и граф переходов следуют утверждённым шести статусам Brief §7. Manifest создаёт config.toml только при отсутствии файла; существующий пользовательский файл не перезаписывается.
 2. **Outcome mapping:** completed отображается в outcome completed; отмена фиксируется как outcome cancelled без изменения workflow status, согласно Todoing task-status-configuration.
-3. **Универсальные API-расширения Todoing:** утвердить схему external references, Review records, final commit marker, идемпотентность review_id и миграцию SQLite schema; расширение не должно содержать терминов или правил Manifest/OpenSpec.
+3. **Универсальные API-расширения Todoing:** реализованы в Todoing — external references, Review records, final commit marker, идемпотентность review_id. Нормативные схемы определены в docs/api/v1/operations.md и request/response schemas Todoing; расширения не содержат терминов или правил Manifest/OpenSpec.
 4. **Утверждение baseline:** Manifest вызывает task.version.approve после того, как пользователь сам переводит задачу из Backlog в Ready; baseline фиксирует текущую версию задачи.
-5. **Project ID и actor ID:** предлагается создавать Project ID как UUIDv4 один раз и сохранять в стабильной конфигурации Manifest; actor_id — стабильный идентификатор роли/сессии длиной не более 128 символов. Формат Project ID требует подтверждения. Эти значения обеспечивают изоляцию/атрибуцию, не аутентификацию.
+5. **Project ID и actor ID:** Project ID — UUIDv4 (RFC 4122), генерируется один раз при bootstrap и хранится в `.manifest/project-id`; это решение Manifest, а не требование Todoing. Формат проходит валидацию Todoing (1–128 символов без whitespace и контрольных). actor_id — стабильный идентификатор роли/сессии длиной не более 128 символов. Эти значения обеспечивают изоляцию/атрибуцию, не аутентификацию.
 
-До утверждения этого документа он остаётся проектом решения. Реализация Manifest integration начинается после утверждения; универсальные расширения Todoing могут выполняться отдельной задачей на основании этой спецификации.
+До утверждения этого документа он остаётся проектом решения. Реализация Manifest integration начинается после утверждения; универсальные механизмы Todoing (external references, Review records, final commit marker) уже реализованы и потребляются Manifest.
 
 ## 14. Источники и ограничения
 
@@ -442,4 +457,4 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 - architecture-roadmap.ru.md §1–3;
 - todoing-implementation-audit.ru.md.
 
-Спецификация подготовлена по опубликованным документам Todoing на HEAD 947048d. Полный набор тестов Todoing в рамках аудита не запускался. Перед утверждением независимый Reviewer должен сверить каждый нормативный тезис с API schema, implementation и тестами. Если Todoing изменит API v1, спецификацию требуется пересмотреть до изменения интеграционного кода.
+Спецификация пересмотрена по документам и реализации Todoing на HEAD 580370f (ветка feature/generic-task-references-review-api). Пересмотр — документальная сверка с API schemas, operations.md и src/api.rs; полный набор тестов Todoing в рамках этого пересмотра не запускался. Перед утверждением независимый Reviewer должен сверить каждый нормативный тезис с API schema, implementation и тестами. Если Todoing изменит API v1, спецификацию требуется пересмотреть до изменения интеграционного кода.
