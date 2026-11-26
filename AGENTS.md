@@ -26,9 +26,10 @@ look and what it must contain.
 
 Type: **doc**.
 
-**Project structure.** This is the head project. Navigation map: `llms.txt`.
+**Project structure.** This repository contains the Manifest framework itself. Connected projects are independent consumers, not sub-projects of this repository. Navigation map: `llms.txt`.
 
-- Register every new sub-project in `llms.txt` with a brief comment.
+- Register connected consumers in `workflow/connected-projects.md`.
+- Add a project to `llms.txt` only when it is an actual component or directory of this repository.
 
 **Plans.** Plan files live in `docs/plans/`. Plan files are stored
 compressed; the agent must perform context compression before storing
