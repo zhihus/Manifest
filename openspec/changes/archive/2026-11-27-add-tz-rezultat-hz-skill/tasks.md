@@ -6,5 +6,6 @@
 - [x] Add Windows GitHub Actions validation for installer, bootstrap approval gate, and regression tests.
 - [x] Move the bootstrap test import path to the Manifest distribution layout.
 - [x] Document the Windows installation workflow and component boundary.
-- [ ] Obtain a successful Windows CI run.
-- [ ] Archive this change after successful verification.
+- [x] Obtain a successful Windows CI run.
+- [x] Verify exact upstream package file list, blob hashes, and modes.
+- [x] Archive this change after successful verification.
