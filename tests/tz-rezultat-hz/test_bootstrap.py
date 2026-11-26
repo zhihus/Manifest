@@ -47,7 +47,7 @@ import tempfile
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKILL_DIR = os.path.abspath(os.path.join(HERE, "..", ".zcode", "skills",
+SKILL_DIR = os.path.abspath(os.path.join(HERE, "..", "..", "skills",
                                          "tz-rezultat-hz"))
 sys.path.insert(0, SKILL_DIR)
 
