@@ -29,7 +29,7 @@ if ru != en:
 assert ru.get("format_version") == 1, "format_version must be 1"
 assert ru.get("locking") == {
     "lease_seconds": 720,
-    "heartbeat_seconds": 180,
+    "heartbeat_seconds": 60,
     "recovery_grace_seconds": 60,
 }, "locking values do not match the approved lease protocol"
 

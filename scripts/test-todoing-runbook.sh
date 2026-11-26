@@ -61,7 +61,7 @@ for file in "$RU" "$EN"; do
     require_text "$file" "$value" "status mapping"
   done
   require_text "$file" "720" "lease duration"
-  require_text "$file" "180" "heartbeat configuration"
+  require_text "$file" "heartbeat_seconds = 60" "heartbeat configuration"
   require_text "$file" "60" "recovery grace"
   require_text "$file" "ready → in_progress" "execution status transition"
   require_text "$file" "openspec archive <change-id> --yes --skip-specs" "cancel archive mode"

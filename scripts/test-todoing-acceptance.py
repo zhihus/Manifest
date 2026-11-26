@@ -128,7 +128,7 @@ def main() -> None:
 
 [locking]
 lease_seconds = 720
-heartbeat_seconds = 180
+heartbeat_seconds = 60
 recovery_grace_seconds = 60
 
 [[statuses]]
