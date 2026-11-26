@@ -74,6 +74,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "bootstrap.ps1 -Plan failed: $LASTEXITCODE" }
           powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./skills/tz-rezultat-hz/bootstrap.ps1
           if ($LASTEXITCODE -ne 4) { throw "Default bootstrap must stop for explicit approval (expected 4, got $LASTEXITCODE)" }
+          $global:LASTEXITCODE = 0
 
       - name: Run bootstrap regression tests
         shell: pwsh
