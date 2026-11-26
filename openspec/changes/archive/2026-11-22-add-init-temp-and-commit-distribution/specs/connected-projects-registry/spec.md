@@ -44,3 +44,4 @@ from the registry). A moved project MUST have its path updated.
 
 - **WHEN** the user says a project is no longer connected
 - **THEN** the entry's status changes to `archived`; the entry stays
+  in the registry as archived
