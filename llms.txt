@@ -2,8 +2,9 @@
 
 ## Project
 
-**Manifest** — head (meta) project: defines the architecture of LLM
-instruction files.
+**Manifest** is a standalone framework project. Projects that connect to it
+remain independent consumers and own their implementation and internal
+workflows.
 Entry point: `AGENTS.md`
 
 ## Directories
@@ -11,7 +12,9 @@ Entry point: `AGENTS.md`
 * `docs/` — project documentation. Manifest specification:
   `docs/manifest.md` (full) and `docs/manifest.compact.md`
   (compressed); project-level manifest with frozen decisions:
-  `docs/project-manifest.md`.
+  `docs/project-manifest.md`. Project independence and publication rules:
+  `docs/project-boundaries-and-publication.ru.md` (authoritative RU) and
+  `docs/project-boundaries-and-publication.en.md` (EN translation).
 * `docs/architecture/` — architecture documents and audits
   (architecture brief, decision registers, MVP/roadmap split, role
   model, integration audits, external dependency register:
@@ -51,6 +54,7 @@ No build step; runs from source.
 ## Rules
 
 * Workflow: `AGENTS.md`
+* Project boundaries and publication: `docs/project-boundaries-and-publication.ru.md`
 * Versioning: `VERSIONING.md`
 * Releases: `releases.md`
 * Commits: `commit-rules.md` (Manifest project itself); universal
