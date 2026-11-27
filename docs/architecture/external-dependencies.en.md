@@ -35,6 +35,7 @@ this file is its translation.
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
 | `ln` | atomic no-clobber file creation; symlink-file test | `skills/manifest-init/scripts/install.sh`, `test-structure-parser.sh` | portable system utility; an existing destination causes failure |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
+| `uname` | platform and architecture detection when resolving the Todoing binary | scripts/resolve-todoing.sh | POSIX utility; included in Git for Windows / macOS / Linux |
 
 ## 1. Removed dependencies
 

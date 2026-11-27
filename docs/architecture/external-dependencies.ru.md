@@ -35,6 +35,7 @@
 | `env` | поиск Bash по PATH в shebang | все исполняемые shell-скрипты | системная утилита |
 | `ln` | атомарное создание новых файлов без перезаписи; проверка symlink-файлов в тестах | `skills/manifest-init/scripts/install.sh`, `test-structure-parser.sh` | переносимая системная утилита; существующая цель вызывает отказ |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | установка, откат и проверка файлов | manifest-init.sh, test-скрипты | coreutils / Git for Windows |
+| `uname` | определение платформы и архитектуры при разрешении бинарника Todoing | scripts/resolve-todoing.sh | POSIX-утилита; входит в Git for Windows / macOS / Linux |
 
 ## 1. Исключённые зависимости
 

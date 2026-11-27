@@ -224,7 +224,15 @@ Todoing is the source of truth for task state, versions, history, locks, and Rev
 
 ### 6.1. Bootstrap and Project ID
 
-1. Verify that the user-installed binary is available with `todoing version` and is compatible with the baseline build below. Stop with a diagnostic if the binary is missing or incompatible. Manifest does not install or update Todoing. Invoke the JSON API as `todoing --json api`: send one JSON request on stdin and read one JSON response from stdout.
+Two usage modes are supported: a normal install on PATH, and a portable package referenced by an explicit path. The resolver scripts (`scripts/resolve-todoing.sh` / `scripts/resolve-todoing.py`) apply a strict priority and verify the version before any store operation:
+
+1. Explicit `TODOING_BIN` — must point to an existing file; a missing file is a hard stop.
+2. Portable build in the Manifest release cache: `.todoing-cache/portable/<VERSION>/<PLATFORM>-<ARCH>/todoing[.exe]`.
+3. `todoing` found on PATH.
+
+An incompatible version is a hard stop: the resolver never silently falls back to another binary. The release cache (`.todoing-cache/`) holds downloaded releases separated by version and platform, is never mixed with the user task store (`.todoing/`), and is git-ignored.
+
+1. Verify that the resolver found a binary and that `todoing version` matches the required version (currently `1.2.0`), and that the binary is compatible with the baseline build below. Stop with a diagnostic if the binary is missing or incompatible. Manifest does not install or update Todoing. Invoke the JSON API as `todoing --json api`: send one JSON request on stdin and read one JSON response from stdout.
 
 The full Manifest workflow requires a Todoing build from commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant. Manifest's acceptance CI pins this commit. The current public `todoing-x/main` does not contain `task.external-ref.*`, `task.review.*`, or `task.commit.finalize`; a binary built from that branch is incompatible with the full workflow. `todoing version` confirms CLI availability but may not identify its source commit, so verify build provenance separately.
 2. If both `.manifest/project-id` and the SQLite store are absent, generate a UUIDv4 and create the file atomically without overwriting an existing file.

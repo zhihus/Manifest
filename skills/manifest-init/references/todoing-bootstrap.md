@@ -4,7 +4,23 @@ Todoing is user-managed. Manifest never downloads or updates its binary.
 
 Use the JSON API as `todoing --json api`: pass exactly one JSON request on stdin and read exactly one JSON response from stdout.
 
-1. Require todoing in PATH and a successful todoing version.
+## Binary resolution
+
+Two usage modes are supported: a normal install on PATH, and a portable
+package referenced by an explicit path. The resolver scripts
+(`scripts/resolve-todoing.sh` / `scripts/resolve-todoing.py`) apply this
+strict priority and verify the reported version before any store operation:
+
+1. Explicit `TODOING_BIN` — must point to an existing file; a missing file is a hard stop.
+2. Portable build in the Manifest release cache: `.todoing-cache/portable/<VERSION>/<PLATFORM>-<ARCH>/todoing[.exe]`.
+3. `todoing` found on PATH.
+
+An incompatible version is a hard stop: the resolver never silently falls back
+to another binary. The release cache (`.todoing-cache/`) holds downloaded
+releases separated by version and platform and is never mixed with the user
+task store (`.todoing/`); it is git-ignored.
+
+1. Require a resolvable todoing binary and a successful `todoing version` matching the required version (currently `1.2.0`).
    The full Manifest workflow requires a build from Todoing commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant; the current public `main` branch lacks the required external-reference, Review, and final-commit API operations. Verify the binary's build provenance separately because `todoing version` may not report its source commit.
 2. Inspect .todoing/ before writing. Existing database: never call store.init. Legacy .todoing/tasks/*.md or index.json: stop and request a separately approved migration. Existing config.toml: preserve and validate; never overwrite.
 3. Project identity is .manifest/project-id. Existing store plus missing ID is a hard stop. For a new store, generate UUIDv4 and write atomically without clobbering.
