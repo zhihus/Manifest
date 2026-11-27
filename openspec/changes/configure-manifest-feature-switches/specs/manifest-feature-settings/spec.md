@@ -30,6 +30,19 @@ other.
 - **THEN** the Orchestrator does not create, validate, or archive OpenSpec changes
 - **AND** Todoing remains available without an OpenSpec reference requirement
 
+#### Scenario: Both components enabled
+
+- **WHEN** Todoing and OpenSpec are both enabled
+- **THEN** the Orchestrator follows the coordinated Todoing/OpenSpec workflow
+- **AND** maintains exactly one Todoing task per OpenSpec change using its exact change ID and a project-scoped `openspec.change` reference
+- **AND** keeps FR and checklist decomposition in `tasks.md` without creating duplicate Todoing tasks
+
+#### Scenario: Both components disabled
+
+- **WHEN** Todoing and OpenSpec are both disabled
+- **THEN** the Orchestrator invokes neither component and does not require a Todoing store or OpenSpec configuration
+- **AND** creates no Todoing task or OpenSpec change
+
 ### Requirement: Independent optional control switches
 
 The configuration MUST define independent boolean switches for workflow
