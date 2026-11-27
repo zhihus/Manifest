@@ -9,7 +9,9 @@
 # Description
 Целевая спецификация интеграции Manifest с Todoing JSON API v1.
 
-**Основа:** Todoing zhihus/todoing-x feature/generic-task-references-review-api @ 580370f00e5197e8aae821bb14ef03bb16afe9d5 (пересмотр); Manifest feature/todoing-contract-spec.
+**Основа:** Todoing zhihus/todoing-x @ 6acca6087fbd4b39ad0dcd5f12db52dc4d84b163 (commit, закреплённый в acceptance CI Manifest);
+проверенный потомок — ветка `feature/generic-task-references-review-api`.
+Manifest `develop`.
 
 > Эта редакция заменяет прежнюю целевую модель CLI + файловый WAL. Она описывает потребление Manifest от Todoing JSON API v1 и фиксирует универсальные механизмы Todoing (external references, Review records, final commit marker), которые реализованы в проверенной сборке Todoing на commit 6acca6087fbd4b39ad0dcd5f12db52dc4d84b163 и потребляются Manifest.
 Текущая публичная ветка Todoing main @ 714664e53f364d03bb5d4ca19c3a504003101570 этих операций не содержит и
