@@ -143,11 +143,15 @@ if (( ! config_exists )); then
   fi
 
   mkdir -p "$MK"
+  todoing_enabled=false
+  openspec_enabled=false
+  [[ $TODOING == enabled ]] && todoing_enabled=true
+  [[ $OPEN_SPEC == enabled ]] && openspec_enabled=true
   yaml_name=$(printf '%s' "$PROJECT_NAME" | perl -pe 's/\\/\\\\/g; s/"/\\"/g; s/\r/\\r/g')
   tmp=$(mktemp "$MK/.manifest.yaml.XXXXXX")
   {
     printf 'format_version: 1\nproject:\n  name: "%s"\n  tracks: %s\n  created: "%s"\n' "$yaml_name" "$TRACKS" "$(date +%F)"
-    printf 'components:\n  todoing:\n    enabled: %s\n  openspec:\n    enabled: %s\ncontext_files:\n' "$TODOING" "$OPEN_SPEC"
+    printf 'components:\n  todoing:\n    enabled: %s\n  openspec:\n    enabled: %s\ncontext_files:\n' "$todoing_enabled" "$openspec_enabled"
     for i in "${!CONTEXT_IDS[@]}"; do
       state=false
       for override in "${CONTEXT_OVERRIDES[@]}"; do
