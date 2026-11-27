@@ -1,7 +1,7 @@
 # Todoing Contract for Manifest
 
 # Metadata
-> **Status: draft**  
+> **Status: active**  
 > **Type: document**  
 > **Version: 1.1.0**  
 > **Updated: 2026-11-27**  
@@ -208,7 +208,7 @@ Recommended Todoing configuration fragment:
 format_version = 1
 
 [locking]
-lease_seconds = 300
+lease_seconds = 720
 heartbeat_seconds = 60
 recovery_grace_seconds = 60
 
@@ -267,9 +267,6 @@ to = "in_progress"
 from = "verified"
 to = "completed"
 
-[[transitions]]
-from = "completed"
-to = "verified"
 ```
 
 The `completed → verified` transition is permitted only through `task.reopen`,
