@@ -139,7 +139,10 @@ def run_todoing_only_acceptance(parent: Path, config: str) -> None:
         "body": "Goal: verify the task lifecycle without an OpenSpec dependency.",
     })["task"]
     task_id = created["id"]
-    assert created.get("external_references", []) == []
+    initial = api(root, "task.get", {"task_id": task_id})["task"]
+    assert initial.get("external_references", []) == []
+    listed = api(root, "task.list", {"status_id": "backlog"})["tasks"]
+    assert any(item["id"] == task_id for item in listed)
 
     # This API sequence represents an explicit user approval of the task.
     api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
