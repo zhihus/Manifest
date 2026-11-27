@@ -113,6 +113,92 @@ def release(root: Path, task_id: int, grant: dict) -> None:
     )
 
 
+def run_todoing_only_acceptance(parent: Path, config: str) -> None:
+    """Exercise the full task lifecycle without creating or invoking OpenSpec."""
+    root = parent / "todoing-only"
+    (root / ".manifest").mkdir(parents=True)
+    (root / ".manifest" / "project-id").write_text(PROJECT_ID, encoding="utf-8")
+    (root / ".todoing").mkdir()
+    (root / ".todoing" / "config.toml").write_text(config, encoding="utf-8")
+
+    run(["git", "init", "-b", "main"], root)
+    run(["git", "config", "user.name", "Manifest Todoing-only Acceptance"], root)
+    run(["git", "config", "user.email", "todoing-only@example.invalid"], root)
+    (root / "tracked.txt").write_text("todoing-only fixture\n", encoding="utf-8")
+    run(["git", "add", "tracked.txt"], root)
+    run(["git", "commit", "-m", "test: initialize Todoing-only fixture"], root)
+
+    assert not (root / "openspec").exists()
+    api(root, "store.init", {})
+    api(root, "store.info", {})
+    api(root, "store.verify", {"deep": True})
+
+    created = api(root, "task.create", {
+        "title": "Standalone Todoing task",
+        "status_id": "backlog",
+        "body": "Goal: verify the task lifecycle without an OpenSpec dependency.",
+    })["task"]
+    task_id = created["id"]
+    assert created.get("external_references", []) == []
+
+    # This API sequence represents an explicit user approval of the task.
+    api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
+    ready = api(root, "task.get", {"task_id": task_id})["task"]
+    api(root, "task.version.approve", {
+        "task_id": task_id,
+        "version_no": ready["version_no"],
+    })
+
+    grant = acquire(root, task_id)
+    owner_call(root, "task.status.set", {
+        "task_id": task_id,
+        "status_id": "in_progress",
+    }, grant)
+    owner_call(root, "task.update", {
+        "task_id": task_id,
+        "patch": {"body": "Implementation completed without OpenSpec."},
+    }, grant)
+    owner_call(root, "task.status.set", {
+        "task_id": task_id,
+        "status_id": "review",
+    }, grant)
+
+    reviewed_version = api(
+        root, "task.get", {"task_id": task_id}, token=grant["lock_token"]
+    )["task"]["version_no"]
+    owner_call(root, "task.review.add", {
+        "task_id": task_id,
+        "review_id": "todoing-only-approved-review",
+        "version_no": reviewed_version,
+        "reviewer": "todoing-only-reviewer",
+        "outcome": "approved",
+        "comments": [],
+    }, grant, actor="todoing-only-reviewer")
+    owner_call(root, "task.status.set", {
+        "task_id": task_id,
+        "status_id": "verified",
+    }, grant)
+
+    final_sha = run(["git", "rev-parse", "HEAD"], root)
+    owner_call(root, "task.commit.finalize", {
+        "task_id": task_id,
+        "revision": final_sha,
+    }, grant)
+    owner_call(root, "task.status.set", {
+        "task_id": task_id,
+        "status_id": "completed",
+    }, grant)
+    release(root, task_id, grant)
+
+    completed = api(root, "task.get", {"task_id": task_id})["task"]
+    assert completed["outcome"] == "completed"
+    assert completed["final_commit_sha"] == final_sha
+    assert completed.get("external_references", []) == []
+    assert len(api(root, "task.review.list", {"task_id": task_id})["reviews"]) == 1
+    assert not (root / "openspec").exists()
+    api(root, "store.verify", {"deep": True})
+
+
 def main() -> None:
     if not TODOING.is_file():
         raise SystemExit(f"TODOING_BIN is not a file: {TODOING}")
@@ -361,8 +447,10 @@ to = "completed"
         assert restored_cancel["outcome"] == "cancelled"
         assert restored_cancel["external_references"][0]["value"] == "acceptance-cancel"
         api(root, "store.verify", {"deep": True})
+        run_todoing_only_acceptance(root, config)
 
     print("PASS real Todoing API ↔ Manifest/OpenSpec acceptance lifecycle")
+    print("PASS standalone Todoing task lifecycle without OpenSpec")
     print("PASS review idempotency, final SHA, cancellation archive, snapshot verify/restore")
 
 
