@@ -103,7 +103,7 @@ tmpdir=$(mktemp -d "$PROJECT/.manifest-stage.XXXXXX") || fail STAGING_FAILED; tr
 if ((context_settings_present)); then
 for i in "${!CONTEXT_IDS[@]}"; do
  id=${CONTEXT_IDS[$i]}
- state=$(grep -A2 "^  $id:" "$CONFIG" | sed -n 's/^[[:space:]]*enabled: \(true\|false\)$/\1/p')
+ state=$(grep -A2 "^  $id:" "$CONFIG" | sed -n 's/^[[:space:]]*enabled: //p')
  [[ $state == true ]] || continue
  name=${CONTEXT_FILES[$i]}; src=$TEMPLATES/${CONTEXT_TEMPLATES[$i]}
  [[ -f $src ]] || fail "TEMPLATE_MISSING: $src"

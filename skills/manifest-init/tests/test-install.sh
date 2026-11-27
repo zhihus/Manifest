@@ -28,3 +28,40 @@ new_repo "$TMP/legacy"; mkdir -p "$TMP/legacy/.manifest"; printf 'project_name=o
 printf 'sha256sum:%s\n' "$(sha256sum "$TMP/legacy/.manifest/manifest.yaml" | awk '{print $1}')" >"$TMP/legacy/.manifest/manifest.yaml.checksum"
 if run "$TMP/legacy" >"$TMP/legacy.out" 2>&1; then echo "FAIL legacy accepted"; fails=$((fails+1)); else grep -q CONFIG_UNSUPPORTED "$TMP/legacy.out" || { echo "FAIL legacy diagnostic"; fails=$((fails+1)); }; fi
 echo "Regression failures: $fails"; ((fails == 0))
+
+new_repo "$TMP/legacy-v1"
+mkdir -p "$TMP/legacy-v1/.manifest"
+cat >"$TMP/legacy-v1/.manifest/manifest.yaml" <<'YAML'
+format_version: 1
+project:
+  name: legacy-v1
+components:
+  todoing:
+    enabled: true
+  openspec:
+    enabled: false
+checks:
+  workflow_preflight:
+    enabled: false
+  git_hooks:
+    enabled: false
+  git_checks:
+    enabled: false
+  openspec_validation:
+    enabled: false
+  tests:
+    enabled: false
+  review_gate:
+    enabled: false
+  additional_gates:
+    enabled: false
+YAML
+printf 'sha256sum:%s\n' "$(sha256sum "$TMP/legacy-v1/.manifest/manifest.yaml" | awk '{print $1}')" >"$TMP/legacy-v1/.manifest/manifest.yaml.checksum"
+run "$TMP/legacy-v1" >"$TMP/legacy-v1.out"
+[[ ! -e "$TMP/legacy-v1/AGENTS.md" ]] || { echo "FAIL legacy config installed context"; fails=$((fails+1)); }
+grep -q 'context_files settings absent' "$TMP/legacy-v1.out" || { echo "FAIL legacy context migration warning"; fails=$((fails+1)); }
+if run "$TMP/partial" --context-file version=enabled >"$TMP/override.out" 2>&1; then
+ echo "FAIL existing config accepted context override"; fails=$((fails+1))
+else
+ grep -q EXISTING_CONFIG_IMMUTABLE "$TMP/override.out" || { echo "FAIL existing config override diagnostic"; fails=$((fails+1)); }
+fi
