@@ -64,8 +64,31 @@ grep -q 'demo' "$TMP/fresh/AGENTS.md" ||
   { ok=0; FAIL+=("fresh: PROJECT_NAME not substituted"); }
 [[ -f $TMP/fresh/.manifest/manifest.yaml.checksum ]] ||
   { ok=0; FAIL+=("fresh: checksum missing"); }
-for expected in \
-  '^format_version: 1
+for expected in
+  '^format_version: 1$'
+  '^  name: "demo"$'
+  '^  tracks: code$'
+  '^components:$'
+  '^  todoing:$'
+  '^    enabled: true$'
+  '^  openspec:$'
+  '^checks:$'
+  '^  workflow_preflight:$'
+  '^  git_hooks:$'
+  '^  git_checks:$'
+  '^  openspec_validation:$'
+  '^  tests:$'
+  '^  review_gate:$'
+  '^  additional_gates:$'
+do
+  grep -q "$expected" "$TMP/fresh/.manifest/manifest.yaml" ||
+    { ok=0; FAIL+=("fresh: config missing '$expected'"); }
+done
+[[ $(grep -c '^    enabled: false$' "$TMP/fresh/.manifest/manifest.yaml") -eq 7 ]] ||
+  { ok=0; FAIL+=("fresh: expected seven disabled optional controls"); }
+! grep -q '^project_name=' "$TMP/fresh/.manifest/manifest.yaml" ||
+  { ok=0; FAIL+=("fresh: legacy key=value format remains"); }
+((ok)) && PASS+=("fresh")
 
 # Fixture 2: project with AGENTS.md and VERSIONING.md already present.
 mkdir -p "$TMP/conflict" && git -C "$TMP/conflict" init -q
