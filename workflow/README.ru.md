@@ -355,10 +355,11 @@ printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-o
    После разрешения выполните `task.status.set` → `ready`, прочитайте
    актуальную версию через `task.get` и зафиксируйте её через
    `task.version.approve`.
-5. До начала работы проверьте зависимости через
-   `task.dependency.list`: outcome каждой prerequisite-задачи должен быть
-   `completed`. При незавершённой, заблокированной или непроверяемой
-   зависимости не начинайте работу.
+5. Связи предпосылок добавляйте и удаляйте через `task.dependency.add` и
+   `task.dependency.remove` только для реальных зависимостей между самостоятельными
+   задачами. До начала работы проверьте их через `task.dependency.list`: outcome
+   каждой prerequisite-задачи должен быть `completed`. При незавершённой,
+   заблокированной или непроверяемой зависимости не начинайте работу.
 6. Затем выполните общий протокол §6.3: acquire lock, переход
    `ready → in_progress`, heartbeat перед каждым блокирующим запуском
    субагента. Только Main Orchestrator вызывает Todoing API.
