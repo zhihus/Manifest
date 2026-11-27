@@ -440,7 +440,7 @@ Orchestrator на проект; параллельные оркестратор�
 После прерывания сначала сверяйте фактическое состояние: Todoing через `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive); Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
 - Если ответ на `task.lock.release` потерян:
   1. Сначала выполните `task.lock.heartbeat`.
-  2. Повторите release только после успешного подтверждения владения.
+  2. Повторите release только после успешного подтверждения владения. Если владение не подтверждено, выясните, завершился ли release; старый token повторно не используйте.
 - `lock_expired`: дождитесь истечения lease и recovery grace (60 секунд), затем вызовите `task.lock.recover`; используйте только новый token и fencing generation. Recovery атомарен: конкурирующие вызовы сериализуются транзакцией и CAS по `fencing_generation`; первый успешный вызов получает новый token, последующий получает `task_locked`. После recovery проверьте актуальную версию задачи и состояние артефактов до продолжения работы.
 - `stale_lock`: старый token больше не использовать.
 - Сценарии частичного сбоя:
