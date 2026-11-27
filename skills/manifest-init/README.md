@@ -1,6 +1,6 @@
 # Manifest Init
 
-Standalone skill for connecting Manifest to new and existing Git projects. Context files are individually selectable and none are installed by default.
+Standalone skill for connecting Manifest to Git projects and managing standalone Todoing tasks after connection. Context files are individually selectable and none are installed by default.
 
 ## Layout
 
@@ -8,6 +8,7 @@ Standalone skill for connecting Manifest to new and existing Git projects. Conte
 - scripts/install.sh — additive installer.
 - templates/ — standalone copies of approved project templates.
 - references/todoing-bootstrap.md — non-destructive Todoing bootstrap contract.
+- references/todoing-agent-workflow.md — runtime task management after connection (Todoing-only mode).
 - tests/test-install.sh — regression suite.
 
 ## Use
