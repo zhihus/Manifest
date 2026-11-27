@@ -30,7 +30,7 @@ check_existence() {
 # catches syntax errors in test scripts and extensionless hooks.
 check_shell_syntax() {
   local f
-  for f in "$ROOT"/scripts/*.sh "$ROOT"/scripts/hooks/*; do
+  for f in "$ROOT"/scripts/*.sh "$ROOT"/scripts/hooks/* "$ROOT"/skills/*/scripts/*.sh "$ROOT"/skills/*/tests/*.sh; do
     [[ -f $f ]] || continue
     if ! bash -n "$f"; then
       fail "shell syntax invalid: ${f#"$ROOT"/}"

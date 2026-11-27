@@ -19,7 +19,7 @@ this file is its translation.
 | `bash` | interpreter for all infrastructure scripts | `scripts/*.sh` and `scripts/hooks/*` | `#!/usr/bin/env bash` |
 | `git` | repository operations, changed-file detection | all infrastructure scripts and the `scripts/hooks/pre-commit` hook | preflight `command -v git` |
 | SHA-256 (`sha256sum` or `shasum -a 256`) | config overwrite protection; byte checks | manifest-init.sh (checksum guard), test-manifest-init.sh (checksum regression fixture) | runtime detection: `sha256sum`, else `shasum -a 256`; the detected tool is used consistently |
-| `perl` | manifest-init template rendering (placeholder and conditional substitution) | manifest-init.sh, `render_template` | preflight: `command -v perl` and `perl -e 'exit 0'` |
+| `perl` | manifest-init template rendering (placeholder and conditional substitution) | `skills/manifest-init/scripts/install.sh` | preflight: `command -v perl` and `perl -e 'exit 0'` |
 | `mktemp` | unique temp files and directories (collision safety) | manifest-init.sh, verify.sh, test-manifest-init.sh, test-portability.sh | coreutils / Git for Windows / macOS |
 | `awk` | checksum output parsing, fixture generation in verify.sh | manifest-init.sh, verify.sh | base system install; only portable constructs used |
 | `cmp` | byte comparison of installed files against renders | manifest-init.sh, test-manifest-init.sh | coreutils / Git for Windows / macOS |
@@ -34,7 +34,7 @@ this file is its translation.
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
 | `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
-| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
+| `ln` | atomic no-clobber creation of new files | `skills/manifest-init/scripts/install.sh` | portable system utility; an existing destination causes failure and is preserved |\n| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
 
