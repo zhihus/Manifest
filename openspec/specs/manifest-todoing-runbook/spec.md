@@ -173,7 +173,8 @@ The runbook MUST require reading actual Todoing, OpenSpec, and Git state before 
 - GIVEN the `task.review.add` response was lost
 - WHEN the Orchestrator resumes
 - THEN it inspects `task.review.list` before retrying
-- AND does not append a duplicate when the same review ID and payload are already present
+- AND treats the Review as already recorded only when the review ID, exact payload, and envelope `actor_id` match
+- AND escalates instead of retrying or appending when an existing record has a different `actor_id` or payload
 - AND performs only the missing status transition after reconciling task state
 
 #### Scenario: Lost lock-release response
