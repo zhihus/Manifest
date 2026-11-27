@@ -225,6 +225,8 @@ Todoing is the source of truth for task state, versions, history, locks, and Rev
 ### 6.1. Bootstrap and Project ID
 
 1. Verify that the user-installed binary is available with `todoing version`. Manifest does not install or update Todoing.
+
+The full Manifest workflow requires a Todoing build from commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant. Manifest's acceptance CI pins this commit. The current public `todoing-x/main` does not contain `task.external-ref.*`, `task.review.*`, or `task.commit.finalize`; a binary built from that branch is incompatible with the full workflow. `todoing version` confirms CLI availability but may not identify its source commit, so verify build provenance separately.
 2. If both `.manifest/project-id` and the SQLite store are absent, generate a UUIDv4 and create the file atomically without overwriting an existing file.
 3. If the store exists but the Project ID is missing, stop. Do not generate a replacement ID or call `store.init`.
 4. If the Project ID exists, reuse it unchanged. For an existing store, call `store.info` and `store.verify`; an ID mismatch or integrity failure is a hard stop.
@@ -312,6 +314,50 @@ One OpenSpec change maps to one Todoing task. When both Todoing and OpenSpec are
 - Do not dispatch implementation, acquire a lock, or move the task to `in_progress` before approval.
 - Manage dependencies with `task.dependency.add`, `task.dependency.remove`, and `task.dependency.list`. Before dispatch, verify that every prerequisite task has outcome `completed`. If a dependency is locked or its state cannot be verified, do not start work. Todoing stores dependency edges and prevents cycles; Manifest decides readiness.
 - `actor_id` is attribution, not authentication. The Orchestrator sends every request; for a Review, set the envelope actor ID to the stable identity of the Reviewer role/session.
+
+### 6.2.1. Todoing-only mode (OpenSpec disabled)
+
+Use this mode when `components.todoing.enabled: true` and
+`components.openspec.enabled: false`. Todoing manages standalone project
+tasks; OpenSpec is not a required dependency.
+
+1. At the start of a work session, list active tasks with `task.list`.
+   Reuse a matching existing task instead of creating a duplicate. If a
+   task's state cannot be verified (for example, it is hidden because
+   another owner holds its lock), stop and resolve the uncertainty; do not
+   assume the task is absent.
+2. Create a task with `task.create` only for an independently meaningful
+   outcome, not for every implementation step. Keep subtasks, technical
+   steps, and intermediate actions inside the parent task description.
+   Check for an existing active task with the same outcome before creating.
+3. New tasks start in `backlog`. Put the concise outcome in `title`, and
+   the goal, boundaries, and acceptance criteria in `body`. Do not add
+   priorities; the current Manifest configuration does not use them.
+4. Only an explicit user instruction to execute the work authorizes
+   `backlog → ready`. A request to discuss, analyze, or prepare a plan is
+   not implementation approval. After approval, call `task.status.set` to
+   `ready`, read the current version with `task.get`, and record it with
+   `task.version.approve`.
+5. Before starting, inspect dependencies with `task.dependency.list`.
+   Every prerequisite must have outcome `completed`. Do not start when a
+   dependency is incomplete, locked, or cannot be verified.
+6. Then follow §6.3: acquire the lock, transition `ready → in_progress`,
+   and heartbeat before each blocking role-agent run. Only the Main
+   Orchestrator calls the Todoing API.
+7. After each meaningful Git commit, attach it with `task.commit.add`.
+   Before handing the result to the Reviewer, move the task to `review`;
+   use the Review API in §6.4. On approval, move it to `verified`.
+8. Complete the task after acceptance checks: record the final Git SHA with
+   `task.commit.finalize`, move the task to `completed`, and release the
+   lock. Do not run OpenSpec archive or create an `openspec.change`
+   reference in this mode.
+9. Cancel only after the user's decision, using `task.cancel`; do not run
+   OpenSpec archive. After an interruption, reconcile Todoing and Git before
+   retrying any operation.
+
+`task.list` omits tasks locked by another owner. Manifest permits only one
+active global task and one Main Orchestrator per project; parallel
+Orchestrators are not used.
 
 ### 6.3. Lock custody and execution
 
