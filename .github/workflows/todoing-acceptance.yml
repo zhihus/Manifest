@@ -11,6 +11,11 @@ on:
       - 'feature/**'
     paths:
       - "scripts/test-todoing-acceptance.py"
+      - "scripts/test-todoing-runbook.sh"
+      - "scripts/test-todoing-config.py"
+      - "skills/manifest-init/references/todoing-bootstrap.md"
+      - "docs/architecture/todoing-contract.*"
+      - "openspec/changes/complete-todoing-agent-workflow/**"
       - "workflow/README.*"
       - "openspec/config.yaml"
       - "openspec/**"
@@ -49,6 +54,9 @@ jobs:
 
       - name: Install OpenSpec CLI
         run: npm install --global @fission-ai/openspec@1.16.0
+
+      - name: Run bilingual Todoing runbook regression checks
+        run: bash scripts/test-todoing-runbook.sh
 
       - name: Build Todoing
         run: cargo build --release --manifest-path todoing/Cargo.toml
