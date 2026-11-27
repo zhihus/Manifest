@@ -177,6 +177,7 @@ merge, and commit SHAs. Never blindly repeat a non-idempotent operation.
   merge only after confirming the state.
 - **After Git merge but before final commit marker:** obtain the actual merge SHA
   and call `task.commit.finalize`. Do not invent or infer the SHA.
+- **After the final commit marker but before `completed`:** verify that the stored final SHA equals the actual merge SHA and that the task remains `verified`; do not replace the marker. After final acceptance checks, perform only the missing `task.status.set` transition.
 - **After `completed` but before lock release:** verify terminal task state
   and confirm ownership before retrying release.
 - **During cancellation:** reconcile task outcome, OpenSpec archive, and lock.
