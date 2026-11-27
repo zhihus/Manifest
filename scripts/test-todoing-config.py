@@ -23,8 +23,28 @@ def extract(language: str) -> dict:
 
 ru = extract("ru")
 en = extract("en")
-if ru != en:
-    raise SystemExit("FAIL Russian and English TOML configurations differ")
+
+# Compare executable configuration semantics while allowing localized labels.
+def semantic_config(config: dict) -> dict:
+    return {
+        **config,
+        "statuses": [
+            {key: value for key, value in status.items() if key != "label"}
+            for status in config.get("statuses", [])
+        ],
+    }
+
+if semantic_config(ru) != semantic_config(en):
+    raise SystemExit("FAIL Russian and English TOML configuration semantics differ")
+
+expected_labels = {
+    "ru": ["Бэклог", "К выполнению", "Выполняется", "На проверке", "Проверено", "Завершена"],
+    "en": ["Backlog", "Ready", "In Progress", "In Review", "Verified", "Completed"],
+}
+for language, config in (("ru", ru), ("en", en)):
+    actual = [item.get("label") for item in config.get("statuses", [])]
+    if actual != expected_labels[language]:
+        raise SystemExit(f"FAIL {language}: localized status labels differ")
 
 assert ru.get("format_version") == 1, "format_version must be 1"
 assert ru.get("locking") == {
