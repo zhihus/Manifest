@@ -84,7 +84,7 @@ jobs:
       - name: Validate active OpenSpec changes
         run: openspec validate --all
       - name: Archive verified change
-        run: openspec archive implement-todoing-manifest-workflow --yes
+        run: openspec archive complete-todoing-agent-workflow --yes
       - name: Validate archived specifications
         run: openspec validate --all
       - name: Commit archive
