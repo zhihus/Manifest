@@ -387,7 +387,7 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 3. Call `task.lock.heartbeat` immediately before each blocking subagent run. A 720-second lease covers the 600-second hard timeout plus 120 seconds of margin.
 4. Do not send heartbeats while the subagent is running. Never give the token to a role agent; role agents never call Todoing.
 5. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
-6. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
+6. Release the lock with `task.lock.release` only after task completion or confirmed cancellation and reconciliation of all required Todoing, OpenSpec, and Git operations.
 
 `actor_id` is attribution, not authentication. The rule that the Main Orchestrator coordinates Todoing calls is the agreed procedural authority boundary. Technical isolation of role agents is intentionally not implemented and is not a workflow compliance criterion: Todoing does not block direct API calls from another process. Do not claim that direct access is technically denied; assess compliance with the procedural rule from agent actions.
 
@@ -401,21 +401,21 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 
 ### 6.5. Completion and cancellation
 
-Successful completion MUST follow this order:
+Successful completion of a coordinated Todoing/OpenSpec task MUST follow this order:
 1. Review approved; status is `verified`.
 2. Acceptance checks across Todoing, OpenSpec, and Git.
-3. Run `openspec archive <change-id> --yes`; delta specs are merged into permanent specs.
+3. When OpenSpec is enabled, run `openspec archive <change-id> --yes`; delta specs are merged into permanent specs. Skip this step for standalone Todoing tasks.
 4. Git merge according to project rules.
-5. `task.commit.finalize` with the final merge commit SHA.
+5. `task.commit.finalize` with the actual final merge commit SHA.
 6. `task.status.set` to `completed` (the transition also sets outcome `completed`).
 7. `task.lock.release`.
 
 Any agent may recommend cancellation with a reason; only the user may approve it. After approval, perform these steps in order:
 1. `task.cancel` with a reason.
-2. Run `openspec archive <change-id> --yes --skip-specs`; the change is archived without modifying permanent specs.
+2. If OpenSpec is enabled, run `openspec archive <change-id> --yes --skip-specs`; skip this step for standalone Todoing tasks.
 3. `task.lock.release`.
 
-Retain the external reference. Archiving alone is not cancellation.
+Retain any existing external reference. Archiving alone is not cancellation.
 
 ### 6.6. Snapshot and restore
 
