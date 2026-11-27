@@ -69,7 +69,7 @@ gates the transition to the next step. This preserves the core invariant:
 | Step | Artifact | Agent | Input → Output |
 |---|---|---|---|
 | — | pipeline state | Orchestrator (always GLM-5.3 Flash) | runs steps, gates transitions |
-| 0 | task in Todoing (when enabled) | Analyst | Backlog → approved task, "To Do" |
+| 0 | task in Todoing (when enabled) | Analyst | Backlog → approved task, "Ready" |
 | 1 | proposal.md (when OpenSpec is enabled) | Analyst | user's words → "why / what" |
 | 2 | spec.md (when OpenSpec is enabled) | Analyst | proposal → scenarios, edge cases, PBT |
 | 3 | design.md (when OpenSpec is enabled) | Architect | proposal + spec → solution (optional) |
@@ -269,7 +269,7 @@ enabled = true
 
 [[statuses]]
 id = "review"
-label = "Review"
+label = "In Review"
 enabled = true
 
 [[statuses]]
