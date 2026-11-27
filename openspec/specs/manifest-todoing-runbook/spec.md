@@ -214,19 +214,21 @@ The distributed Manifest agent skill MUST provide a runtime Todoing procedure th
 can be invoked after project connection. It MUST NOT depend on project context files
 being enabled or copied into the connected project.
 
-#### Scenario: Manage tasks after connection
+#### Scenario: Manage standalone Todoing tasks after connection
 
 - GIVEN the project is connected, Todoing is enabled, and OpenSpec is disabled
 - WHEN the user asks the agent to create, update, execute, review, or complete work
 - THEN the agent skill loads the Todoing runtime workflow reference
 - AND the agent follows the standalone Todoing lifecycle without rerunning initialization
 
-#### Scenario: OpenSpec is enabled while stage 2 is frozen
+#### Scenario: Manage coordinated Todoing and OpenSpec work after connection
 
-- GIVEN Todoing and OpenSpec are both enabled
-- WHEN the stage-1 Todoing skill is invoked
-- THEN it stops before cross-system operations
-- AND reports that Todoing/OpenSpec coordination is outside the current stage
+- GIVEN the project is connected and both Todoing and OpenSpec are enabled
+- WHEN the user asks the agent to prepare or execute an OpenSpec change
+- THEN the agent skill loads the coordinated Todoing/OpenSpec workflow
+- AND registers exactly one Backlog Todoing task with the exact change ID and project-scoped `openspec.change` reference
+- AND keeps all implementation decomposition in the change's `tasks.md`
+- AND requires explicit user authorization and an approved task-version baseline before execution
 
 ### Requirement: Compatible Todoing API build
 
