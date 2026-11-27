@@ -10,8 +10,7 @@ workflow behavior controlled by them.
 ### Requirement: Independent component switches
 
 The configuration MUST define independent boolean switches for the Todoing
-and OpenSpec components. Both MUST default to enabled for newly initialized
-projects. Disabling one component MUST NOT implicitly disable or enable the
+and OpenSpec components. Todoing MUST default to enabled and OpenSpec MUST default to disabled for newly initialized projects. Disabling one component MUST NOT implicitly disable or enable the
 other.
 
 #### Scenario: Both components enabled by default
@@ -124,3 +123,22 @@ tasks.
 - **WHEN** the Todoing task title differs from the OpenSpec change directory ID
 - **THEN** the Orchestrator stops before approval or implementation and reports
   the mismatch
+
+### Requirement: Context files have independent switches
+
+The configuration MUST expose an independent boolean setting for each supported context file under `context_files.<id>.enabled`. Every context-file switch MUST default to false. The installer MUST install only files whose own switch is true and MUST never delete an existing file when a switch is false.
+
+#### Scenario: Default context selection
+
+- WHEN a new project is initialized without context-file selection
+- THEN all context-file switches are false and no context templates are installed
+
+#### Scenario: Single-file selection
+
+- WHEN one context-file switch is true
+- THEN only that file is eligible for installation
+
+#### Scenario: Legacy config
+
+- WHEN an existing valid config lacks context_files
+- THEN it is preserved unchanged and context-file installation is skipped pending explicit migration

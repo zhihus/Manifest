@@ -8,12 +8,12 @@ Defines safe connection behavior for empty, non-empty, partially connected, and 
 
 ### Requirement: New project receives the baseline
 
-When the target is a Git project without Manifest components, the initializer MUST create the mandatory context files, .manifest/manifest.yaml, its checksum, and default OpenSpec scaffolding when enabled.
+When the target is a Git project without Manifest components, the initializer MUST create .manifest/manifest.yaml, its checksum, and only the explicitly enabled components and context files.
 
 #### Scenario: Fresh project
 
 - WHEN initialization runs in a new Git project
-- THEN the complete mandatory context baseline is installed
+- THEN only explicitly enabled context files are installed
 - AND component switches and optional control defaults are written as specified
 - AND optional Git hooks are not activated while the git_hooks switch is false
 
@@ -63,3 +63,19 @@ The distributable skill MUST NOT contain Manifest repository verification script
 - WHEN the package is inspected
 - THEN it contains only its instructions, installer, templates, references, and tests
 - AND it does not contain scripts/verify.sh or scripts/hooks/
+
+### Requirement: Context files are independently configurable
+
+Every supported context file MUST have an independent boolean setting. All context-file settings default to false for a new project. Existing files are never deleted when a setting is disabled.
+
+#### Scenario: Select one context file
+
+- WHEN the user enables one context-file setting
+- THEN only that missing file is installed
+- AND other context files are not installed
+
+#### Scenario: Existing legacy configuration
+
+- WHEN a valid existing configuration lacks the context_files section
+- THEN it is preserved without modification
+- AND context installation is skipped pending an explicit migration
