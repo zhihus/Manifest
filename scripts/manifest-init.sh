@@ -170,7 +170,9 @@ preflight() {
 }
 
 write_config() {
-  local newline=
+  local newline
+  newline=$(printf '\nX')
+  newline=${newline%X}
   [[ $PROJECT_NAME != *"$newline"* ]] || { echo "CONFIG_INVALID_NAME: project name must be a single line"; exit 1; }
   mkdir -p "$MK"
   local tmp=$MK/manifest.yaml.tmp
