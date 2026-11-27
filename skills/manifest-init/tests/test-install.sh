@@ -27,8 +27,6 @@ if run "$TMP/partial" >"$TMP/tamper.out" 2>&1; then echo "FAIL tamper accepted";
 new_repo "$TMP/legacy"; mkdir -p "$TMP/legacy/.manifest"; printf 'project_name=old\n' >"$TMP/legacy/.manifest/manifest.yaml"
 printf 'sha256sum:%s\n' "$(sha256sum "$TMP/legacy/.manifest/manifest.yaml" | awk '{print $1}')" >"$TMP/legacy/.manifest/manifest.yaml.checksum"
 if run "$TMP/legacy" >"$TMP/legacy.out" 2>&1; then echo "FAIL legacy accepted"; fails=$((fails+1)); else grep -q CONFIG_UNSUPPORTED "$TMP/legacy.out" || { echo "FAIL legacy diagnostic"; fails=$((fails+1)); }; fi
-echo "Regression failures: $fails"; ((fails == 0))
-
 new_repo "$TMP/legacy-v1"
 mkdir -p "$TMP/legacy-v1/.manifest"
 cat >"$TMP/legacy-v1/.manifest/manifest.yaml" <<'YAML'
@@ -65,3 +63,6 @@ if run "$TMP/partial" --context-file version=enabled >"$TMP/override.out" 2>&1; 
 else
  grep -q EXISTING_CONFIG_IMMUTABLE "$TMP/override.out" || { echo "FAIL existing config override diagnostic"; fails=$((fails+1)); }
 fi
+
+echo "Regression failures: $fails"
+((fails == 0))

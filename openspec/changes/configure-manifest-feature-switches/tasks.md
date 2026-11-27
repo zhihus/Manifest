@@ -2,7 +2,7 @@
 
 - [x] fr-1.1-write-feature-switches
   Update `scripts/manifest-init.sh` so newly initialized projects receive
-  valid YAML containing project metadata, enabled Todoing/OpenSpec component
+  valid YAML containing project metadata, Todoing enabled and OpenSpec disabled component
   switches, and all optional control switches disabled. Escape project names
   as valid YAML scalars. Keep the existing SHA-256 checksum sidecar behavior
   unchanged. Do not weaken installer Preflight or checksum protection.
