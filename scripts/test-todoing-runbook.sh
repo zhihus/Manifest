@@ -55,7 +55,7 @@ require_text "$CONTRACT_EN" '`todoing --json api`' "English contract JSON API CL
 forbid_text "$CONTRACT_RU" "todoing api --json" "incorrect Russian contract CLI syntax"
 forbid_text "$CONTRACT_EN" "todoing api --json" "incorrect English contract CLI syntax"
 
-require_text "$SKILL" "manage Todoing tasks in a connected project" "runtime skill trigger"
+require_text "$SKILL" "manage work in a connected Todoing project" "runtime skill trigger"
 require_text "$SKILL" "Choose exactly one procedure" "skill mode selection"
 require_text "$SKILL" "Connection procedure" "skill connection mode"
 require_text "$SKILL" "Do not run the installer as part of ordinary task management" "no installer rerun"
