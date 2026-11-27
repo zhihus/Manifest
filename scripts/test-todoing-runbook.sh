@@ -156,6 +156,24 @@ require_text "$EN" "Never give the token to a role agent" "token custody"
 require_text "$RU" "actor_id" "actor attribution boundary"
 require_text "$RU" "принятой процедурной границей полномочий" "honest role-access boundary"
 require_text "$EN" "agreed procedural authority boundary" "honest role-access boundary"
+for file in "$CONTRACT_RU" "$CONTRACT_EN"; do
+  require_text "$file" "immediately before each blocking role-agent run" "heartbeat timing contract"
+  require_text "$file" "Do not heartbeat while the role agent is executing" "no heartbeat during execution"
+done
+forbid_text "$CONTRACT_EN" "renew the lease while it is active" "obsolete heartbeat timing"
+require_text "$CONTRACT_EN" "implemented in Todoing as generic mechanisms" "implemented generic Todoing APIs"
+
+require_order "$TODOING_AGENT" "Agent coordinated completion sequence" \
+  "## Completion" "openspec archive <change-id> --yes" "Merge Git" \
+  "task.commit.finalize" "task.status.set" "task.lock.release"
+require_order "$TODOING_AGENT" "Agent cancellation sequence" \
+  "## Cancellation" "task.cancel" "openspec archive <change-id> --yes --skip-specs" \
+  "task.lock.release"
+for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after" "S4 — lease expires" "S5 — failure during cancellation"; do
+  require_text "$RU" "$scenario" "Russian partial recovery scenario"
+  require_text "$EN" "$scenario" "English partial recovery scenario"
+done
+
 
 require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"
