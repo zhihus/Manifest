@@ -375,6 +375,8 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 5. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
 6. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
 
+`actor_id` is attribution, not authentication. The rule that only the Main Orchestrator calls Todoing is procedural, not technical enforcement: Todoing does not block direct API calls from another process. If the runtime gives role agents direct CLI access, strict role isolation and prevention of agent-initiated `backlog → ready` are not technically enforced. Do not claim otherwise; report and escalate this limitation.
+
 ### 6.4. Status and Review
 
 - Before handing work to the Reviewer, move the task to `review` using `task.status.set`.
