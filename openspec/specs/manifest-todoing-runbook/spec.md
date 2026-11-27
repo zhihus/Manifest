@@ -25,15 +25,49 @@ The runbook MUST require the Orchestrator to verify the installed Todoing binary
 - WHEN bootstrap is requested
 - THEN the Orchestrator stops and requests explicit recovery; it does not generate a replacement ID or call `store.init`
 
-### Requirement: User-controlled task approval
+### Requirement: One-to-one OpenSpec and Todoing mapping
 
-The runbook MUST map one OpenSpec change to one Todoing task and MUST preserve the user's exclusive authority to approve work. Analyst-created tasks remain in Backlog until the user approves transition to Ready. A task MUST NOT enter execution without that approval.
+When both OpenSpec and Todoing are enabled, each OpenSpec change MUST be represented by exactly one Todoing task. The Orchestrator MUST create that task in `backlog` and add a project-scoped external reference with namespace `openspec.change`, value equal to the exact OpenSpec change directory ID, relation `implements`, and scope `project`. The Orchestrator MUST reuse the existing task for that change rather than create a duplicate.
+
+All implementation decomposition MUST remain inside that change's `tasks.md`. FR entries, checkboxes, implementation steps, and other work items in `tasks.md` MUST NOT become separate Todoing tasks. Todoing tracks the OpenSpec change as a whole; it does not mirror its internal work breakdown.
+
+#### Scenario: Register an OpenSpec change
+
+- GIVEN a new OpenSpec change exists and no Todoing task is linked to it
+- WHEN the Orchestrator registers the change
+- THEN it creates exactly one Todoing task in `backlog`
+- AND adds the project-scoped `openspec.change` reference using the exact change directory ID and relation `implements`
+
+#### Scenario: Keep FR decomposition in tasks.md
+
+- GIVEN an OpenSpec change has multiple FR entries or implementation checkboxes in `tasks.md`
+- WHEN the Orchestrator plans or dispatches the work
+- THEN those entries remain internal work items in `tasks.md`
+- AND it does not create separate Todoing tasks for FR entries, checkboxes, or implementation steps
+
+#### Scenario: Reuse the task for an existing change
+
+- GIVEN a Todoing task already has the project-scoped `openspec.change` reference for the change
+- WHEN the Orchestrator registers or resumes that change
+- THEN it reuses the linked task and does not create another Todoing task
+
+### Requirement: User-controlled task approval and baseline
+
+The runbook MUST preserve the user's exclusive authority to authorize execution. A change-tracking Todoing task MUST remain in `backlog` until the user explicitly approves work and authorizes the transition to `ready`. After that transition, the Orchestrator MUST record the current task version as the approved baseline using `task.version.approve` before acquiring the execution lock, dispatching an agent, or moving the task to `in_progress`. A task MUST NOT enter execution without both user authorization and a recorded baseline.
 
 #### Scenario: Unapproved task
 
-- GIVEN a task is in Backlog
-- WHEN an agent proposes starting implementation
-- THEN the Orchestrator refuses to acquire a lock or dispatch implementation until the user approves the task
+- GIVEN a task is in `backlog`
+- WHEN an agent proposes starting implementation without explicit user authorization
+- THEN the Orchestrator refuses to transition it to `ready`, acquire a lock, or dispatch implementation
+
+#### Scenario: Approve and baseline a change
+
+- GIVEN a change-tracking task is in `backlog`
+- WHEN the user explicitly authorizes its execution
+- THEN the Orchestrator transitions the task to `ready`
+- AND records the current task version with `task.version.approve`
+- AND only then may it acquire the lock and start execution
 
 ### Requirement: Gate execution on dependencies
 
