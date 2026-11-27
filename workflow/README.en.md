@@ -441,10 +441,11 @@ archive state; and Git branch, merge, and commit SHAs. Never blindly repeat a
 non-idempotent operation.
 
 - If the `task.review.add` response was lost, inspect `task.review.list`.
-  If the same `review_id` and exact payload are already present, do not append
-  another record; reconcile task status and perform only the missing transition.
-  If no record exists, retry only after confirming the reviewed version and
-  review ID are still valid. A conflicting payload requires escalation.
+  Treat the Review as already recorded only when the `review_id`, exact Review
+  arguments, and envelope `actor_id` match. Do not append another record; reconcile
+  task status and perform only the missing transition. If an existing record has
+  a different `actor_id` or payload, stop and escalate. If no record exists, retry
+  only after confirming the reviewed version and review ID are still valid.
 - If the `task.lock.release` response was lost:
   1. Call `task.lock.heartbeat` first.
   2. Retry release only after successful ownership confirmation. If ownership
