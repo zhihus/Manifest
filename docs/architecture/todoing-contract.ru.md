@@ -302,7 +302,7 @@ Manifest не трактует archive как отмену и не исполь�
 6. `task.status.set` переводит задачу в `completed` и фиксирует outcome `completed`.
 7. `task.lock.release` освобождает блокировку.
 
-Для standalone Todoing-задачи шаг OpenSpec archive пропускается; завершение привязывается к принятому итоговому Git revision. Git commit reference сам по себе не доказывает прохождение критериев приёмки.
+Для standalone Todoing-задачи шаг OpenSpec archive пропускается. После Review approved и acceptance checks Manifest выполняет Git merge, если он требуется правилами проекта, фиксирует фактический итоговый Git SHA через `task.commit.finalize`, переводит задачу в `completed` и освобождает lock. Git commit reference сам по себе не доказывает прохождение критериев приёмки.
 
 ### 4.6. Отмена
 
