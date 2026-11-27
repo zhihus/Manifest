@@ -169,7 +169,7 @@ require_order "$TODOING_AGENT" "Agent coordinated completion sequence" \
 require_order "$TODOING_AGENT" "Agent cancellation sequence" \
   "## Cancellation" "task.cancel" "openspec archive <change-id> --yes --skip-specs" \
   "task.lock.release"
-for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after" "S4 — lease expires" "S5 — failure during cancellation"; do
+for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after final marker" "S4 — after переход" "S5 — lease истёк" "S6 — сбой при отмене"; do
   require_text "$RU" "$scenario" "Russian partial recovery scenario"
   require_text "$EN" "$scenario" "English partial recovery scenario"
 done
