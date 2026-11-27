@@ -25,7 +25,7 @@ Use when the user asks to connect, initialize, install, or repair Manifest in a 
 ## Procedure
 
 1. Inspect Git status and project structure. Identify existing Manifest files, OpenSpec state, Todoing binary/config/database/legacy tasks, hooks and local conventions.
-2. Run scripts/install.sh --project <path>. For a new connection, confirm project name, purpose and tracks before writing. Existing valid project metadata is not re-interviewed.
+2. Run scripts/install.sh --project <path>. For a new project, defaults may be overridden with --todoing enabled|disabled and --openspec enabled|disabled. For a new connection, confirm project name, purpose and tracks before writing. Existing valid project metadata is not re-interviewed.
 3. Review installed, preserved and pending report sections. Existing destinations are never overwritten.
 4. If Todoing is enabled, follow references/todoing-bootstrap.md. If its binary is unavailable, report the prerequisite and stop Todoing-dependent workflow; do not silently disable it.
 5. Validate the resulting connection. File copying alone is not proof of runtime integration.

@@ -3,14 +3,15 @@ set -euo pipefail
 PROJECT=.
 TEMPLATES="$(cd "$(dirname "$0")/.." && pwd)/templates"
 PROJECT_NAME= PURPOSE= TRACKS= INITIAL_VERSION=0.1.0
+TODOING=enabled OPEN_SPEC=enabled
 usage(){ echo "usage: install.sh [--project DIR] [--templates DIR] [--project-name NAME] [--purpose TEXT] [--tracks none|code|documentation|mixed]"; exit 2; }
 while (($#)); do
  case "$1" in
-  --project|--templates|--project-name|--purpose|--tracks|--initial-version)
+  --project|--templates|--project-name|--purpose|--tracks|--initial-version|--todoing|--openspec)
    (($# >= 2)) || usage
    case "$1" in
     --project) PROJECT=$2;; --templates) TEMPLATES=$2;; --project-name) PROJECT_NAME=$2;;
-    --purpose) PURPOSE=$2;; --tracks) TRACKS=$2;; --initial-version) INITIAL_VERSION=$2;;
+    --purpose) PURPOSE=$2;; --tracks) TRACKS=$2;; --initial-version) INITIAL_VERSION=$2;; --todoing) TODOING=$2;; --openspec) OPEN_SPEC=$2;;
    esac; shift 2;;
   *) usage;;
  esac
@@ -28,6 +29,7 @@ analyze_tracks(){
 }
 [[ -n $TRACKS ]] || TRACKS=$(analyze_tracks)
 case "$TRACKS" in none|code|documentation|mixed) ;; *) fail "INVALID_TRACKS: $TRACKS";; esac
+case "$TODOING:$OPEN_SPEC" in enabled:enabled|enabled:disabled|disabled:enabled|disabled:disabled) ;; *) fail INVALID_COMPONENT_SELECTION;; esac
 [[ -n $PROJECT_NAME ]] || PROJECT_NAME=$(basename "$PROJECT")
 [[ -n $PURPOSE ]] || PURPOSE="Not established."
 [[ $PROJECT_NAME != *$'\n'* && $PROJECT_NAME != *$'\r'* ]] || fail INVALID_PROJECT_NAME
@@ -61,7 +63,7 @@ if (( ! config_exists )); then
  tmp=$(mktemp "$MK/.manifest.yaml.XXXXXX")
  {
   printf 'format_version: 1\nproject:\n  name: "%s"\n  tracks: %s\n  created: "%s"\n' "$yaml_name" "$TRACKS" "$(date +%F)"
-  printf 'components:\n  todoing:\n    enabled: true\n  openspec:\n    enabled: true\nchecks:\n'
+  printf 'components:\n  todoing:\n    enabled: %s\n  openspec:\n    enabled: %s\nchecks:\n' "$TODOING" "$OPEN_SPEC"
   for key in workflow_preflight git_hooks git_checks openspec_validation tests review_gate additional_gates; do printf '  %s:\n    enabled: false\n' "$key"; done
  } >"$tmp"
  ln "$tmp" "$CONFIG" 2>/dev/null || { rm -f "$tmp"; fail CONFIG_RACE; }; rm -f "$tmp"
@@ -86,6 +88,7 @@ for i in "\${!NAMES[@]}"; do
   s/\{\{INITIAL_VERSION\}\}/$ENV{INITIAL_VERSION}/g;
   s/\{\{[A-Z0-9_]+\}\}//g;
  ' "$src" >"$rendered"
+ chmod 644 "$rendered"
  grep -q -e '{{' -e '{%' "$rendered" && fail "TEMPLATE_RENDER_FAILED: $name"
  if ln "$rendered" "$PROJECT/$name" 2>/dev/null; then INSTALLED+=("$name"); else SKIPPED+=("$name (appeared during install; preserved)"); fi
 done
