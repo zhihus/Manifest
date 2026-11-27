@@ -5,6 +5,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 RU="$ROOT/workflow/README.ru.md"
 EN="$ROOT/workflow/README.en.md"
+BOOTSTRAP="$ROOT/skills/manifest-init/references/todoing-bootstrap.md"
 FAIL=0
 
 fail() {
@@ -43,6 +44,10 @@ require_order() {
     previous=$line
   done
 }
+
+require_text "$BOOTSTRAP" "todoing --json api" "bootstrap JSON API CLI syntax"
+require_text "$BOOTSTRAP" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "bootstrap compatible Todoing build"
+forbid_text "$BOOTSTRAP" "todoing api --json" "incorrect bootstrap JSON API CLI syntax"
 
 for file in "$RU" "$EN"; do
   require_text "$file" "todoing --json api" "JSON API CLI syntax"
