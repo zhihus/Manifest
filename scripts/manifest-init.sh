@@ -176,7 +176,42 @@ write_config() {
   # Quote user input as a YAML double-quoted scalar.
   yaml_name=${yaml_name//\\/\\\\}
   yaml_name=${yaml_name//\"/\\\"}
-  yaml_name=${yaml_name//
+  yaml_name=${yaml_name//$'\t'/\\t}
+  yaml_name=${yaml_name//$'\r'/\\r}
+  {
+    echo "format_version: 1"
+    echo "project:"
+    printf '  name: "%s"\n' "$yaml_name"
+    echo "  tracks: $TRACKS"
+    echo "  created: \"$(date +%F)\""
+    echo "components:"
+    echo "  todoing:"
+    echo "    enabled: true"
+    echo "  openspec:"
+    echo "    enabled: true"
+    echo "checks:"
+    echo "  workflow_preflight:"
+    echo "    enabled: false"
+    echo "  git_hooks:"
+    echo "    enabled: false"
+    echo "  git_checks:"
+    echo "    enabled: false"
+    echo "  openspec_validation:"
+    echo "    enabled: false"
+    echo "  tests:"
+    echo "    enabled: false"
+    echo "  review_gate:"
+    echo "    enabled: false"
+    echo "  additional_gates:"
+    echo "    enabled: false"
+  } >"$tmp"
+  mv "$tmp" "$MK/manifest.yaml"
+  # The checksum records the SHA-256 tool that produced it:
+  # "<tool>:<hash>"; the guard extracts the hash after the prefix.
+  sha256_of "$MK/manifest.yaml" >/dev/null
+  printf '%s:%s\n' "$SHA_TOOL_USED" "$(sha256_of "$MK/manifest.yaml")" \
+    >"$MK/manifest.yaml.checksum"
+}
 
 # Name-mapping table (design D4): installed file <- source template.
 BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
