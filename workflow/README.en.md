@@ -455,13 +455,17 @@ non-idempotent operation.
   with Git merge only after confirming the state.
 - **S2 — after Git merge, before final commit marker:** obtain the actual merge
   SHA and call `task.commit.finalize`. Never infer or invent the SHA.
-- **S3 — after `completed`, before lock release:** verify terminal task state
+- **S3 — after final commit marker, before `completed`:** verify that the stored
+  SHA equals the actual merge SHA and the task remains `verified`; do not replace
+  the marker. After final acceptance checks, perform only the missing transition
+  to `completed`.
+- **S4 — after `completed`, before lock release:** verify terminal task state
   and confirm ownership before retrying release.
-- **S4 — lease expires during a role-agent run:** recover only after lease
+- **S5 — lease expires during a role-agent run:** recover only after lease
   expiry and grace; use the new fencing generation, re-read the task version,
   and inspect Git/OpenSpec artifacts. Do not assume the previous agent stopped
   or that its work was committed.
-- **S5 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
+- **S6 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
   and lock. If outcome is already `cancelled`, do not repeat `task.cancel`;
   perform only missing archive/release steps. Never merge delta specs for a
   cancelled change.
