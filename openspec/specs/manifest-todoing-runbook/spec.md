@@ -27,7 +27,7 @@ The runbook MUST require the Orchestrator to verify the installed Todoing binary
 
 ### Requirement: One-to-one OpenSpec and Todoing mapping
 
-When both OpenSpec and Todoing are enabled, each OpenSpec change MUST be represented by exactly one Todoing task. The Orchestrator MUST create that task in `backlog` and add a project-scoped external reference with namespace `openspec.change`, value equal to the exact OpenSpec change directory ID, relation `implements`, and scope `project`. The Orchestrator MUST reuse the existing task for that change rather than create a duplicate.
+When both OpenSpec and Todoing are enabled, each OpenSpec change MUST be represented by exactly one Todoing task. The Orchestrator MUST create that task in `backlog`, set its title to the exact OpenSpec change directory ID, and add a project-scoped external reference with namespace `openspec.change`, value equal to that exact change directory ID, relation `implements`, and scope `project`. The Orchestrator MUST reuse the existing task for that change rather than create a duplicate.
 
 All implementation decomposition MUST remain inside that change's `tasks.md`. FR entries, checkboxes, implementation steps, and other work items in `tasks.md` MUST NOT become separate Todoing tasks. Todoing tracks the OpenSpec change as a whole; it does not mirror its internal work breakdown.
 
@@ -36,6 +36,7 @@ All implementation decomposition MUST remain inside that change's `tasks.md`. FR
 - GIVEN a new OpenSpec change exists and no Todoing task is linked to it
 - WHEN the Orchestrator registers the change
 - THEN it creates exactly one Todoing task in `backlog`
+- AND sets the Todoing task title to the exact change directory ID
 - AND adds the project-scoped `openspec.change` reference using the exact change directory ID and relation `implements`
 
 #### Scenario: Keep FR decomposition in tasks.md
