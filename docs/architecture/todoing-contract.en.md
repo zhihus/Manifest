@@ -257,11 +257,11 @@ to = "review"
 
 [[transitions]]
 from = "review"
-to = "verified"
+to = "in_progress"
 
 [[transitions]]
 from = "review"
-to = "in_progress"
+to = "verified"
 
 [[transitions]]
 from = "verified"
