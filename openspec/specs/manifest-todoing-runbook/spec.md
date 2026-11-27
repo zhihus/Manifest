@@ -83,14 +83,28 @@ The Orchestrator MUST inspect each task's dependencies before dispatch. Every pr
 
 ### Requirement: Orchestrator-owned lock custody
 
-The runbook MUST define the Orchestrator's procedural responsibility for coordinating Todoing calls and retaining the raw lock token. Role agents MUST follow the procedural boundary: they must not independently invoke Todoing or receive the token. This is not technical isolation, and the runtime is not required to block direct CLI/API access by role agents. Compliance is evaluated from the recorded and observable actions of the agents, not from an access-control test. The runbook MUST also specify a 720-second lease, heartbeat immediately before each blocking role-agent run, no heartbeat while that agent is executing, and explicit recovery after lease expiry plus grace.
+The runbook MUST define the Orchestrator's procedural responsibility for coordinating Todoing calls and retaining the raw lock token. The task MUST have an explicitly user-approved baseline and all prerequisites MUST have outcome `completed` before lock acquisition. After acquiring the lock, the Orchestrator MUST immediately transition `ready → in_progress` before dispatch. Role agents MUST NOT receive the token or independently invoke Todoing. The Orchestrator MUST heartbeat immediately before each blocking role-agent run and MUST NOT heartbeat while that agent is executing. It MUST use the current owner ID and fencing generation for owner operations, stop using a token after `stale_lock`, and release the lock only after completion/cancellation and cross-system reconciliation. These are procedural boundaries, not technical isolation; the runtime is not required to block direct CLI/API access by role agents.
+
+#### Scenario: Start approved work
+
+- GIVEN the user approved the task, its current version is recorded with `task.version.approve`, and all prerequisites have outcome `completed`
+- WHEN the Orchestrator acquires the task lock
+- THEN it immediately transitions the task from `ready` to `in_progress`
+- AND keeps the lock token outside the agent prompt and environment
+
+#### Scenario: Heartbeat before a blocking agent run
+
+- GIVEN the Orchestrator owns a valid task lock
+- WHEN it is about to dispatch a blocking role-agent run
+- THEN it calls `task.lock.heartbeat` immediately before dispatch
+- AND it does not heartbeat while the role agent is executing
 
 #### Scenario: Role agent execution
 
 - GIVEN the Orchestrator owns a valid task lock
 - WHEN it dispatches a role agent
 - THEN the token remains in protected Orchestrator session state and is not included in the agent's prompt or environment
-- AND the runbook identifies this as a procedural boundary rather than a technical access restriction
+- AND the role agent does not call Todoing directly
 
 #### Scenario: Direct Todoing access is not technically blocked
 
@@ -99,48 +113,102 @@ The runbook MUST define the Orchestrator's procedural responsibility for coordin
 - THEN the runbook does not claim that direct access is technically prevented
 - AND compliance is assessed against the procedural instructions and observed agent actions
 
-### Requirement: Traceable task lifecycle and review
+### Requirement: Independent Review and revision loop
 
-The runbook MUST define the approved status transitions, the project-scoped `openspec.change` external reference, version baseline approval, and append-only Review records bound to the reviewed version. It MUST specify that `changes_requested` increments Todoing `revision_count` once and returns the task to `in_progress`, while `approved` moves it to `verified`.
+The runbook MUST require a separate Reviewer role/session to inspect the exact result and task version independently from the Implementer. Before review dispatch, the Orchestrator MUST transition `in_progress → review`. It MUST append a Review record with stable `review_id`, exact `version_no`, reviewer identity, outcome, and ordered comments. On `approved`, it MUST transition `review → verified`. On `changes_requested`, Todoing MUST atomically append the Review and increment `revision_count` exactly once; the Orchestrator MUST transition `review → in_progress` and return the findings for correction. After corrections, a new independent review cycle MUST occur. Review records MUST be immutable and bound to the reviewed task version.
 
-#### Scenario: Start approved work
+#### Scenario: Approve an independently reviewed result
 
-- GIVEN the user approved a task and all prerequisites have outcome `completed`
-- WHEN the Orchestrator acquires the task lock
-- THEN it transitions the task from `ready` to `in_progress` before dispatching an implementation agent
-- AND keeps the lock token outside the agent prompt and environment
+- GIVEN an independent Reviewer has approved the exact task version
+- WHEN the Orchestrator records the Review
+- THEN Todoing appends an `approved` Review record
+- AND the Orchestrator transitions the task to `verified`
 
 #### Scenario: Review requests changes
 
 - GIVEN a Reviewer has completed review of a specific task version
 - WHEN the Orchestrator records a `changes_requested` review
-- THEN it stores the review with a stable review ID and exact version number, and Todoing increments `revision_count` once
+- THEN Todoing appends the review with a stable review ID and exact version number
+- AND increments `revision_count` exactly once
+- AND the Orchestrator transitions the task to `in_progress` for correction
+
+#### Scenario: Repeat review after correction
+
+- GIVEN a `changes_requested` Review has returned the task to `in_progress`
+- WHEN the Implementer corrects the result and the work is reviewed again
+- THEN the Orchestrator appends a new Review record for the exact new version
+- AND preserves all previous Review records and the accumulated `revision_count`
 
 ### Requirement: Verified completion and user-approved cancellation
 
-The runbook MUST define the ordered success sequence: Verified, acceptance checks, `openspec archive <change-id> --yes` (merge delta specs), Git merge, `task.commit.finalize`, transition to Completed, then lock release. Cancellation MUST require explicit user confirmation, set cancelled outcome, archive the OpenSpec change with `openspec archive <change-id> --yes --skip-specs` without merging delta specs, then release the lock. The external reference MUST be retained.
+For coordinated Todoing/OpenSpec work, the runbook MUST define the ordered success sequence: Review approved and task Verified; acceptance checks across Todoing, OpenSpec, and Git; `openspec archive <change-id> --yes` to merge delta specs; Git merge; `task.commit.finalize` with the actual final merge SHA; transition to Completed; then lock release. Standalone Todoing work MUST omit OpenSpec archive. Cancellation MUST require explicit user confirmation, call `task.cancel`, archive a linked OpenSpec change with `openspec archive <change-id> --yes --skip-specs` without merging delta specs, retain the external reference, then release the lock. The Orchestrator MUST NOT treat archiving alone as cancellation.
 
-#### Scenario: Successful completion
+#### Scenario: Successful coordinated completion
 
 - GIVEN review is approved and acceptance checks pass
 - WHEN the Orchestrator completes the change
-- THEN it archives OpenSpec, merges Git, records the final merge SHA, transitions Todoing to Completed, and releases the lock in that order
+- THEN it archives OpenSpec, merges Git, records the actual final merge SHA, transitions Todoing to Completed, and releases the lock in that order
 
-#### Scenario: Cancellation
+#### Scenario: Cancellation without user approval
 
 - GIVEN an agent recommends cancellation
 - WHEN the user has not confirmed it
-- THEN the Orchestrator does not cancel or archive the change
+- THEN the Orchestrator does not call `task.cancel`, change the task outcome, or archive the change
+
+#### Scenario: User-approved cancellation
+
+- GIVEN the user explicitly confirms cancellation
+- WHEN the Orchestrator cancels the linked task
+- THEN it records outcome `cancelled`
+- AND archives the OpenSpec change without merging delta specs
+- AND retains the external reference
+- AND releases the lock after reconciling the operations
 
 ### Requirement: Reconciliation before recovery
 
-The runbook MUST require reading actual Todoing, OpenSpec, and Git state before any retry after interruption. It MUST distinguish idempotent from non-idempotent operations and MUST NOT blindly repeat `task.cancel` or `task.lock.release`. It MUST describe recovery for partial failure around archive, merge, finalization, completion, lock release, and cancellation.
+The runbook MUST require reading actual Todoing, OpenSpec, and Git state before any retry after interruption. It MUST distinguish idempotent from non-idempotent operations and MUST NOT blindly repeat `task.cancel`, `task.lock.release`, or OpenSpec archive. It MUST describe recovery for partial failure after archive, after Git merge, after finalization, after completion, during lock release, after lease expiry, and during cancellation. Recovery MUST use the current fencing generation and MUST stop for user escalation if the cross-system state is ambiguous.
 
 #### Scenario: Lost lock-release response
 
 - GIVEN the release response was lost
 - WHEN the Orchestrator resumes
-- THEN it checks ownership with `task.lock.heartbeat` and retries release only after successful ownership confirmation
+- THEN it checks ownership with `task.lock.heartbeat`
+- AND retries release only after successful ownership confirmation
+
+#### Scenario: Failure after OpenSpec archive
+
+- GIVEN the OpenSpec change is already archived and permanent specs contain the delta
+- WHEN Git merge has not yet completed
+- THEN the Orchestrator does not archive again
+- AND reconciles and continues with Git merge
+
+#### Scenario: Failure after Git merge
+
+- GIVEN Git merge completed but `task.commit.finalize` was not recorded
+- WHEN the Orchestrator resumes
+- THEN it obtains the actual merge SHA and records it with `task.commit.finalize`
+
+#### Scenario: Failure after task completion
+
+- GIVEN the task is already `completed` but the lock may still be held
+- WHEN the Orchestrator resumes
+- THEN it does not repeat the completion transition
+- AND confirms ownership before attempting lock release
+
+#### Scenario: Lease expires during agent execution
+
+- GIVEN the task lease expires while a role agent is running
+- WHEN the recovery grace period has elapsed
+- THEN the Orchestrator uses `task.lock.recover` to obtain a new token and fencing generation
+- AND re-reads the task version and reconciles Git/OpenSpec artifacts before resuming
+
+#### Scenario: Partial cancellation
+
+- GIVEN `task.cancel` succeeded but OpenSpec archive or lock release did not complete
+- WHEN the Orchestrator resumes
+- THEN it does not repeat `task.cancel`
+- AND performs only the missing archive and release steps after reconciling state
+- AND never merges the cancelled change's delta specs into permanent specs
 
 ### Requirement: Standalone Todoing task lifecycle
 
