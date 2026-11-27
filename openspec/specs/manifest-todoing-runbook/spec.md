@@ -52,6 +52,12 @@ All implementation decomposition MUST remain inside that change's `tasks.md`. FR
 - WHEN the Orchestrator registers or resumes that change
 - THEN it reuses the linked task and does not create another Todoing task
 
+#### Scenario: Ambiguous task candidate
+
+- GIVEN a task title matches the OpenSpec change ID but the exact external reference is missing, or the exact reference belongs to a task with a different title
+- WHEN the Orchestrator registers or resumes the change
+- THEN it stops and reconciles the candidate instead of creating another task or silently repairing the reference
+
 ### Requirement: User-controlled task approval and baseline
 
 The runbook MUST preserve the user's exclusive authority to authorize execution. A change-tracking Todoing task MUST remain in `backlog` until the user explicitly approves work and authorizes the transition to `ready`. After that transition, the Orchestrator MUST record the current task version as the approved baseline using `task.version.approve` before acquiring the execution lock, dispatching an agent, or moving the task to `in_progress`. A task MUST NOT enter execution without both user authorization and a recorded baseline.
