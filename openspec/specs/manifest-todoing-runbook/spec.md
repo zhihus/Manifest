@@ -272,9 +272,10 @@ external references, or archive operations.
 
 - GIVEN an independent task has passed Review and acceptance checks
 - WHEN the Orchestrator completes it
-- THEN it records the final Git commit, moves the task to `completed`, and releases
-  the lock
-- AND it does not create an `openspec.change` reference or invoke OpenSpec archive
+- THEN it records the accepted final Git SHA with `task.commit.finalize`
+- AND moves the task to `completed` with `task.status.set`
+- AND releases the lock with `task.lock.release`
+- AND does not create an `openspec.change` reference or invoke OpenSpec archive
 
 #### Scenario: Cancel without OpenSpec
 
