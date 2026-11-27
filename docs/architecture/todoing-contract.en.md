@@ -1,7 +1,7 @@
 # Todoing Contract for Manifest
 
 # Metadata
-> **Status: active**  
+> **Status: draft**  
 > **Type: document**  
 > **Version: 1.1.0**  
 > **Updated: 2026-11-27**  
@@ -548,30 +548,15 @@ recovery. It MUST NOT claim cross-system atomicity.
 18. Repeating the same final SHA is idempotent; replacement is allowed only after
     an explicit task reopen and creates a new version/history event.
 
-## 13. Decisions required before approval
+## 13. Recorded decisions and approval conditions
 
-1. **Status configuration:** the proposed IDs, labels, and transition graph follow
-   the six approved statuses in Architecture Brief §7. Manifest creates the config
-   only when absent and never overwrites a user-provided file.
-2. **Outcome mapping:** `completed` maps to outcome `completed`; cancellation is
-   recorded as outcome `cancelled` without changing workflow status, consistent
-   with Todoing's task-status-configuration specification.
-3. **Universal Todoing API extensions:** approve external-reference and Review
-   record schemas, final commit marker, `review_id` idempotency, and SQLite schema
-   migration. These extensions MUST NOT contain Manifest/OpenSpec terminology or
-   policy.
-4. **Baseline approval:** Manifest calls `task.version.approve` after the user
-   personally moves the task from Backlog to Ready; the baseline is the current
-   task version.
-5. **Project ID and actor ID:** the proposal is to generate a UUIDv4 Project ID
-   once and store it in Manifest's stable configuration; actor_id is a stable
-   role/session identifier of no more than 128 characters. The Project ID format
-   requires confirmation. These values provide isolation/attribution, not
-   authentication.
+1. **Status model:** the six workflow statuses are `backlog` (Backlog), `ready` (Ready), `in_progress` (In Progress), `review` (In Review), `verified` (Verified), and `completed` (Completed). Cancellation is not a workflow status: it is recorded as `outcome=cancelled` while preserving the last workflow status.
+2. **Authority:** only the user authorizes execution through `backlog → ready`. The Orchestrator performs subsequent transitions according to the lifecycle. Role agents have no independent authority to change task statuses. This is a procedural boundary, not technical isolation.
+3. **Baseline:** after confirmed user authorization through `backlog → ready`, Manifest records the current version with `task.version.approve`. `actor_id` is not proof of user consent.
+4. **Generic API mechanisms:** external references, Review records, and the final commit marker are general Todoing capabilities; they contain no Manifest/OpenSpec-specific semantics. Manifest's use of them is defined by this contract.
+5. **Identifiers:** the Project ID is a UUIDv4 (RFC 4122), created once during bootstrap and stored in `.manifest/project-id`. `actor_id` is a stable role/session identifier of no more than 128 characters. These values identify the store and attribute an operation; they do not authenticate the caller.
 
-Until this document is approved, it remains a draft. Manifest integration
-implementation starts after approval; universal Todoing extensions may be developed
-as a separate task based on this specification.
+This document remains a draft pending an independent verification of its normative claims against the Todoing API, implementation, and tests. Manifest integration must rely on the approved revision; the generic Todoing mechanisms are already present in the pinned baseline build.
 
 ## 14. Sources and limitations
 
