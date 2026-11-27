@@ -4,7 +4,7 @@
 > **Status: approved**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-22**  
+> **Updated: 2026-11-27**  
 
 # Описание
 Единственный источник перечня внешних бинарных инструментов,
@@ -32,6 +32,7 @@
 | `cat` | чтение контрольных файлов в тестах | test-manifest-init.sh | переносимая системная утилита |
 | `chmod` | установка исполняемого бита тестового Perl-stub | test-manifest-init.sh | переносимая системная утилита |
 | `env` | поиск Bash по PATH в shebang | все исполняемые shell-скрипты | системная утилита |
+| `ln` | создание символической ссылки для проверки обхода symlink-файлов | test-structure-parser.sh | POSIX-утилита; доступна в Unix-подобных средах и Git for Windows |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | установка, откат и проверка файлов | manifest-init.sh, test-скрипты | coreutils / Git for Windows |
 
 ## 1. Исключённые зависимости
