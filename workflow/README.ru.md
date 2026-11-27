@@ -29,7 +29,7 @@
 | Ключ | Включён по умолчанию | Поведение |
 |---|---:|---|
 | `components.todoing.enabled` | `true` | Использовать Todoing API, задачи, историю и блокировки |
-| `components.openspec.enabled` | `true` | Использовать OpenSpec changes и постоянные спецификации |
+| `components.openspec.enabled` | `false` | Использовать OpenSpec changes и постоянные спецификации |
 | `checks.workflow_preflight.enabled` | `false` | Выполнять workflow Preflight |
 | `checks.git_hooks.enabled` | `false` | Устанавливать/запускать Git hooks Manifest |
 | `checks.git_checks.enabled` | `false` | Выполнять дополнительные Git-проверки Manifest |
@@ -384,3 +384,8 @@ to = "completed"
 - При отмене не повторяйте `task.cancel`, если outcome уже `cancelled`; продолжайте только недостающие шаги после сверки.
 
 Todoing, OpenSpec и Git не образуют общей транзакции. При неоднозначном состоянии остановитесь и эскалируйте пользователю.
+
+
+### Индивидуальное подключение файлов контекста
+
+Каждый файл контекста управляется собственным переключателем `context_files.<id>.enabled` в `.manifest/manifest.yaml`. Поддерживаемые ID: `agents`, `llm-navigation`, `versioning`, `releases`, `logging`, `code-rules`, `test-rules`, `commit-rules`, `version`, `llmignore`. Все переключатели новых проектов по умолчанию `false`. Файл подключается только при включённом собственном переключателе. Отключение не удаляет уже существующий файл. Существующие конфигурации без секции `context_files` не изменяются автоматически: подключение файлов контекста откладывается до отдельной согласованной миграции.

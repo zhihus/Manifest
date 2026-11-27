@@ -29,7 +29,7 @@ For `format_version: 1`, the following independent switches apply:
 | Key | Default | Behavior |
 |---|---:|---|
 | `components.todoing.enabled` | `true` | Use Todoing API, tasks, history, and locks |
-| `components.openspec.enabled` | `true` | Use OpenSpec changes and permanent specifications |
+| `components.openspec.enabled` | `false` | Use OpenSpec changes and permanent specifications |
 | `checks.workflow_preflight.enabled` | `false` | Run workflow Preflight |
 | `checks.git_hooks.enabled` | `false` | Install/run Manifest Git hooks |
 | `checks.git_checks.enabled` | `false` | Run additional Manifest Git checks |
@@ -374,3 +374,8 @@ After interruption, first reconcile actual state: Todoing via `task.get`, `task.
 - During cancellation, do not repeat `task.cancel` if outcome is already `cancelled`; reconcile and perform only the missing steps.
 
 Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the user if state is ambiguous.
+
+
+### Individually selectable context files
+
+Each context file is controlled by its own `context_files.<id>.enabled` switch in `.manifest/manifest.yaml`. Supported IDs are `agents`, `llm-navigation`, `versioning`, `releases`, `logging`, `code-rules`, `test-rules`, `commit-rules`, `version`, and `llmignore`. All switches default to `false` for new projects. A file is connected only when its own switch is enabled. Disabling a switch never deletes an existing file. Existing configurations without the `context_files` section are not changed automatically; context-file installation is deferred until a separate, approved migration is designed.

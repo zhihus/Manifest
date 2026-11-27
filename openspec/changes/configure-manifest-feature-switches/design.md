@@ -8,7 +8,7 @@
 3. Default `components.todoing.enabled` to `true` and
    `components.openspec.enabled` to `false`.
 4. Add independent `context_files.<id>.enabled` switches for every supported context file; all default to `false`.
-5. Default every optional control under `checks` to `false:
+5. Default every optional control under `checks` to `false`:
    `workflow_preflight`, `git_hooks`, `git_checks`,
    `openspec_validation`, `tests`, `review_gate`, and
    `additional_gates`.
