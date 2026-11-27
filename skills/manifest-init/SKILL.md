@@ -1,6 +1,6 @@
 ---
 name: manifest-init
-description: Connect Manifest to a Git project, or manage its standalone Todoing tasks after connection. Adds only missing files and never overwrites user data.
+description: Connect Manifest to a Git project, or manage standalone and coordinated Todoing tasks after connection. Adds only missing files and never overwrites user data.
 ---
 
 # Manifest Init
@@ -57,7 +57,14 @@ update, review, complete, or cancel project work.
    the user explicitly asks to initialize Todoing.
 5. Read and follow `references/todoing-agent-workflow.md` for every Todoing task
    lifecycle operation.
-6. Do not copy this reference into project context files or enable any context-file
+6. The Main Orchestrator is the sole Todoing API client. Role agents must not call
+   Todoing, change task statuses, or receive lock tokens.
+7. Only the user authorizes `backlog → ready` and cancellation. The Orchestrator
+   records those decisions only after explicit user approval.
+8. When both components are enabled, maintain exactly one Todoing task per
+   OpenSpec change, reuse it by its external reference, and keep FR/checklist
+   decomposition in `tasks.md` rather than creating duplicate tasks.
+9. Do not copy this reference into project context files or enable any context-file
    switches. It is an agent skill reference, not a project template.
 
 ## Package
