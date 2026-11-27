@@ -4,7 +4,7 @@ PROJECT=.
 TEMPLATES="$(cd "$(dirname "$0")/.." && pwd)/templates"
 PROJECT_NAME= PURPOSE= TRACKS= INITIAL_VERSION=0.1.0
 TODOING=enabled OPEN_SPEC=enabled
-usage(){ echo "usage: install.sh [--project DIR] [--templates DIR] [--project-name NAME] [--purpose TEXT] [--tracks none|code|documentation|mixed]"; exit 2; }
+usage(){ echo "usage: install.sh [--project DIR] [--templates DIR] [--project-name NAME] [--purpose TEXT] [--tracks none|code|documentation|mixed] [--todoing enabled|disabled] [--openspec enabled|disabled]"; exit 2; }
 while (($#)); do
  case "$1" in
   --project|--templates|--project-name|--purpose|--tracks|--initial-version|--todoing|--openspec)
@@ -110,4 +110,5 @@ echo "== MANIFEST CONNECTION REPORT =="
 echo "== INSTALLED (\${#INSTALLED[@]})"; printf '  %s\n' "\${INSTALLED[@]}"
 echo "== PRESERVED (\${#SKIPPED[@]})"; printf '  %s\n' "\${SKIPPED[@]}"
 echo "== PENDING (\${#PENDING[@]})"; printf '  %s\n' "\${PENDING[@]}"
+if [[ -n $(git -C "$PROJECT" ls-files -- temp/) ]]; then PENDING+=("temp/ contains Git-tracked files; installer did not untrack or delete them"); fi
 echo "INIT OK"

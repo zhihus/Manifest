@@ -6,15 +6,28 @@ Defines safe, repeatable Manifest connection for new, existing, and partially co
 
 ## Requirements
 
-### Requirement: Additive and idempotent connection
+### Requirement: Init entry point performs the connection cycle
 
-The initializer MUST analyze the target project and add only missing Manifest components and mandatory context files. It MUST NOT overwrite, merge, archive, or delete existing user files automatically.
+The system MUST provide one command that analyzes the project, obtains confirmation for new project metadata, validates safety and integrity, adds missing components, and produces a connection report.
 
 #### Scenario: New project
 
-- WHEN the initializer runs in a Git project without Manifest files
-- THEN it creates the Manifest configuration, all mandatory context files, and default OpenSpec scaffolding
-- AND it reports every created item
+- WHEN the command runs in a Git project without Manifest files and the user confirms the proposed metadata
+- THEN the Manifest configuration, mandatory context files, and enabled component scaffolding are created
+- AND the final report lists every created item
+
+### Requirement: Working directory and configuration location
+
+The system MUST store project settings in the single configuration file .manifest/manifest.yaml in the project root and MUST NOT create parallel Manifest settings files.
+
+#### Scenario: Configuration location
+
+- WHEN initialization completes
+- THEN project settings exist in .manifest/manifest.yaml with a matching checksum sidecar
+
+### Requirement: Additive and idempotent connection
+
+The initializer MUST add only missing Manifest files and components. It MUST NOT overwrite, merge, archive, or delete existing user files automatically.
 
 #### Scenario: Partially connected project
 
@@ -24,48 +37,69 @@ The initializer MUST analyze the target project and add only missing Manifest co
 
 #### Scenario: Repeated initialization
 
-- WHEN the initializer runs again after a successful connection
-- THEN it makes no duplicate changes
-- AND reports existing items as preserved
+- WHEN initialization runs again against an already connected project
+- THEN it preserves existing files and settings and creates no duplicates
 
-### Requirement: Existing configuration integrity
+### Requirement: Existing configuration is immutable
 
-The initializer MUST verify the checksum and schema of an existing .manifest/manifest.yaml before any write. It MUST never rewrite the configuration or checksum automatically.
+The system MUST never rewrite an existing configuration or checksum automatically. A valid existing configuration is preserved while missing independent components may be added.
 
-#### Scenario: Tampered configuration
+#### Scenario: Existing valid configuration
 
-- WHEN the checksum does not match
-- THEN initialization stops before writing any project files
+- WHEN initialization runs against a valid existing .manifest/manifest.yaml
+- THEN its configuration and checksum remain byte-identical
+- AND only missing project artifacts may be added
 
-#### Scenario: Unsupported legacy configuration
+### Requirement: Configuration integrity is mandatory
 
-- WHEN an existing configuration is not supported format_version 1
-- THEN initialization stops and reports that explicit migration is required
+The system MUST verify the configuration checksum and required schema before any project write.
 
-### Requirement: Independent component configuration
+#### Scenario: Modified configuration detected
 
-New configurations MUST enable Todoing and OpenSpec independently by default and MUST disable all seven optional controls by default.
+- WHEN the checksum does not match, is missing, or is orphaned
+- THEN initialization stops before writing project files and reports the integrity failure
 
-#### Scenario: Defaults
+#### Scenario: Unsupported configuration
 
-- WHEN a new configuration is created
-- THEN components.todoing.enabled and components.openspec.enabled are true
-- AND checks.workflow_preflight, git_hooks, git_checks, openspec_validation, tests, review_gate, and additional_gates are false
+- WHEN the existing configuration is not supported format_version 1 or a required switch is malformed
+- THEN initialization stops and requires an explicit migration or repair decision
+
+### Requirement: Interview determines new project metadata
+
+For a project without an existing Manifest configuration, the system MUST derive the proposed project name and tracks from project analysis and obtain user confirmation before writing. Existing valid project metadata MUST NOT be re-interviewed or changed.
+
+#### Scenario: User adjusts proposed metadata
+
+- WHEN the user changes a proposed value
+- THEN the confirmed value is used for newly generated files and configuration
+
+### Requirement: Component defaults and independence
+
+New configuration MUST enable Todoing and OpenSpec independently by default and MUST disable all seven optional controls by default. Explicit component selections may override only the corresponding component default.
+
+#### Scenario: Default switches
+
+- WHEN a new configuration is generated without component overrides
+- THEN Todoing and OpenSpec are enabled and workflow_preflight, git_hooks, git_checks, openspec_validation, tests, review_gate, and additional_gates are disabled
 
 ### Requirement: Todoing bootstrap is non-destructive
 
-The initializer MUST NOT download or update the Todoing binary and MUST NOT initialize over an existing database or legacy data. Existing Todoing configuration MUST remain unchanged.
+Manifest MUST NOT download or update the Todoing binary and MUST NOT initialize over an existing database or legacy data. Existing Todoing configuration MUST remain unchanged.
 
 #### Scenario: Todoing unavailable
 
-- WHEN the Todoing binary is unavailable
-- THEN core Manifest connection may complete and Todoing is reported as pending
-
-#### Scenario: Existing Todoing data
-
-- WHEN a database, legacy tasks, or configuration already exists
-- THEN the initializer preserves it and does not call store.init blindly
+- WHEN Todoing is enabled but its binary is unavailable
+- THEN core connection may complete and Todoing is reported as pending
 
 ### Requirement: Connection report
 
 Every completed run MUST report installed, preserved, pending, and conflicting items separately.
+
+### Requirement: Install-time dependencies are declared
+
+The installer MUST use only external binaries declared in the external dependency register, including Bash, Git, Perl, SHA-256 tooling, mktemp, awk, grep, sed, find, ln, chmod, and date where invoked.
+
+#### Scenario: Registered dependencies
+
+- WHEN the installer runs
+- THEN every external binary it invokes is documented with its purpose, scope, and detection method

@@ -1,71 +1,23 @@
-# manifest-init Specification
+## MODIFIED Requirements
 
-## Purpose
+### Requirement: Init entry point performs the connection cycle
 
-Defines safe, repeatable Manifest connection for new, existing, and partially connected Git projects.
+The system MUST provide one command that analyzes the project, confirms new metadata, validates integrity, adds missing items, and reports installed, preserved, and pending components.
 
-## Requirements
+### Requirement: Configuration is stable and never auto-overwritten
+
+The system MUST preserve a valid existing configuration and checksum byte-for-byte. Existing .manifest/ does not block additive installation of missing files; it blocks only unsafe or unsupported configuration changes.
+
+### Requirement: Final report is produced on every completed run
+
+The system MUST report installed items, preserved existing items, pending external prerequisites, and conflicts separately.
+
+## ADDED Requirements
 
 ### Requirement: Additive and idempotent connection
 
-The initializer MUST analyze the target project and add only missing Manifest components and mandatory context files. It MUST NOT overwrite, merge, archive, or delete existing user files automatically.
+New projects receive the complete mandatory context and enabled component scaffolding. Existing projects receive only missing items. No existing file is automatically overwritten, merged, archived, or deleted.
 
-#### Scenario: New project
+### Requirement: Todoing bootstrap remains non-destructive
 
-- WHEN the initializer runs in a Git project without Manifest files
-- THEN it creates the Manifest configuration, all mandatory context files, and default OpenSpec scaffolding
-- AND it reports every created item
-
-#### Scenario: Partially connected project
-
-- WHEN some Manifest files or components already exist
-- THEN only missing items are created
-- AND all existing files remain byte-identical
-
-#### Scenario: Repeated initialization
-
-- WHEN the initializer runs again after a successful connection
-- THEN it makes no duplicate changes
-- AND reports existing items as preserved
-
-### Requirement: Existing configuration integrity
-
-The initializer MUST verify the checksum and schema of an existing .manifest/manifest.yaml before any write. It MUST never rewrite the configuration or checksum automatically.
-
-#### Scenario: Tampered configuration
-
-- WHEN the checksum does not match
-- THEN initialization stops before writing any project files
-
-#### Scenario: Unsupported legacy configuration
-
-- WHEN an existing configuration is not supported format_version 1
-- THEN initialization stops and reports that explicit migration is required
-
-### Requirement: Independent component configuration
-
-New configurations MUST enable Todoing and OpenSpec independently by default and MUST disable all seven optional controls by default.
-
-#### Scenario: Defaults
-
-- WHEN a new configuration is created
-- THEN components.todoing.enabled and components.openspec.enabled are true
-- AND checks.workflow_preflight, git_hooks, git_checks, openspec_validation, tests, review_gate, and additional_gates are false
-
-### Requirement: Todoing bootstrap is non-destructive
-
-The initializer MUST NOT download or update the Todoing binary and MUST NOT initialize over an existing database or legacy data. Existing Todoing configuration MUST remain unchanged.
-
-#### Scenario: Todoing unavailable
-
-- WHEN the Todoing binary is unavailable
-- THEN core Manifest connection may complete and Todoing is reported as pending
-
-#### Scenario: Existing Todoing data
-
-- WHEN a database, legacy tasks, or configuration already exists
-- THEN the initializer preserves it and does not call store.init blindly
-
-### Requirement: Connection report
-
-Every completed run MUST report installed, preserved, pending, and conflicting items separately.
+The skill MUST NOT download the Todoing binary or initialize over an existing store or legacy task data.
