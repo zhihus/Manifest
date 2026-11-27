@@ -320,61 +320,51 @@ mechanism. Base OpenSpec specifications remain unchanged.
 
 ### 4.3. Execution and locking
 
-1. The orchestrator selects an approved task.
-2. The Main Orchestrator acquires a lock through `task.lock.acquire`.
-3. Manifest keeps owner ID, token, and fencing generation in protected session
-   state and passes the token with every owner request.
-4. The Main Orchestrator renews the lease through `task.lock.heartbeat`
-   while it is active.
-5. Manifest moves the task to `in_progress` and performs permitted operations.
-6. The Main Orchestrator releases the lock through `task.lock.release` when finished.
+1. Before dispatch, Manifest verifies that the task is in `ready`, its baseline was approved with `task.version.approve`, and every prerequisite has outcome `completed`.
+2. The Main Orchestrator acquires the task lock through `task.lock.acquire`.
+3. Immediately after acquisition, it moves the task `ready → in_progress` with `task.status.set`, supplying the token in the request envelope.
+4. Owner ID, token, fencing generation, and lease expiry remain in protected Main Orchestrator session state. The token is never passed to role agents or placed in prompts, environments, task content, logs, or Git.
+5. Call `task.lock.heartbeat` immediately before each blocking role-agent run. Do not heartbeat while the role agent is executing.
+6. Every owner request carries the current token, owner ID, and fencing generation. After `stale_lock`, never use the old token again.
+7. Release the lock only after task completion or confirmed cancellation and reconciliation of all required Todoing, OpenSpec, and Git operations.
 
-A task under lock is inaccessible to other clients for both reading and writing.
-Todoing lists do not reveal even the IDs of locked tasks. Manifest MUST NOT bypass
-this restriction by reading the database or using a snapshot.
+A task under lock is inaccessible to other clients for both reading and writing. Todoing lists do not reveal even the IDs of locked tasks. Manifest MUST NOT bypass this restriction by reading the database or using a snapshot.
 
-### 4.4. Review and return
+### 4.4. Independent review and revision loop
 
-- Before submission, Manifest moves the task to `review` and provides the Reviewer
-  with artifacts through its own workflow.
-- The Reviewer independently checks the result.
-- Manifest calls `task.review.add` with review_id, the reviewed version number,
-  reviewer label, outcome, and ordered comments. Envelope actor_id identifies the
-  Reviewer agent.
-- On approval, Todoing stores a structured Review record with outcome `approved`;
-  Manifest moves the task to `verified`.
-- When changes are requested, Todoing atomically stores a Review record with
-  outcome `changes_requested` and increments `revision_count` by exactly one;
-  Manifest returns the task to `in_progress`.
-- Repeating the same `review_id` with identical content is idempotent; the same ID
-  with different content is rejected. A Review record references the exact immutable
-  task version. Recording a Review does not change workflow status.
-- Repeated review cycles do not require additional Todoing statuses.
-
-`revision_count` is the number of Review records with outcome
-`changes_requested`, not the number of task versions or comments. Todoing stores
-Review history and `revision_count` as universal task data. Manifest determines
-when a Reviewer may create a record and what workflow action follows its outcome.
+- Before handing off the result, Manifest moves the task `in_progress → review` and provides the exact artifacts and task version to an independent Reviewer.
+- The Reviewer runs in a separate role/session from the Implementer, independently checks the result, receives no lock token, and does not call the Todoing API.
+- The Main Orchestrator records the result with `task.review.add`, including a stable `review_id`, exact reviewed `version_no`, reviewer identity, outcome, and ordered comments. The envelope `actor_id` identifies the Reviewer session.
+- On `approved`, Todoing stores the Review record and Manifest moves the task `review → verified`.
+- On `changes_requested`, Todoing atomically stores the Review record and increments `revision_count` exactly once; Manifest then moves the task `review → in_progress` and returns the findings to the Implementer.
+- After corrections, attach new meaningful Git commits and repeat independent review. Review history is append-only; never edit or delete previous records.
+- Repeating the same `review_id` with identical content is idempotent; a different payload with the same ID is rejected. Every Review record references the exact immutable task version.
+- `revision_count` counts Review records with outcome `changes_requested`, not task versions or comments. Repeated cycles do not require additional Todoing statuses.
 
 ### 4.5. Final completion
 
-After status `verified`, the orchestrator runs final consistency checks across
-Todoing, OpenSpec, and Git. On success, it moves the task to `completed`, which
-maps to outcome `completed` if configured accordingly. A Git commit reference
-alone does not prove completion.
+For a coordinated Todoing/OpenSpec task, successful completion MUST follow this order:
+
+1. Review is approved and the task is in `verified`.
+2. Manifest runs final consistency checks across Todoing, OpenSpec, and Git.
+3. Run `openspec archive <change-id> --yes` to merge delta specs into permanent specs and archive the change.
+4. Perform Git merge according to the project's branch and merge rules.
+5. Call `task.commit.finalize` with the actual final merge commit SHA.
+6. Move the task to `completed` with `task.status.set`, recording outcome `completed`.
+7. Release the lock with `task.lock.release`.
+
+For standalone Todoing tasks, omit the OpenSpec archive step and complete against the accepted final Git revision. A Git commit reference alone does not prove that acceptance criteria passed.
 
 ### 4.6. Cancellation
 
 1. Any agent may recommend cancellation with a reason.
-2. Only the user approves cancellation.
+2. Only the user may approve cancellation. Without explicit approval, do not call `task.cancel`, change the outcome, or archive the OpenSpec change.
 3. After approval, Manifest calls `task.cancel` with the reason.
-4. Manifest archives the linked OpenSpec change through the standard Archive
-   mechanism.
-5. Base OpenSpec specifications remain unchanged.
+4. For a linked OpenSpec change, run `openspec archive <change-id> --yes --skip-specs`; archive the change without modifying permanent specs and retain the `openspec.change` reference.
+5. For standalone Todoing tasks, do not invoke OpenSpec archive.
+6. Release the lock only after the required cancellation and archive operations are reconciled.
 
-Cancellation MUST NOT be implemented only by changing workflow status or archiving
-the task. The outcome and OpenSpec archive are separate actions. Reopening a
-cancelled task requires an explicit decision and `task.reopen`.
+Cancellation is not equivalent to archiving: moving an OpenSpec change to the archive does not cancel the Todoing task. Delta specs from a cancelled change MUST NOT be merged into permanent specs. Reopening a cancelled task requires a separate explicit user decision and a supported reopen operation.
 
 ## 5. Versions, history, and Git
 
