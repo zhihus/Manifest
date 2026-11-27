@@ -81,7 +81,7 @@ require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery re
 for scenario in "After OpenSpec archive but before Git merge" "After Git merge but before final commit marker" "During cancellation"; do
   require_text "$TODOING_AGENT" "$scenario" "partial failure recovery"
 done
-for scenario in "Failure after OpenSpec archive" "Failure after Git merge" "Failure after task completion" "Lease expires during agent execution" "Partial cancellation"; do
+for scenario in "Failure after OpenSpec archive" "Failure after Git merge" "Failure after final commit marker" "Failure after task completion" "Lease expires during agent execution" "Partial cancellation"; do
   require_text "$RUNBOOK_SPEC" "$scenario" "normative recovery scenario"
 done
 
