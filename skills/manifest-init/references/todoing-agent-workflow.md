@@ -127,8 +127,8 @@ The Main Orchestrator is the only Todoing API client and lock-token custodian.
 2. Before dispatching the independent Reviewer, move `in_progress → review` with `task.status.set`.
 3. Give the Reviewer the exact artifacts and task version to inspect. The Reviewer must be a separate role/session from the Implementer and must not receive the lock token or call Todoing.
 4. The Main Orchestrator records the result with `task.review.add`, including a stable `review_id`, exact reviewed `version_no`, reviewer identity, outcome, and ordered comments. The envelope `actor_id` identifies the Reviewer role/session.
-5. On `approved`, move `review → verified`. Do not mark the task completed yet.
-6. On `changes_requested`, Todoing atomically appends the Review and increments `revision_count` exactly once. Then move `review → in_progress` and return the findings to the Implementer. Preserve the Review record; never edit or delete it.
+5. On `approved`, call `task.status.set` to move `review → verified`. Do not mark the task completed yet.
+6. On `changes_requested`, Todoing atomically appends the Review and increments `revision_count` exactly once. Then call `task.status.set` to move `review → in_progress` and return the findings to the Implementer. Preserve the Review record; never edit or delete it.
 7. After corrections, attach the new meaningful commits and repeat the independent review cycle. `revision_count` counts `changes_requested` Review records, not task versions or comments. The same `review_id` and identical payload is idempotent; a different payload with that ID is a conflict.
 
 ## Completion
@@ -142,7 +142,7 @@ For coordinated Todoing/OpenSpec work, perform these steps in order:
 3. Run `openspec archive <change-id> --yes` to merge delta specs into permanent specs and archive the change.
 4. Merge Git according to the project's branch and commit rules.
 5. Record the actual final merge SHA with `task.commit.finalize`.
-6. Move the task to `completed`; this records outcome `completed`.
+6. Call `task.status.set` to move the task to `completed`; this records outcome `completed`.
 7. Release the task lock with `task.lock.release`.
 
 For standalone Todoing work, omit the OpenSpec archive step and complete against the accepted final Git revision. A Git commit reference alone never proves acceptance or completion.
