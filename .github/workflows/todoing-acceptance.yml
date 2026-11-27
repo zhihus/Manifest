@@ -23,6 +23,23 @@ on:
       - "openspec/config.yaml"
       - "openspec/**"
       - ".github/workflows/todoing-acceptance.yml"
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "scripts/test-todoing-acceptance.py"
+      - "scripts/test-todoing-runbook.sh"
+      - "scripts/test-todoing-config.py"
+      - "scripts/test-manifest-init.sh"
+      - "skills/manifest-init/tests/**"
+      - "skills/manifest-init/scripts/**"
+      - "skills/manifest-init/references/todoing-bootstrap.md"
+      - "docs/architecture/todoing-contract.*"
+      - "openspec/changes/complete-todoing-agent-workflow/**"
+      - "workflow/README.*"
+      - "openspec/config.yaml"
+      - "openspec/**"
+      - ".github/workflows/todoing-acceptance.yml"
 
 permissions:
   contents: read
