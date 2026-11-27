@@ -338,7 +338,11 @@ tasks; OpenSpec is not a required dependency.
    Check for an existing active task with the same outcome before creating.
 3. New tasks start in `backlog`. Put the concise outcome in `title`, and
    the goal, boundaries, and acceptance criteria in `body`. Do not add
-   priorities; the current Manifest configuration does not use them.
+   priorities; the current Manifest configuration does not use them. Update
+   an existing task only after `task.get`, using `task.update` for `title` or
+   `body`. A material scope or acceptance-criteria change after approval
+   requires a new explicit user decision and a new baseline via
+   `task.version.approve`.
 4. Only an explicit user instruction to execute the work authorizes
    `backlog → ready`. A request to discuss, analyze, or prepare a plan is
    not implementation approval. After approval, call `task.status.set` to
