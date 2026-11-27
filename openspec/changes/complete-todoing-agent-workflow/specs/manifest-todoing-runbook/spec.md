@@ -68,6 +68,26 @@ external references, or archive operations.
 - THEN it records outcome `cancelled` and releases the lock
 - AND it does not invoke OpenSpec archive
 
+### Requirement: Agent skill exposes runtime Todoing management
+
+The distributed Manifest agent skill MUST provide a runtime Todoing procedure that
+can be invoked after project connection. It MUST NOT depend on project context files
+being enabled or copied into the connected project.
+
+#### Scenario: Manage tasks after connection
+
+- GIVEN the project is connected, Todoing is enabled, and OpenSpec is disabled
+- WHEN the user asks the agent to create, update, execute, review, or complete work
+- THEN the agent skill loads the Todoing runtime workflow reference
+- AND the agent follows the standalone Todoing lifecycle without rerunning initialization
+
+#### Scenario: OpenSpec is enabled while stage 2 is frozen
+
+- GIVEN Todoing and OpenSpec are both enabled
+- WHEN the stage-1 Todoing skill is invoked
+- THEN it stops before cross-system operations
+- AND reports that Todoing/OpenSpec coordination is outside the current stage
+
 ### Requirement: Compatible Todoing API build
 
 The full Manifest Todoing workflow MUST use Todoing source commit
