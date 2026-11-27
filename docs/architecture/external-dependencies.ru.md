@@ -31,10 +31,10 @@
 | `cut` | извлечение номера строки из вывода `grep -n` | test-todoing-runbook.sh | переносимая системная утилита |
 | `sort`, `tr` | сортировка нарушений и обработка токенов/вывода | structure-parser.sh, verify.sh, test-portability.sh | переносимые системные утилиты |
 | `cat` | чтение контрольных файлов в тестах | test-manifest-init.sh | переносимая системная утилита |
-| `chmod` | установка исполняемого бита тестового Perl-stub | test-manifest-init.sh | переносимая системная утилита |
+| `chmod` | установка прав чтения на подготовленные шаблоны | `skills/manifest-init/scripts/install.sh` | переносимая системная утилита |
 | `env` | поиск Bash по PATH в shebang | все исполняемые shell-скрипты | системная утилита |
-| `ln` | создание символической ссылки для проверки обхода symlink-файлов | test-structure-parser.sh | POSIX-утилита; доступна в Unix-подобных средах и Git for Windows |
-| `ln` | атомарное создание файлов без перезаписи существующих путей | `skills/manifest-init/scripts/install.sh` | переносимая системная утилита; ошибка при существующей цели используется как защита от clobber |\n| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | установка, откат и проверка файлов | manifest-init.sh, test-скрипты | coreutils / Git for Windows |
+| `ln` | атомарное создание новых файлов без перезаписи; проверка symlink-файлов в тестах | `skills/manifest-init/scripts/install.sh`, `test-structure-parser.sh` | переносимая системная утилита; существующая цель вызывает отказ |
+| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | установка, откат и проверка файлов | manifest-init.sh, test-скрипты | coreutils / Git for Windows |
 
 ## 1. Исключённые зависимости
 

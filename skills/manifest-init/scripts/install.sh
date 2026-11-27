@@ -18,7 +18,7 @@ while (($#)); do
 done
 [[ -d $PROJECT ]] || { echo "PROJECT_NOT_FOUND: $PROJECT"; exit 1; }
 PROJECT=$(cd "$PROJECT" && pwd); MK=$PROJECT/.manifest
-INSTALLED=(); SKIPPED=(); PENDING=()
+INSTALLED=(); SKIPPED=(); PENDING=(); CONFLICTS=()
 sha256_of(){ if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'; elif command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | awk '{print $1}'; else return 1; fi; }
 fail(){ echo "$1" >&2; exit 1; }
 analyze_tracks(){
@@ -41,7 +41,9 @@ sha256_of "$0" >/dev/null || fail SHA256_REQUIRED
 probe=$(mktemp "$PROJECT/.manifest-write-probe.XXXXXX") || fail PROJECT_NOT_WRITABLE
 rm -f "$probe"
 CONFIG=$MK/manifest.yaml; CHECKSUM=$MK/manifest.yaml.checksum; config_exists=0
+[[ ! -e $MK || -d $MK ]] || fail MANIFEST_PATH_CONFLICT
 if [[ -e $CONFIG ]]; then
+ [[ -f $CONFIG ]] || fail CONFIG_PATH_CONFLICT
  config_exists=1
  [[ -f $CHECKSUM ]] || fail "CHECKSUM_MISSING: refusing writes"
  expected=$(sed 's/^[^:]*://' "$CHECKSUM"); actual=$(sha256_of "$CONFIG")
@@ -78,7 +80,10 @@ tmpdir=$(mktemp -d "$PROJECT/.manifest-stage.XXXXXX") || fail STAGING_FAILED; tr
 for i in "\${!NAMES[@]}"; do
  name=\${NAMES[$i]}; src=$TEMPLATES/\${SOURCES[$i]}
  [[ -f $src ]] || fail "TEMPLATE_MISSING: $src"
- if [[ -e $PROJECT/$name ]]; then SKIPPED+=("$name (already exists; preserved)"); continue; fi
+ if [[ -e $PROJECT/$name ]]; then
+  if [[ -f $PROJECT/$name || -L $PROJECT/$name ]]; then SKIPPED+=("$name (already exists; preserved)"); else CONFLICTS+=("$name (path exists but is not a regular file)"); fi
+  continue
+ fi
  rendered=$tmpdir/$name
  PROJECT_NAME="$PROJECT_NAME" PURPOSE="$PURPOSE" INITIAL_VERSION="$INITIAL_VERSION" perl -pe '
   s/\{%\s*if\s+\w+\s*%\}(.*?)\{%\s*else\s*%\}(.*?)\{%\s*endif\s*%\}/$2/gs;
@@ -92,23 +97,34 @@ for i in "\${!NAMES[@]}"; do
  grep -q -e '{{' -e '{%' "$rendered" && fail "TEMPLATE_RENDER_FAILED: $name"
  if ln "$rendered" "$PROJECT/$name" 2>/dev/null; then INSTALLED+=("$name"); else SKIPPED+=("$name (appeared during install; preserved)"); fi
 done
-if [[ -f $PROJECT/.gitignore ]]; then
+if [[ -e $PROJECT/.gitignore && ! -f $PROJECT/.gitignore ]]; then CONFLICTS+=(".gitignore (path is not a regular file)")
+elif [[ -f $PROJECT/.gitignore ]]; then
  if ! grep -Eq '^[[:space:]]*temp/([[:space:]]|$)' "$PROJECT/.gitignore"; then printf '\n# Manifest temporary workspace\ntemp/\n' >>"$PROJECT/.gitignore"; INSTALLED+=(".gitignore (added temp/ exclusion)"); else SKIPPED+=(".gitignore temp/ exclusion already present"); fi
 else printf '# Manifest temporary workspace\ntemp/\n' >"$PROJECT/.gitignore"; INSTALLED+=(".gitignore"); fi
 if grep -A1 '^  openspec:' "$CONFIG" | grep -q 'enabled: true'; then
- mkdir -p "$PROJECT/openspec/specs" "$PROJECT/openspec/changes"
- if [[ ! -e $PROJECT/openspec/config.yaml ]]; then
-  [[ -f $TEMPLATES/openspec-config.yaml ]] || fail OPENSPEC_TEMPLATE_MISSING
-  if ln "$TEMPLATES/openspec-config.yaml" "$PROJECT/openspec/config.yaml" 2>/dev/null; then INSTALLED+=("openspec/config.yaml"); else SKIPPED+=("openspec/config.yaml (preserved)"); fi
- else SKIPPED+=("openspec/config.yaml (already exists; preserved)"); fi
+ if [[ -e $PROJECT/openspec && ! -d $PROJECT/openspec ]]; then
+  CONFLICTS+=("openspec (path exists but is not a directory)")
+ else
+  mkdir -p "$PROJECT/openspec/specs" "$PROJECT/openspec/changes"
+  if [[ ! -e $PROJECT/openspec/config.yaml ]]; then
+   [[ -f $TEMPLATES/openspec-config.yaml ]] || fail OPENSPEC_TEMPLATE_MISSING
+   cp "$TEMPLATES/openspec-config.yaml" "$tmpdir/openspec-config.yaml"
+   chmod 644 "$tmpdir/openspec-config.yaml"
+   if ln "$tmpdir/openspec-config.yaml" "$PROJECT/openspec/config.yaml" 2>/dev/null; then INSTALLED+=("openspec/config.yaml"); else SKIPPED+=("openspec/config.yaml (appeared during install; preserved)"); fi
+  elif [[ -f $PROJECT/openspec/config.yaml || -L $PROJECT/openspec/config.yaml ]]; then SKIPPED+=("openspec/config.yaml (already exists; preserved)")
+  else CONFLICTS+=("openspec/config.yaml (path exists but is not a regular file)")
+  fi
+ fi
 fi
 if grep -A1 '^  todoing:' "$CONFIG" | grep -q 'enabled: true'; then
  if command -v todoing >/dev/null 2>&1; then PENDING+=("Todoing binary detected; run documented non-destructive store bootstrap")
  else PENDING+=("Todoing enabled; user must install its binary before Todoing workflow use"); fi
 fi
+if [[ -n $(git -C "$PROJECT" ls-files -- temp/) ]]; then PENDING+=("temp/ contains Git-tracked files; installer did not untrack or delete them"); fi
 echo "== MANIFEST CONNECTION REPORT =="
 echo "== INSTALLED (\${#INSTALLED[@]})"; printf '  %s\n' "\${INSTALLED[@]}"
 echo "== PRESERVED (\${#SKIPPED[@]})"; printf '  %s\n' "\${SKIPPED[@]}"
 echo "== PENDING (\${#PENDING[@]})"; printf '  %s\n' "\${PENDING[@]}"
-if [[ -n $(git -C "$PROJECT" ls-files -- temp/) ]]; then PENDING+=("temp/ contains Git-tracked files; installer did not untrack or delete them"); fi
+echo "== CONFLICTS (\${#CONFLICTS[@]})"; printf '  %s\n' "\${CONFLICTS[@]}"
+if (( \${#CONFLICTS[@]} > 0 )); then exit 3; fi
 echo "INIT OK"

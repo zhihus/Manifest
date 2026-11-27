@@ -8,7 +8,7 @@
 
 # Description
 The single source listing the external binary tools that Manifest
-repository infrastructure scripts (`scripts/*.sh` and hooks under `scripts/hooks/`) may invoke.
+repository infrastructure scripts (`scripts/*.sh`, `skills/*/scripts/*.sh`, `skills/*/tests/*.sh`, and hooks under `scripts/hooks/`) may invoke.
 Adding a new external dependency requires an entry in this register.
 Entry format: tool, purpose, scope of use, detection method. The
 Russian edition (`external-dependencies.ru.md`) is authoritative;
@@ -34,7 +34,7 @@ this file is its translation.
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
 | `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
-| `ln` | atomic no-clobber creation of new files | `skills/manifest-init/scripts/install.sh` | portable system utility; an existing destination causes failure and is preserved |\n| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
+| `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
 

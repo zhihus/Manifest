@@ -53,9 +53,10 @@ the Todoing task title MUST exactly equal the change directory ID, and the
 The `workflow_preflight` switch controls only the workflow Preflight stage.
 The mandatory safety checks performed by `manifest-init.sh` (Git work tree,
 template availability, safe write access, and required tools) remain enabled.
-Checksum protection, refusal to reinitialize, and the prohibition on automatic
-configuration overwrites also always remain active. These mechanisms cannot
-be disabled by configuration.
+Checksum protection and the prohibition on automatically rewriting an existing
+configuration always remain active. Reconnection is additive: it adds only missing
+items and preserves existing files and settings. These protections cannot be
+disabled by configuration.
 
 ## 1. Roles
 
