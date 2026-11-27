@@ -104,3 +104,23 @@ Any migration of an existing configuration requires a separate explicit action.
 - **WHEN** a project already has `.manifest/manifest.yaml`
 - **THEN** initialization refuses reinitialization and leaves the configuration
   and checksum byte-identical
+
+### Requirement: Todoing task identity matches the OpenSpec change
+
+When both Todoing and OpenSpec are enabled, the Todoing task title MUST
+exactly equal the OpenSpec change directory ID. The task MUST carry one
+project-scoped `openspec.change` reference whose value is that same ID.
+FR implementation tasks inside the change MUST NOT become separate Todoing
+tasks.
+
+#### Scenario: Matching task and change
+
+- **WHEN** the Orchestrator creates a Todoing task for an OpenSpec change
+- **THEN** the task title and `openspec.change` reference value exactly match
+  the change directory ID
+
+#### Scenario: Mismatched task title
+
+- **WHEN** the Todoing task title differs from the OpenSpec change directory ID
+- **THEN** the Orchestrator stops before approval or implementation and reports
+  the mismatch
