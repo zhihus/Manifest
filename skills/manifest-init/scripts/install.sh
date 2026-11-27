@@ -4,6 +4,7 @@ PROJECT=.
 TEMPLATES="$(cd "$(dirname "$0")/.." && pwd)/templates"
 PROJECT_NAME= PURPOSE= TRACKS= INITIAL_VERSION=0.1.0
 TODOING=enabled OPEN_SPEC=disabled
+COMPONENT_OVERRIDES=0
 CONTEXT_OVERRIDES=()
 usage(){ echo "usage: install.sh [--project DIR] [--templates DIR] [--project-name NAME] [--purpose TEXT] [--tracks none|code|documentation|mixed] [--todoing enabled|disabled] [--openspec enabled|disabled] [--context-file ID=enabled|disabled ...]"; exit 2; }
 while (($#)); do
@@ -12,7 +13,7 @@ while (($#)); do
    (($# >= 2)) || usage
    case "$1" in
     --project) PROJECT=$2;; --templates) TEMPLATES=$2;; --project-name) PROJECT_NAME=$2;;
-    --purpose) PURPOSE=$2;; --tracks) TRACKS=$2;; --initial-version) INITIAL_VERSION=$2;; --todoing) TODOING=$2;; --openspec) OPEN_SPEC=$2;; --context-file) CONTEXT_OVERRIDES+=("$2");;
+    --purpose) PURPOSE=$2;; --tracks) TRACKS=$2;; --initial-version) INITIAL_VERSION=$2;; --todoing) TODOING=$2; COMPONENT_OVERRIDES=1;; --openspec) OPEN_SPEC=$2; COMPONENT_OVERRIDES=1;; --context-file) CONTEXT_OVERRIDES+=("$2");;
    esac; shift 2;;
   *) usage;;
  esac
@@ -57,7 +58,7 @@ CONFIG=$MK/manifest.yaml; CHECKSUM=$MK/manifest.yaml.checksum; config_exists=0
 if [[ -e $CONFIG ]]; then
  [[ -f $CONFIG ]] || fail CONFIG_PATH_CONFLICT
  config_exists=1
- ((${#CONTEXT_OVERRIDES[@]} == 0)) || fail "EXISTING_CONFIG_IMMUTABLE: context-file overrides require explicit migration"
+ ((COMPONENT_OVERRIDES == 0 && ${#CONTEXT_OVERRIDES[@]} == 0)) || fail "EXISTING_CONFIG_IMMUTABLE: setting overrides require an explicit configuration change"
  [[ -f $CHECKSUM ]] || fail "CHECKSUM_MISSING: refusing writes"
  expected=$(sed 's/^[^:]*://' "$CHECKSUM"); actual=$(sha256_of "$CONFIG")
  [[ $actual == "$expected" ]] || fail "CHECKSUM_MISMATCH: $CONFIG"

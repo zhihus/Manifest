@@ -33,7 +33,7 @@ this file is its translation.
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
 | `chmod` | setting read permissions on staged templates | `skills/manifest-init/scripts/install.sh` | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
-| `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
+| `ln` | atomic no-clobber file creation; symlink-file test | `skills/manifest-init/scripts/install.sh`, `test-structure-parser.sh` | portable system utility; an existing destination causes failure |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
