@@ -172,10 +172,194 @@ preflight() {
 write_config() {
   mkdir -p "$MK"
   local tmp=$MK/manifest.yaml.tmp
+  local yaml_name=$PROJECT_NAME
+  # Quote user input as a YAML double-quoted scalar.
+  yaml_name=${yaml_name//\\/\\\\}
+  yaml_name=${yaml_name//\"/\\\"}
+  yaml_name=${yaml_name//
+
+# Name-mapping table (design D4): installed file <- source template.
+BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
+BASE_SOURCES=(agents.template.md llm.template.txt commit-rules.template.md version.template versioning.template.md)
+
+# Render a template per the placeholder policy (design D7):
+# conditional blocks render through the templates' own fallback
+# branches (ENTRY_POINT / BUILD_METHOD stay empty), then variables
+# are substituted from interview data or deterministic defaults.
+render_template() {
+  local src=$1 dst=$2
+  PROJECT_NAME="$PROJECT_NAME" PURPOSE="$PURPOSE" \
+    INITIAL_VERSION="$INITIAL_VERSION" \
+    perl -pe '
+      s/\{%\s*if\s+\w+\s*%\}(.*?)\{%\s*else\s*%\}(.*?)\{%\s*endif\s*%\}/$2/gs;
+      s/\{%\s*if\s+\w+\s*%\}.*?\{%\s*endif\s*%\}//gs;
+      s/\{\{PROJECT_NAME\}\}/$ENV{PROJECT_NAME}/g;
+      s/\{\{PROJECT_PURPOSE\}\}/$ENV{PURPOSE}/g;
+      s/\{\{INITIAL_VERSION\}\}/$ENV{INITIAL_VERSION}/g;
+      s/\{\{PROJECT_CONTEXT\}\}/Not established./g;
+      s/\{\{PROJECT_DIRECTORIES\}\}/Not established./g;
+    ' "$src" >"$dst"
+}
+
+# INSTALL_CORRUPT handler (design D7 rollback note): the file is not
+# installed, files created by THIS run are removed, pre-existing files
+# are never touched, the full report is printed before exit.
+install_corrupt() {
+  local msg=$1 tmpdir=$2 f
+  echo "INSTALL_CORRUPT $msg"
+  report
+  for f in "${INSTALLED[@]}"; do
+    rm -f "$PROJECT/$f"
+  done
+  rm -rf "$MK" "$tmpdir"
+  echo "INSTALL CORRUPT: files created by this run were removed; pre-existing files untouched"
+  exit 1
+}
+
+install_templates() {
+  local i name src rendered
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  for i in "${!BASE_NAMES[@]}"; do
+    name=${BASE_NAMES[$i]}
+    src=$TEMPLATES/${BASE_SOURCES[$i]}
+    if [[ -e $PROJECT/$name ]]; then
+      CONFLICTS+=("$name")
+      continue
+    fi
+    rendered=$tmpdir/$name
+    if ! render_template "$src" "$rendered"; then
+      install_corrupt "$name (render failed)" "$tmpdir"
+    fi
+    # A file with a leftover placeholder is never installed.
+    if grep -q -e '{{' -e '{%' "$rendered"; then
+      install_corrupt "$name (unresolved placeholder)" "$tmpdir"
+    fi
+    cp "$rendered" "$PROJECT/$name"
+    cmp -s "$rendered" "$PROJECT/$name" ||
+      install_corrupt "$name (installed file differs from render)" "$tmpdir"
+    INSTALLED+=("$name")
+  done
+  rm -rf "$tmpdir"
+  report
+  if ((${#CONFLICTS[@]})); then
+    echo "INIT DONE WITH CONFLICTS (${#CONFLICTS[@]})"
+    exit 3
+  fi
+  echo "INIT OK"
+}
+
+checksum_guard
+preflight
+interview
+write_config
+install_templates
+\t'/\\t}
+  yaml_name=${yaml_name//
+
+# Name-mapping table (design D4): installed file <- source template.
+BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
+BASE_SOURCES=(agents.template.md llm.template.txt commit-rules.template.md version.template versioning.template.md)
+
+# Render a template per the placeholder policy (design D7):
+# conditional blocks render through the templates' own fallback
+# branches (ENTRY_POINT / BUILD_METHOD stay empty), then variables
+# are substituted from interview data or deterministic defaults.
+render_template() {
+  local src=$1 dst=$2
+  PROJECT_NAME="$PROJECT_NAME" PURPOSE="$PURPOSE" \
+    INITIAL_VERSION="$INITIAL_VERSION" \
+    perl -pe '
+      s/\{%\s*if\s+\w+\s*%\}(.*?)\{%\s*else\s*%\}(.*?)\{%\s*endif\s*%\}/$2/gs;
+      s/\{%\s*if\s+\w+\s*%\}.*?\{%\s*endif\s*%\}//gs;
+      s/\{\{PROJECT_NAME\}\}/$ENV{PROJECT_NAME}/g;
+      s/\{\{PROJECT_PURPOSE\}\}/$ENV{PURPOSE}/g;
+      s/\{\{INITIAL_VERSION\}\}/$ENV{INITIAL_VERSION}/g;
+      s/\{\{PROJECT_CONTEXT\}\}/Not established./g;
+      s/\{\{PROJECT_DIRECTORIES\}\}/Not established./g;
+    ' "$src" >"$dst"
+}
+
+# INSTALL_CORRUPT handler (design D7 rollback note): the file is not
+# installed, files created by THIS run are removed, pre-existing files
+# are never touched, the full report is printed before exit.
+install_corrupt() {
+  local msg=$1 tmpdir=$2 f
+  echo "INSTALL_CORRUPT $msg"
+  report
+  for f in "${INSTALLED[@]}"; do
+    rm -f "$PROJECT/$f"
+  done
+  rm -rf "$MK" "$tmpdir"
+  echo "INSTALL CORRUPT: files created by this run were removed; pre-existing files untouched"
+  exit 1
+}
+
+install_templates() {
+  local i name src rendered
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  for i in "${!BASE_NAMES[@]}"; do
+    name=${BASE_NAMES[$i]}
+    src=$TEMPLATES/${BASE_SOURCES[$i]}
+    if [[ -e $PROJECT/$name ]]; then
+      CONFLICTS+=("$name")
+      continue
+    fi
+    rendered=$tmpdir/$name
+    if ! render_template "$src" "$rendered"; then
+      install_corrupt "$name (render failed)" "$tmpdir"
+    fi
+    # A file with a leftover placeholder is never installed.
+    if grep -q -e '{{' -e '{%' "$rendered"; then
+      install_corrupt "$name (unresolved placeholder)" "$tmpdir"
+    fi
+    cp "$rendered" "$PROJECT/$name"
+    cmp -s "$rendered" "$PROJECT/$name" ||
+      install_corrupt "$name (installed file differs from render)" "$tmpdir"
+    INSTALLED+=("$name")
+  done
+  rm -rf "$tmpdir"
+  report
+  if ((${#CONFLICTS[@]})); then
+    echo "INIT DONE WITH CONFLICTS (${#CONFLICTS[@]})"
+    exit 3
+  fi
+  echo "INIT OK"
+}
+
+checksum_guard
+preflight
+interview
+write_config
+install_templates
+\r'/\\r}
   {
-    echo "project_name=$PROJECT_NAME"
-    echo "tracks=$TRACKS"
-    echo "created=$(date +%F)"
+    echo "format_version: 1"
+    echo "project:"
+    printf '  name: "%s"\n' "$yaml_name"
+    echo "  tracks: $TRACKS"
+    echo "  created: \"$(date +%F)\""
+    echo "components:"
+    echo "  todoing:"
+    echo "    enabled: true"
+    echo "  openspec:"
+    echo "    enabled: true"
+    echo "checks:"
+    echo "  workflow_preflight:"
+    echo "    enabled: false"
+    echo "  git_hooks:"
+    echo "    enabled: false"
+    echo "  git_checks:"
+    echo "    enabled: false"
+    echo "  openspec_validation:"
+    echo "    enabled: false"
+    echo "  tests:"
+    echo "    enabled: false"
+    echo "  review_gate:"
+    echo "    enabled: false"
+    echo "  additional_gates:"
+    echo "    enabled: false"
   } >"$tmp"
   mv "$tmp" "$MK/manifest.yaml"
   # The checksum records the SHA-256 tool that produced it:
