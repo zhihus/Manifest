@@ -69,14 +69,14 @@ gates the transition to the next step. This preserves the core invariant:
 |---|---|---|---|
 | — | pipeline state | Orchestrator (always GLM-5.3 Flash) | runs steps, gates transitions |
 | 0 | task in Todoing (when enabled) | Analyst | Backlog → approved task, "To Do" |
-| 1 | proposal.md | Analyst | user's words → "why / what" |
-| 2 | spec.md | Analyst | proposal → scenarios, edge cases, PBT |
-| 3 | design.md | Architect | proposal + spec → solution (optional) |
-| 4 | tasks.md | Planner | spec + design → atomic task checklist |
+| 1 | proposal.md (when OpenSpec is enabled) | Analyst | user's words → "why / what" |
+| 2 | spec.md (when OpenSpec is enabled) | Analyst | proposal → scenarios, edge cases, PBT |
+| 3 | design.md (when OpenSpec is enabled) | Architect | proposal + spec → solution (optional) |
+| 4 | tasks.md (when OpenSpec is enabled) | Planner | spec + design → atomic task checklist |
 | 5.1 | tests (when checks.tests.enabled) | Tester | spec properties → tests before code |
 | 5.2 | code or document | Implementer / Documenter | tasks + spec → implementation |
 | 6 | verify.md (when checks.review_gate.enabled) | Reviewer | artifacts + spec → ✅/❌ report |
-| 7 | archive | Orchestrator | verify all ✅ → specs updated |
+| 7 | archive (when OpenSpec is enabled) | Orchestrator | verify all ✅ → specs updated |
 
 Each role runs in its own agent session (subagent run); the same model
 may serve different roles, model-per-role assignment is not fixed. The
@@ -163,6 +163,8 @@ Fail → back to step 5.
 
 ### 2.6. Verify (Reviewer)
 
+Run this stage only when `checks.review_gate.enabled: true`; otherwise skip the separate Review/verify gate and Reviewer with status `SKIPPED`.
+
 A conformance check against the spec, not a style review. For each
 scenario and property: covered by a test and passing on the
 implementation (code), or the document matches scenarios and adds
@@ -176,6 +178,8 @@ Documenter.
 route back and re-run the affected step.
 
 ### 2.7. Archive (Orchestrator / automation)
+
+Run this stage only when `components.openspec.enabled: true`; otherwise do not run OpenSpec archive.
 
 Triggered only after verify is all ✅. The delta-spec from
 `changes/<name>/specs/` merges into the permanent `openspec/specs/`,
