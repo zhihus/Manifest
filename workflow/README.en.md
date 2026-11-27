@@ -1,7 +1,7 @@
 # OpenSpec Protocol
 
 # Metadata
-> **Status: draft**  
+> **Status: active**  
 > **Type: document**  
 > **Version: 1.1.2**  
 > **Updated: 2026-11-27**  
