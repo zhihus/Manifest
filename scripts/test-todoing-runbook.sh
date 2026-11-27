@@ -79,7 +79,7 @@ require_text "$TODOING_AGENT" "exclusively in that change's `tasks.md`" "OpenSpe
 forbid_text "$TODOING_AGENT" "frozen next stage" "obsolete runtime OpenSpec boundary"
 require_text "$TODOING_AGENT" "does not modify project context files" "context templates remain untouched"
 require_text "$SKILL" "Do not copy this reference into project context files" "runtime workflow stays in skill package"
-require_text "$SKILL" "one-to-one" "runtime OpenSpec coordination path"
+require_text "$SKILL" "Todoing/OpenSpec coordination path" "runtime OpenSpec coordination path"
 require_text "$RUNBOOK_SPEC" "Manage coordinated Todoing and OpenSpec work after connection" "normative runtime OpenSpec scenario"
 require_text "$RUNBOOK_SPEC" "registers exactly one Backlog Todoing task" "normative task registration"
 forbid_text "$RUNBOOK_SPEC" "stage 2 is frozen" "obsolete normative stage boundary"
