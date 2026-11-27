@@ -49,8 +49,8 @@ require_order() {
   done
 }
 
-require_text "$CONTRACT_RU" "`todoing --json api`" "Russian contract JSON API CLI syntax"
-require_text "$CONTRACT_EN" "`todoing --json api`" "English contract JSON API CLI syntax"
+require_text "$CONTRACT_RU" '`todoing --json api`' "Russian contract JSON API CLI syntax"
+require_text "$CONTRACT_EN" '`todoing --json api`' "English contract JSON API CLI syntax"
 forbid_text "$CONTRACT_RU" "todoing api --json" "incorrect Russian contract CLI syntax"
 forbid_text "$CONTRACT_EN" "todoing api --json" "incorrect English contract CLI syntax"
 
@@ -65,7 +65,7 @@ require_text "$TODOING_AGENT" "task.dependency.add" "runtime dependency manageme
 require_text "$TODOING_AGENT" "task.lock.acquire" "runtime lock management"
 require_text "$TODOING_AGENT" "task.review.add" "runtime Review management"
 require_text "$TODOING_AGENT" "task.commit.finalize" "runtime task completion"
-require_text "$TODOING_AGENT" "actor_id` is attribution, not authentication" "runtime trust boundary"
+require_text "$TODOING_AGENT" '`actor_id` is attribution, not authentication' "runtime trust boundary"
 require_text "$TODOING_AGENT" "frozen next stage" "runtime OpenSpec boundary"
 forbid_text "$TODOING_AGENT" "todoing api --json" "incorrect runtime JSON API CLI syntax"
 
