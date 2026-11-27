@@ -428,21 +428,46 @@ Retain the external reference. Archiving alone is not cancellation.
 
 ### 6.7. Recovery
 
-Restoring Todoing from a snapshot rolls back only Todoing's SQLite state; it does not undo OpenSpec archives or Git commits. After restore, reconcile all three systems before repeating any operation.
+Restoring Todoing from a snapshot rolls back only Todoing's SQLite state; it does
+not undo OpenSpec archives or Git commits. After restore, reconcile all three
+systems before repeating any operation.
 
-After interruption, first reconcile actual state: Todoing via `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list`, and `task.dependency.list`; OpenSpec (change and archive); Git (branch, merge, SHA). Never blindly repeat a non-idempotent operation.
+After interruption, first reconcile actual state: Todoing via `task.get`,
+`task.version.list`, `task.history.list`, `task.review.list`,
+`task.external-ref.list`, and `task.dependency.list`; OpenSpec change and
+archive state; and Git branch, merge, and commit SHAs. Never blindly repeat a
+non-idempotent operation.
+
 - If the `task.lock.release` response was lost:
   1. Call `task.lock.heartbeat` first.
-  2. Retry release only after ownership is confirmed.
-- On `lock_expired`, wait for lease expiry plus the 60-second grace period, then call `task.lock.recover`; use only the new token and fencing generation.
+  2. Retry release only after successful ownership confirmation. If ownership
+     cannot be confirmed, reconcile whether release already succeeded; do not
+     reuse an old token.
+- On `lock_expired`, wait for lease expiry plus the 60-second recovery grace,
+  then call `task.lock.recover`; use only the new token and fencing generation.
+  Recovery is atomic: competing calls are serialized by a transaction and CAS
+  on `fencing_generation`; the first successful call receives the new token,
+  while a subsequent call receives `task_locked`. Re-read the current task
+  version and inspect artifacts before continuing.
 - On `stale_lock`, never use the old token again.
-- After a failure between archive and merge, do not archive again; reconcile and continue with merge.
-- After a merge without a final marker, obtain the actual merge SHA and call `task.commit.finalize`.
-- After `completed`, do not repeat `task.status.set` or `task.complete`; verify state and release the lock only after confirming ownership.
-- During cancellation, do not repeat `task.cancel` if outcome is already `cancelled`; reconcile and perform only the missing steps.
+- **S1 — after OpenSpec archive, before Git merge:** verify that the change is
+  archived and permanent specs contain the delta. Do not archive again; continue
+  with Git merge only after confirming the state.
+- **S2 — after Git merge, before final commit marker:** obtain the actual merge
+  SHA and call `task.commit.finalize`. Never infer or invent the SHA.
+- **S3 — after `completed`, before lock release:** verify terminal task state
+  and confirm ownership before retrying release.
+- **S4 — lease expires during a role-agent run:** recover only after lease
+  expiry and grace; use the new fencing generation, re-read the task version,
+  and inspect Git/OpenSpec artifacts. Do not assume the previous agent stopped
+  or that its work was committed.
+- **S5 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
+  and lock. If outcome is already `cancelled`, do not repeat `task.cancel`;
+  perform only missing archive/release steps. Never merge delta specs for a
+  cancelled change.
 
-Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the user if state is ambiguous.
-
+Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the
+user if the actual state is ambiguous or cannot be reconciled safely.
 
 ### Individually selectable context files
 
