@@ -327,9 +327,10 @@ mechanism. Base OpenSpec specifications remain unchanged.
 2. The Main Orchestrator acquires a lock through `task.lock.acquire`.
 3. Manifest keeps owner ID, token, and fencing generation in protected session
    state and passes the token with every owner request.
-4. The Main Orchestrator renews the lease through `task.lock.heartbeat` while it is active.
+4. The Main Orchestrator renews the lease through `task.lock.heartbeat`
+   while it is active.
 5. Manifest moves the task to `in_progress` and performs permitted operations.
-6. The agent releases the lock through `task.lock.release` when finished.
+6. The Main Orchestrator releases the lock through `task.lock.release` when finished.
 
 A task under lock is inaccessible to other clients for both reading and writing.
 Todoing lists do not reveal even the IDs of locked tasks. Manifest MUST NOT bypass
