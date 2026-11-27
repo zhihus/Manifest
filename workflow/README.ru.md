@@ -309,7 +309,7 @@ to = "completed"
 
 Каждый вызов — отдельный процесс `todoing api`, одна JSON-команда через stdin и один JSON-ответ через stdout. Envelope содержит `api_version: 1`, `project_id`, `actor_id`, `operation`, `args`; `lock_token` передаётся только в envelope owner-запроса. Ошибки определяйте по машинному `code`, не по тексту сообщения. Токен нельзя помещать в аргументы CLI, prompt субагента, task content, логи или Git.
 
-Один OpenSpec change соответствует одной Todoing task:
+Один OpenSpec change соответствует одной Todoing task. При включённых Todoing и OpenSpec название задачи Todoing должно в точности совпадать с ID каталога change; FR-задачи внутри change отдельными Todoing-задачами не становятся:
 - Создайте задачу через `task.create` со статусом `backlog`.
 - Добавьте project-scoped reference через `task.external-ref.add`: namespace `openspec.change`, value — ID каталога change, relation `implements`, scope `project`.
 - Переход `backlog → ready` разрешён только после явного одобрения пользователя. После одобрения зафиксируйте baseline текущей версии через `task.version.approve`.
