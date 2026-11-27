@@ -58,7 +58,7 @@ Todoing не парсит OpenSpec и не проверяет Git workflow: он
 
 ### 2.1. Нормативный интерфейс
 
-Manifest использует только публичный JSON API v1 через CLI-команду todoing api. Каждый вызов — отдельный процесс: один JSON request через stdin, один JSON response через stdout. Диагностика направляется в stderr.
+Manifest использует только публичный JSON API v1 через CLI-команду `todoing --json api`. Каждый вызов — отдельный процесс: один JSON request через stdin, один JSON response через stdout. Диагностика направляется в stderr.
 
 Обязательные поля request envelope: api_version=1, project_id, actor_id, operation, args. Дополнительно могут передаваться request_id и lock_token. Неизвестные поля, неподдерживаемые операции и версии API отклоняются. Ошибка возвращается в JSON envelope и сопровождается ненулевым exit code.
 
