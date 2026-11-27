@@ -3,8 +3,8 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.1.1**  
-> **Updated: 2026-11-24**  
+> **Version: 1.1.2**  
+> **Updated: 2026-11-27**  
 
 # Description
 Process for working with LLM agents on the OpenSpec pipeline; task
@@ -13,6 +13,49 @@ rules live in `openspec-rules.md`.
 Sequential execution is a Manifest rule: agents run one at a time,
 no parallel dispatch (analysis, implementation, verification alike);
 one global task per project at a time.
+
+## 0. Workflow Configuration and Switches
+
+Before starting work, the Orchestrator reads `.manifest/manifest.yaml` and
+verifies its SHA-256 against `.manifest/manifest.yaml.checksum`. Integrity
+verification is mandatory and is not controlled by switches. If the file is
+missing, the checksum differs, the format version is unsupported, or a switch
+has an invalid value, the Orchestrator stops and reports the exact key/reason.
+Legacy configurations without `format_version` and switch sections are not
+migrated automatically.
+
+For `format_version: 1`, the following independent switches apply:
+
+| Key | Default | Behavior |
+|---|---:|---|
+| `components.todoing.enabled` | `true` | Use Todoing API, tasks, history, and locks |
+| `components.openspec.enabled` | `true` | Use OpenSpec changes and permanent specifications |
+| `checks.workflow_preflight.enabled` | `false` | Run workflow Preflight |
+| `checks.git_hooks.enabled` | `false` | Install/run Manifest Git hooks |
+| `checks.git_checks.enabled` | `false` | Run additional Manifest Git checks |
+| `checks.openspec_validation.enabled` | `false` | Run `openspec validate` |
+| `checks.tests.enabled` | `false` | Run tests |
+| `checks.review_gate.enabled` | `false` | Run the separate Review/verify gate |
+| `checks.additional_gates.enabled` | `false` | Run other optional control mechanisms |
+
+The Orchestrator checks the corresponding flag immediately before each stage.
+When it is `false`, the stage, command, hook, or subagent is not launched;
+the stage is recorded as `SKIPPED`, not `PASSED`. One switch never changes
+the value of another.
+
+If Todoing is enabled while OpenSpec is disabled, tasks are managed in Todoing
+without a required OpenSpec reference. If OpenSpec is enabled while Todoing is
+disabled, changes are managed in OpenSpec without Todoing calls. When both
+components are enabled, one Todoing task corresponds to one OpenSpec change:
+the Todoing task title MUST exactly equal the change directory ID, and the
+`openspec.change` reference is mandatory.
+
+The `workflow_preflight` switch controls only the workflow Preflight stage.
+The mandatory safety checks performed by `manifest-init.sh` (Git work tree,
+template availability, safe write access, and required tools) remain enabled.
+Checksum protection, refusal to reinitialize, and the prohibition on automatic
+configuration overwrites also always remain active. These mechanisms cannot
+be disabled by configuration.
 
 ## 1. Roles
 
@@ -25,14 +68,14 @@ gates the transition to the next step. This preserves the core invariant:
 | Step | Artifact | Agent | Input → Output |
 |---|---|---|---|
 | — | pipeline state | Orchestrator (always GLM-5.3 Flash) | runs steps, gates transitions |
-| 0 | task in Todoing | Analyst | user's Backlog work → approved task, "To Do" |
+| 0 | task in Todoing (when enabled) | Analyst | Backlog → approved task, "To Do" |
 | 1 | proposal.md | Analyst | user's words → "why / what" |
 | 2 | spec.md | Analyst | proposal → scenarios, edge cases, PBT |
 | 3 | design.md | Architect | proposal + spec → solution (optional) |
 | 4 | tasks.md | Planner | spec + design → atomic task checklist |
-| 5.1 | tests | Tester | spec properties → tests before code |
+| 5.1 | tests (when checks.tests.enabled) | Tester | spec properties → tests before code |
 | 5.2 | code or document | Implementer / Documenter | tasks + spec → implementation |
-| 6 | verify.md | Reviewer | artifacts + spec → ✅/❌ report |
+| 6 | verify.md (when checks.review_gate.enabled) | Reviewer | artifacts + spec → ✅/❌ report |
 | 7 | archive | Orchestrator | verify all ✅ → specs updated |
 
 Each role runs in its own agent session (subagent run); the same model
