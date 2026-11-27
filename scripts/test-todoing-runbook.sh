@@ -71,6 +71,9 @@ require_text "$TODOING_AGENT" "task.review.add" "runtime Review management"
 require_text "$TODOING_AGENT" "task.commit.finalize" "runtime task completion"
 require_text "$TODOING_AGENT" '`actor_id` is attribution, not authentication' "runtime trust boundary"
 require_text "$TODOING_AGENT" "frozen next stage" "runtime OpenSpec boundary"
+require_text "$TODOING_AGENT" "does not modify project context files" "context templates remain untouched"
+require_text "$SKILL" "Do not copy this reference into project context files" "runtime workflow stays in skill package"
+
 forbid_text "$TODOING_AGENT" "todoing api --json" "incorrect runtime JSON API CLI syntax"
 
 require_text "$BOOTSTRAP" "todoing --json api" "bootstrap JSON API CLI syntax"
