@@ -154,7 +154,7 @@ For standalone Todoing work, omit the OpenSpec archive step and complete against
 - After approval, call `task.cancel` with the reason.
 - In coordinated mode, then run `openspec archive <change-id> --yes --skip-specs`, retaining the external reference and leaving permanent specs unchanged.
 - In standalone mode, do not invoke OpenSpec archive.
-- Release the lock after the cancellation and any required archive operation are reconciled. Archiving alone is not cancellation.
+- Call `task.lock.release` after the cancellation and any required archive operation are reconciled. Archiving alone is not cancellation.
 
 ## Recovery
 
