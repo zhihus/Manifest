@@ -269,41 +269,51 @@ Manifest не трактует archive как отмену и не исполь�
 
 ### 4.3. Выполнение задачи и блокировка
 
-1. Оркестратор выбирает утверждённую задачу.
-2. Оркестратор (Main Orchestrator) получает блокировку через task.lock.acquire.
-3. Manifest сохраняет owner ID, token и fencing generation в защищённом контексте сессии Main Orchestrator и передаёт token в каждом owner-запросе.
-4. Пока работа продолжается, оркестратор продлевает lease через task.lock.heartbeat.
-5. Manifest переводит задачу в in_progress и выполняет разрешённые операции.
-6. По окончании оркестратор освобождает блокировку через task.lock.release.
+1. До запуска Manifest проверяет, что задача находится в `ready`, её baseline утверждён через `task.version.approve`, а все prerequisite-задачи имеют outcome `completed`.
+2. Main Orchestrator получает блокировку через `task.lock.acquire`.
+3. Сразу после получения lock переводит задачу `ready → in_progress` через `task.status.set`, передавая token в envelope.
+4. Owner ID, token, fencing generation и срок lease хранятся только в защищённом контексте Main Orchestrator. Token не передаётся субагентам и не помещается в prompt, environment, task content, логи или Git.
+5. `task.lock.heartbeat` вызывается непосредственно перед каждым блокирующим запуском агента. Во время выполнения агента heartbeat не отправляется.
+6. Все owner-запросы содержат актуальные token, owner ID и fencing generation. При `stale_lock` старый token больше не используется.
+7. Lock освобождается только после завершения задачи либо подтверждённой отмены и сверки всех обязательных операций Todoing, OpenSpec и Git.
 
 Заблокированная задача недоступна другим клиентам для чтения и изменения. Списки Todoing не раскрывают даже ID заблокированных задач. Manifest не обходит это ограничение чтением БД или snapshot.
 
-### 4.4. Передача на Review и возврат
+### 4.4. Независимый Review и возврат на исправление
 
-- Перед передачей результата Manifest переводит задачу в review и передаёт Reviewer необходимые артефакты через собственный workflow.
-- Reviewer независимо проверяет результат.
-- Manifest вызывает task.review.add с review_id, version_no проверяемой версии,
-  reviewer label, outcome и упорядоченным массивом comments. actor_id envelope
-  фиксирует агента Reviewer.
-- При одобрении Todoing сохраняет структурированную запись Review с outcome approved; Manifest переводит задачу в verified.
-- При запросе изменений Todoing атомарно сохраняет запись Review с outcome changes_requested и увеличивает revision_count ровно на один; Manifest возвращает задачу в in_progress.
-- Повторная отправка того же review_id с идентичным содержимым идемпотентна; тот же ID с другим содержимым отклоняется. Review record ссылается на конкретную immutable version задачи. Запись Review не меняет workflow status. Повторные циклы не создают отдельные Todoing статусы.
-
-revision_count — количество Review records с outcome changes_requested, а не количество версий или комментариев. Todoing хранит Review history и revision_count как универсальные данные задачи; Manifest определяет, когда Reviewer вправе создать такую запись и какие действия следуют из её outcome.
+- Перед передачей результата независимому Reviewer Manifest переводит задачу `in_progress → review` и передаёт точные артефакты и версию задачи.
+- Reviewer работает в отдельной роли/сессии, независимо от Implementer; он не получает lock token и не вызывает Todoing API.
+- Main Orchestrator записывает результат через `task.review.add`: стабильный `review_id`, точный `version_no`, reviewer identity, outcome и упорядоченный массив comments. `actor_id` envelope идентифицирует сессию Reviewer.
+- При outcome `approved` Todoing сохраняет Review record, после чего Manifest переводит задачу `review → verified`.
+- При outcome `changes_requested` Todoing атомарно сохраняет Review record и увеличивает `revision_count` ровно на один; после этого Manifest переводит задачу `review → in_progress` и передаёт замечания Implementer.
+- После исправлений добавляются новые значимые Git commits и выполняется новый независимый Review. История Review append-only; предыдущие записи не изменяются и не удаляются.
+- Повтор того же `review_id` с идентичным payload идемпотентен; другой payload с тем же ID отклоняется. Review всегда привязан к конкретной immutable task version.
+- `revision_count` — количество Review records с outcome `changes_requested`, а не число task versions или comments. Для повторных циклов не вводятся дополнительные статусы Todoing.
 
 ### 4.5. Итоговое завершение
 
-После статуса verified оркестратор выполняет итоговые проверки согласованности Todoing, OpenSpec и Git. При успехе переводит задачу в completed (и тем самым фиксирует outcome completed, если статус настроен соответствующим образом). Наличие Git commit reference само по себе не означает завершение.
+Для связанной Todoing/OpenSpec-задачи успешное завершение выполняется строго по порядку:
+
+1. Review одобрен, статус задачи — `verified`.
+2. Manifest выполняет итоговые проверки согласованности Todoing, OpenSpec и Git.
+3. `openspec archive <change-id> --yes` объединяет delta specs с permanent specs и архивирует change.
+4. Git merge выполняется согласно правилам ветвления и слияния проекта.
+5. `task.commit.finalize` фиксирует фактический SHA итогового merge commit.
+6. `task.status.set` переводит задачу в `completed` и фиксирует outcome `completed`.
+7. `task.lock.release` освобождает блокировку.
+
+Для standalone Todoing-задачи шаг OpenSpec archive пропускается; завершение привязывается к принятому итоговому Git revision. Git commit reference сам по себе не доказывает прохождение критериев приёмки.
 
 ### 4.6. Отмена
 
-1. Любой агент может рекомендовать отмену с обоснованием.
-2. Отмену подтверждает только пользователь.
-3. После подтверждения Manifest вызывает task.cancel с причиной.
-4. Manifest архивирует связанный OpenSpec change штатным механизмом Archive.
-5. Основные спецификации OpenSpec не изменяются.
+1. Любой агент может рекомендовать отмену с причиной.
+2. Отмену и переход к ней подтверждает только пользователь. Без подтверждения запрещены `task.cancel`, изменение outcome и OpenSpec archive.
+3. После подтверждения Manifest вызывает `task.cancel` с причиной.
+4. Для связанного OpenSpec change выполняется `openspec archive <change-id> --yes --skip-specs`: change архивируется, permanent specs не изменяются. Внешняя ссылка `openspec.change` сохраняется.
+5. Для standalone Todoing-задачи OpenSpec archive не вызывается.
+6. После выполнения и сверки обязательных операций Manifest освобождает lock.
 
-Отмена не должна выполняться только переводом статуса или архивированием задачи. Outcome и OpenSpec archive фиксируются отдельными действиями. Повторное открытие отменённой задачи требует явного решения и операции task.reopen.
+Отмена не равна архивированию: одно только перемещение OpenSpec change в архив не отменяет Todoing-задачу. Delta specs отменённого change не вливаются в permanent specs. Повторное открытие отменённой задачи требует отдельного явного решения пользователя и поддерживаемой операции reopen.
 
 ## 5. Версии, история и Git
 
