@@ -1,6 +1,6 @@
 # Manifest Init
 
-Standalone skill for connecting Manifest to new and existing Git projects.
+Standalone skill for connecting Manifest to new and existing Git projects. Context files are individually selectable and none are installed by default.
 
 ## Layout
 
