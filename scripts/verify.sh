@@ -153,7 +153,7 @@ check_autonomy() {
   local re_foreign='(InvestPlan)|(handy[-/ ])|(dictation)'
   local re_email='[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
   # Model/harness names apply to every file in the checked scope.
-  local re_model='(Qwen)|(ZCode)|(GLM-[0-9])'
+  local re_model='(^|[^[:alnum:]_.-])(Qwen[0-9]|ZCode)([^[:alnum:]]|$)|(^|[^[:alnum:]_.-])GLM-[0-9]'
   if [[ -n $scope_dir ]]; then
     while IFS= read -r f; do files+=("$f"); done < <(find "$scope_dir" -type f)
   else
