@@ -22,8 +22,8 @@
 
 - [x] fr-2.1-add-todoing-only-api-scenario
   Add a separate temporary project with no `openspec/` directory and exercise
-  task creation, listing, approval baseline, lock, update, Review, final commit,
-  completion, and release without OpenSpec operations.
+  task creation, listing, dependency add/list/remove, approval baseline, lock,
+  update, Review, final commit, completion, and release without OpenSpec operations.
   Stop: the acceptance test asserts the task is completed with no external
   references and no OpenSpec directory.
 
