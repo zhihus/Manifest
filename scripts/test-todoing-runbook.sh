@@ -303,7 +303,7 @@ require_order "$EN_CANCELLATION" "English cancellation sequence" \
 require_order "$RU_RECOVERY" "Russian lost-release recovery" \
   "task.lock.heartbeat" "успешного подтверждения владения"
 require_order "$EN_RECOVERY" "English lost-release recovery" \
-  "task.lock.heartbeat" "Retry release only if ownership is"
+  "task.lock.heartbeat" "Retry release only after successful ownership confirmation"
 
 if (( FAIL )); then
   exit 1
