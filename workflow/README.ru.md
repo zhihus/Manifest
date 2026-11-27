@@ -435,27 +435,55 @@ Orchestrator на проект; параллельные оркестратор�
 
 ### 6.7. Recovery
 
-Восстановление Todoing из snapshot откатывает только SQLite-состояние Todoing; оно не отменяет OpenSpec archive и Git commits. После restore сверяйте все три системы до любых повторных операций.
+Восстановление Todoing из snapshot откатывает только SQLite-состояние Todoing; оно
+не отменяет OpenSpec archive и Git commits. После restore сверяйте все три системы
+до повторения любых операций.
 
-После прерывания сначала сверяйте фактическое состояние: Todoing через `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive); Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
-- Если ответ на `task.lock.release` потерян:
+После прерывания сначала сверяйте фактическое состояние: Todoing через
+`task.get`, `task.version.list`, `task.history.list`, `task.review.list`,
+`task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive);
+Git (ветка, merge и SHA). Не повторяйте non-idempotent операции вслепую.
+
+- Если потерян ответ на `task.review.add`, проверьте `task.review.list`.
+  Если запись с тем же `review_id` и payload уже существует, не добавляйте её
+  повторно; сверьте статус задачи и выполните только недостающий переход.
+  Если записи нет, повторяйте вызов только после проверки версии и review ID.
+  Конфликтующий payload требует эскалации.
+- Если потерян ответ на `task.lock.release`:
   1. Сначала выполните `task.lock.heartbeat`.
-  2. Повторите release только после успешного подтверждения владения. Если владение не подтверждено, выясните, завершился ли release; старый token повторно не используйте.
-- `lock_expired`: дождитесь истечения lease и recovery grace (60 секунд), затем вызовите `task.lock.recover`; используйте только новый token и fencing generation. Recovery атомарен: конкурирующие вызовы сериализуются транзакцией и CAS по `fencing_generation`; первый успешный вызов получает новый token, последующий получает `task_locked`. После recovery проверьте актуальную версию задачи и состояние артефактов до продолжения работы.
-- `stale_lock`: старый token больше не использовать.
+  2. Повторите release только после успешного подтверждения владения. Если
+     владение не подтверждено, выясните, завершился ли release; старый token
+     повторно не используйте.
+- При `lock_expired` дождитесь истечения lease и recovery grace (60 секунд),
+  затем вызовите `task.lock.recover`; используйте только новый token и fencing
+  generation. Recovery атомарен: конкурирующие вызовы сериализуются транзакцией
+  и CAS по `fencing_generation`; первый успешный вызов получает новый token,
+  последующий получает `task_locked`. После recovery проверьте актуальную
+  версию задачи и состояние артефактов до продолжения работы.
+- При `stale_lock` старый token больше не используйте.
 - Сценарии частичного сбоя:
-- **S1 — после OpenSpec archive, до Git merge:** не повторяйте archive; проверьте, что change находится в архиве и permanent specs обновлены, затем выполните Git merge.
-- **S2 — после Git merge, до final marker:** получите фактический SHA merge commit и вызовите `task.commit.finalize`; повтор с тем же SHA безопасен.
-- **S3 — после final marker, до `completed`:** проверьте, что сохранённый SHA совпадает с фактическим merge SHA, а задача остаётся в `verified`; marker не перезаписывайте. После итоговых acceptance checks выполните только недостающий переход в `completed`.
-- **S4 — после перехода в `completed`, до release:** проверьте владение через `task.lock.heartbeat`; повторяйте release только после успешного heartbeat. `stale_lock` означает, что старый token больше не действителен.
-- **S5 — lease истёк во время субагента:** после lease expiry и recovery grace выполните явный `task.lock.recover`, получите новый token/generation, проверьте версию задачи и артефакты; старый token не используйте.
-- **S6 — сбой при отмене:** сверяйте outcome, archive и lock. Если outcome уже `cancelled`, не повторяйте `task.cancel`; завершите только недостающие шаги. При отмене delta specs не вливаются в permanent specs.
-- После merge без final marker получите фактический merge SHA и вызовите `task.commit.finalize`.
-- После `completed` не повторяйте `task.status.set` или `task.complete`; проверьте состояние и освободите lock после проверки владения.
-- При отмене не повторяйте `task.cancel`, если outcome уже `cancelled`; продолжайте только недостающие шаги после сверки.
+  - **S1 — после OpenSpec archive, до Git merge:** проверьте, что change находится
+    в архиве и permanent specs обновлены. Не повторяйте archive; после сверки
+    продолжите Git merge.
+  - **S2 — после Git merge, до final marker:** получите фактический SHA merge
+    commit и вызовите `task.commit.finalize`. Не выдумывайте SHA.
+  - **S3 — после final marker, до `completed`:** проверьте, что сохранённый SHA
+    совпадает с фактическим merge SHA, а задача остаётся в `verified`; marker
+    не перезаписывайте. После итоговых acceptance checks выполните только
+    недостающий переход в `completed`.
+  - **S4 — после `completed`, до lock release:** проверьте terminal state и
+    подтвердите владение перед повторным release.
+  - **S5 — lease истёк во время запуска агента:** дождитесь lease expiry и grace,
+    выполните recovery с новым fencing generation, перечитайте версию задачи и
+    проверьте Git/OpenSpec артефакты. Не предполагайте, что предыдущий агент
+    остановился или сохранил результат.
+  - **S6 — сбой при отмене:** сверьте outcome, OpenSpec archive и lock. Если
+    outcome уже `cancelled`, не повторяйте `task.cancel`; выполните только
+    недостающие archive/release шаги. Delta specs отменённого change не вливаются
+    в permanent specs.
 
-Todoing, OpenSpec и Git не образуют общей транзакции. При неоднозначном состоянии остановитесь и эскалируйте пользователю.
-
+Todoing, OpenSpec и Git не образуют общей транзакции. При неоднозначном состоянии
+остановитесь и эскалируйте пользователю.
 
 ### Индивидуальное подключение файлов контекста
 
