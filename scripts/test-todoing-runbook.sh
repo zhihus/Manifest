@@ -70,6 +70,21 @@ require_text "$TODOING_AGENT" "task.dependency.add" "runtime dependency manageme
 require_text "$TODOING_AGENT" "task.lock.acquire" "runtime lock management"
 require_text "$TODOING_AGENT" "task.review.add" "runtime Review management"
 require_text "$TODOING_AGENT" "task.commit.finalize" "runtime task completion"
+require_text "$TODOING_AGENT" "Do not heartbeat while the role agent is running" "heartbeat must not run during agent execution"
+require_text "$TODOING_AGENT" "separate role/session" "independent Reviewer"
+require_text "$TODOING_AGENT" "revision_count" "revision counter semantics"
+require_text "$TODOING_AGENT" "review → in_progress" "review return transition"
+require_text "$TODOING_AGENT" "openspec archive <change-id> --yes" "successful OpenSpec archive"
+require_text "$TODOING_AGENT" "openspec archive <change-id> --yes --skip-specs" "cancellation archive without spec merge"
+require_text "$TODOING_AGENT" "Only the user may approve it" "user-only cancellation authority"
+require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery reconciliation"
+for scenario in "After OpenSpec archive but before Git merge" "After Git merge but before final commit marker" "During cancellation"; do
+  require_text "$TODOING_AGENT" "$scenario" "partial failure recovery"
+done
+for scenario in "Failure after OpenSpec archive" "Failure after Git merge" "Failure after task completion" "Lease expires during agent execution" "Partial cancellation"; do
+  require_text "$RUNBOOK_SPEC" "$scenario" "normative recovery scenario"
+done
+
 require_text "$TODOING_AGENT" '`actor_id` is attribution, not authentication' "runtime trust boundary"
 require_text "$TODOING_AGENT" "Todoing/OpenSpec registration" "runtime OpenSpec coordination"
 require_text "$TODOING_AGENT" "task.external-ref.add" "OpenSpec task reference"
