@@ -89,6 +89,8 @@ require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery re
 require_text "$TODOING_AGENT" 'If the `task.review.add` response was lost' "Review response recovery"
 require_text "$TODOING_AGENT" "confirm that the previous role-agent invocation has terminated" "recovery waits for previous agent termination"
 require_text "$TODOING_AGENT" 'envelope `actor_id` match' "Review retry actor identity"
+require_text "$RUNBOOK_SPEC" 'envelope `actor_id` match' "normative Review retry actor identity"
+require_text "$CONTRACT_RU" "незаблокированная задача изменяется без" "Russian final commit marker lock semantics"
 require_text "$RU" 'envelope `actor_id`' "Russian Review retry actor identity"
 require_text "$EN" 'envelope `actor_id` match' "English Review retry actor identity"
 require_text "$CONTRACT_RU" "payload и envelope" "Russian Review idempotency actor identity"
