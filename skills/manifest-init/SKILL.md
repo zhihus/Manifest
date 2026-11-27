@@ -1,11 +1,11 @@
 ---
 name: manifest-init
-description: Connect Manifest to a new or existing Git project. Adds only missing files and components without overwriting user data.
+description: Connect Manifest to a Git project, or manage its standalone Todoing tasks after connection. Adds only missing files and never overwrites user data.
 ---
 
 # Manifest Init
 
-Use when the user asks to connect, initialize, install, or repair Manifest in a project.
+Use when the user asks to connect, initialize, install, or repair Manifest, or to manage Todoing tasks in a connected project.
 
 ## Contract
 
@@ -32,6 +32,25 @@ Use when the user asks to connect, initialize, install, or repair Manifest in a 
 4. If Todoing is enabled, follow references/todoing-bootstrap.md. If its binary is unavailable, report the prerequisite and stop Todoing-dependent workflow; do not silently disable it.
 5. Validate the resulting connection. File copying alone is not proof of runtime integration.
 6. Report installed, preserved, pending and conflicting items separately.
+
+## Ongoing Todoing task management
+
+Use this mode when the project is already connected and the user asks to start,
+update, review, complete, or cancel project work.
+
+1. Do not rerun the installer for ordinary task work.
+2. Verify `.manifest/manifest.yaml` and its checksum; require
+   `components.todoing.enabled: true`.
+3. This runtime workflow is limited to standalone Todoing mode:
+   `components.openspec.enabled: false`. If OpenSpec is enabled, stop and report
+   that Todoing/OpenSpec coordination belongs to the frozen next stage.
+4. Verify the Project ID, existing Todoing config/store, and compatible binary.
+   If bootstrap is incomplete, follow `references/todoing-bootstrap.md` only when
+   the user explicitly asks to initialize Todoing.
+5. Read and follow `references/todoing-agent-workflow.md` for every Todoing task
+   lifecycle operation.
+6. Do not copy this reference into project context files or enable any context-file
+   switches. It is an agent skill reference, not a project template.
 
 ## Package
 
