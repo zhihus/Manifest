@@ -90,6 +90,8 @@ require_text "$RU" 'не зависит от `checks.review_gate.enabled`' "mand
 require_text "$EN" 'independent of `checks.review_gate.enabled`' "mandatory Todoing Review independent of optional gate"
 require_text "$RU" "Reviewer работает в отдельной роли/сессии от Implementer" "independent Reviewer session"
 require_text "$EN" "Reviewer runs in a separate role/session from the Implementer" "independent Reviewer session"
+require_text "$RU" "Шаг 6 — необязательный OpenSpec verify-гейт" "Russian optional OpenSpec verify gate"
+require_text "$EN" 'If `checks.review_gate.enabled` is false, skip this optional OpenSpec verify gate' "English optional OpenSpec verify gate"
 require_text "$RU" "не запускайте её повторно или отдельно" "single coordinated archive operation"
 require_text "$EN" "do not run it a second time or outside that sequence" "single coordinated archive operation"
 require_text "$TODOING_AGENT" "revision_count" "revision counter semantics"
