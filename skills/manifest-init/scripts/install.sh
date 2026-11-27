@@ -72,7 +72,7 @@ else SKIPPED+=(".manifest/manifest.yaml (preserved; checksum valid)")
 fi
 NAMES=(AGENTS.md llms.txt VERSIONING.md RELEASES.md LOG_RULES.md CODE_RULES.md TEST_RULES.md COMMIT_RULES.md VERSION .llmignore)
 SOURCES=(agents.template.md llm.template.txt versioning.template.md code-releases.template.md code-log-rules.template.md code-rules.template.md code-test-rules.template.md commit-rules.template.md version.template llmignore.template)
-tmpdir=$(mktemp -d); trap 'rm -rf "$tmpdir"' EXIT
+tmpdir=$(mktemp -d "$PROJECT/.manifest-stage.XXXXXX") || fail STAGING_FAILED; trap 'rm -rf "$tmpdir"' EXIT
 for i in "\${!NAMES[@]}"; do
  name=\${NAMES[$i]}; src=$TEMPLATES/\${SOURCES[$i]}
  [[ -f $src ]] || fail "TEMPLATE_MISSING: $src"
