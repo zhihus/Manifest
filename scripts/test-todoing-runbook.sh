@@ -96,6 +96,10 @@ require_text "$RU" 'outcome должен быть `completed`' "dependency readi
 require_text "$RU" "store уже существует, а конфиг отсутствует — остановитесь" "existing store configuration guard"
 require_text "$EN" "only after explicit user approval" "user approval gate"
 require_text "$EN" "Never give the token to a role agent" "token custody"
+require_text "$RU" "actor_id" "actor attribution boundary"
+require_text "$RU" "процедурным, а не технической защитой" "honest role-access boundary"
+require_text "$EN" "procedural, not technical enforcement" "honest role-access boundary"
+
 require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"
 require_text "$EN" 'outcome `completed`' "dependency readiness gate"
