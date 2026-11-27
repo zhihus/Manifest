@@ -9,35 +9,39 @@
 # Description
 A prospective architectural plan for protecting Manifest projects from
 dangerous actions that an AI agent may perform through its tools. The
-document describes the goal and boundaries of protection, categories
-of dangerous actions, the interception mechanism, passing the request
-for confirmation to the user, handling the response, interaction with
-agents and tools, limitations, failure scenarios, and security
-requirements. The concrete implementation approach (including the hook
-mechanism of a specific harness) is the subject of separate design: in
-this document it is named as a possible prototype, not as an
-architectural dependency.
+document describes the goal and boundaries of protection, a
+preliminary set of dangerous-action categories, the interception
+mechanism and the full lifecycle of the `allow` / `ask` / `deny`
+decisions, interaction with agents and tools, limitations, failure
+scenarios, and security requirements. Protection is treated as a
+standalone Manifest capability: the concrete enforcement approach
+(universal Git mechanisms, mechanisms of a specific AI-harness) is
+the subject of separate design and is not tied to a specific harness
+in this document.
 
 ## 1. Goal and Boundaries
 
 ### 1.1. Goal
 
 Protect the project from dangerous actions that an AI agent performs
-through its tools, and ensure agreed user intervention before such an
-action is executed.
+through its tools. The mechanism makes a decision for each call:
+allow it automatically by approved policy (`allow`), request user
+confirmation (`ask`), or reject it (`deny`).
 
-The mechanism does not execute a dangerous action automatically and
-does not decide on behalf of the user: it interrupts the action,
-passes the request for confirmation, and delivers the user's response
-to the agent.
+The mechanism does not perform a dangerous action itself and does not
+decide on behalf of the user where confirmation is required: it
+interrupts the call, passes the request for confirmation, and
+delivers the user's response to the agent. Automatic decisions
+(`allow` and `deny`) are made by a pre-approved policy, not by the
+user at the moment of the call.
 
 ### 1.2. Boundaries
 
 - Protection acts at the level of tool calls (before their execution),
   not only at the commit stage.
-- The mechanism is not tied to a specific AI harness, provider, or
-  version: Manifest defines the behavior, not a concrete
-  implementation.
+- The main scope of the function is protection of tool calls.
+  Interception of user prompts and agent messages is separate future
+  directions (see §7).
 - The mechanism does not replace task approval, roles, and workflow
   gates: it complements them at the level of tool execution.
 - The mechanism does not change the architecture of other Manifest
@@ -45,17 +49,26 @@ to the agent.
 
 ### 1.3. Place in the Manifest Architecture
 
-Protection from dangerous actions is a prospective Manifest capability
-that extends the `context-files-guard` component (see
-`architecture-brief.ru.md`, section «Защита контекстных файлов»).
+Protection from dangerous actions is a standalone prospective
+Manifest capability, not a function of a single component.
+
+`context-files-guard` is a related existing mechanism and a special
+case of this protection: it protects a specific class of objects —
+context files (see `architecture-brief.ru.md`, section «Защита
+контекстных файлов»). The dangerous-action protection capability
+covers a broader class of actions; `context-files-guard` is one of
+its special cases, not the component that automatically handles all
+dangerous actions.
+
 The principle "a technical prohibition takes priority over agent
-instructions" applies to dangerous actions as well: the prohibition is
-configured by the user and is not overridden by a prompt.
+instructions" applies to dangerous actions as well: the prohibition
+is configured by the user and is not overridden by a prompt.
 
 ## 2. Categories of Dangerous Actions
 
 Categories are defined by the `tool_input` of a call, not by the
-semantics of intent. The basic set (by default):
+semantics of intent. Below is a preliminary set of categories: it is
+a starting point for design, not approved default settings.
 
 - destructive file operations (`rm -rf` and analogues);
 - writing to system and protected paths;
@@ -64,8 +77,8 @@ semantics of intent. The basic set (by default):
 - rewriting Git history (`reset --hard`, `rebase`, force-push);
 - modifying protected context files.
 
-The exact set of categories and their thresholds is a design topic
-(see §9).
+The exact set of categories, their thresholds, and the decision for
+each are a design topic (see §9).
 
 ## 3. Interception Mechanism
 
@@ -73,7 +86,8 @@ The exact set of categories and their thresholds is a design topic
 
 Interception happens before a tool call is executed. The mechanism
 receives the full input of the call (tool name and its arguments) and
-makes a decision: execute, request confirmation, or reject.
+makes a decision: allow (`allow`), request confirmation (`ask`), or
+reject (`deny`).
 
 ### 3.2. Determining "Danger"
 
@@ -81,27 +95,75 @@ makes a decision: execute, request confirmation, or reject.
 not by semantic analysis of intent. For typical cases this is enough;
 extending to semantics is a possible development (see §9).
 
-### 3.3. Check Result
+### 3.3. Policy and Enforcement Mechanisms
 
-For each call the mechanism returns one of the decisions:
+The universal security policy (what is considered dangerous, which
+decision for each category) is separated from the concrete
+mechanisms that enforce it. The policy is harness-independent; the
+enforcement mechanisms are harness-dependent.
 
-- `allow` — execute without confirmation;
-- `ask` — require user confirmation;
-- `deny` — reject and pass the reason to the agent.
+The priority of enforcement mechanisms is aligned with the Manifest
+decision (see `architecture-brief.ru.md`, section «Автоматизированный
+контроль»):
+
+- first level — universal Git mechanisms (Git Hooks and control
+  scripts, installed by `manifest-init`);
+- second level — mechanisms of a specific AI-harness (for example,
+  ZCode); for the other harnesses the principles and an example
+  implementation are fixed.
+
+Manifest does not develop its own hooks manager and does not manage
+the settings of a specific AI-harness. The protection behavior is not
+guaranteed identical on all harnesses: it is identical where the
+universal level (Git) acts, and depends on the capabilities of the
+specific harness at the second level.
+
+### 3.4. Lifecycle of the `allow` / `ask` / `deny` Decisions
+
+For each call the mechanism returns one of three decisions.
+
+`allow`:
+
+- the call is allowed automatically by approved policy;
+- the call returns to the executor and is performed without user
+  involvement;
+- user confirmation is not required.
+
+`ask`:
+
+- the mechanism interrupts execution and passes the user a request
+  for confirmation with a description of the action (tool and
+  arguments);
+- the user confirms or rejects;
+- on confirmation the call returns to the executor and is performed;
+- on rejection the call is not performed and the agent is passed the
+  reason;
+- the confirmation is bound to the specific call: re-execution of the
+  same call and applying the confirmation to another call are
+  excluded. The concrete binding method (call identifier, one-time
+  token, re-trigger control) is an open architectural decision (see
+  §9).
+
+`deny`:
+
+- the call is rejected by approved policy;
+- the agent is passed the rejection reason;
+- the call is not performed and is not passed to the user.
 
 ## 4. Passing the Request to the User
 
-On an `ask` decision or on interception of a dangerous action, the
-mechanism interrupts execution and passes a request for confirmation
-to the user.
+On an `ask` decision the mechanism interrupts execution and passes the
+user a request for confirmation.
 
 The delivery channel (interface, input field, notification) is a
 design topic. Requirement: the user receives a description of the
-action (tool and arguments) and can set a response.
+action (tool and arguments) and can set a response — confirm or
+reject.
 
 ## 5. Handling the User's Response
 
-The user's response reaches the agent through two paths:
+The user's response to an `ask` decision reaches the agent through two
+paths:
 
 - as the rejection reason (the agent sees why the action was not
   performed);
@@ -114,8 +176,10 @@ the default is to reject with a system message.
 
 - The mechanism works at the "agent → tool" boundary: it sees the
   input of a call and returns a decision to the executor.
-- The agent does not receive direct permission for a dangerous
-  action: the user makes the decision.
+- The agent does not receive direct permission for an action that
+  requires confirmation: the user makes the decision.
+- Automatic decisions (`allow` and `deny`) are made by approved
+  policy, without user involvement at the moment of the call.
 - The mechanism does not rewrite the agent's intent: it can only
   reject, request confirmation, or let the call pass. Rewriting the
   call input (for example, replacing a dangerous path) is a possible
@@ -127,22 +191,36 @@ the default is to reject with a system message.
    positives and misses are possible.
 2. Interception is synchronous: the mechanism must be fast so it does
    not block the agent's work.
-3. If the "dangerous" item is the user's prompt rather than a tool
-   call, the interception point is different (before prompt
-   processing); the same decision, a different point.
-4. If the "dangerous" item is the agent's own output, there is no
-   direct interception of the text: the mechanism can require
-   continuation but cannot rewrite the message.
-5. If the confirmation channel is unavailable (the user did not
+3. The protection behavior is not identical on all harnesses: the
+   universal level (Git) acts identically, the second level depends
+   on the capabilities of the specific harness.
+4. If the confirmation channel is unavailable (the user did not
    respond), the action is not performed: the safe default behavior
    is to reject.
 
+Interception of user prompts and the agent's own messages is outside
+the boundaries of the current function (protection of tool calls) and
+is considered as separate future directions: for a prompt the
+interception point is different (before prompt processing), for the
+agent's output there is no direct interception of the text.
+
 ## 8. Security Requirements
+
+The requirements are separated by data class:
+
+- Secrets and sensitive data: not written to Git, logs, or
+  command-line arguments.
+- Contents of intercepted calls: writing to Git, logs, and
+  command-line arguments is prohibited by default; the question of
+  logging is an open decision (see §9).
+- Safe audit metadata: may be written for audit; the audit
+  composition is not adopted and is determined by the user's decision
+  (see §9).
+
+Additionally:
 
 - The prohibition is configured by the user and is not overridden by
   agent instructions or a prompt.
-- The user's response and interception data are not written to Git,
-  logs, or command-line arguments.
 - The mechanism stores no secrets: it passes only the action
   description and the user's response.
 - The default failure is safe: on an error or timeout the action is
@@ -150,16 +228,19 @@ the default is to reject with a system message.
 
 ## 9. Open Questions (Require Design)
 
-1. The exact set of "dangerous" action categories and their default
-   thresholds.
+1. The exact set of "dangerous" action categories, their thresholds,
+   and the decision for each category.
 2. The channel for passing the request to the user (interface, field,
    notification).
 3. Behavior on an empty response: reject or let it pass.
-4. Whether interception events should be logged for audit.
+4. The audit composition: whether interception events are logged,
+   which metadata, and where they are stored.
 5. Extending to semantic analysis of intent (beyond patterns).
 6. Rewriting the call input (replacing a dangerous path with a safe
    one).
 7. Interface localization (en/ru).
+8. The method of binding a confirmation to a specific call: excluding
+   re-execution and applying the confirmation to another call.
 
 ## 10. Possible Implementation Stages
 
