@@ -113,8 +113,8 @@ Todoing хранит только универсальные ссылки, Revie
   `actor_id` envelope фиксирует технического актора, `reviewer` — роль/имя Reviewer.
 - `task.review.list`: принимает `task_id`, необязательный `before_record_id`
   и `limit`; возвращает append-only историю Review с пагинацией.
-- Повторный `review_id` с тем же payload идемпотентен; тот же ID с иным
-  payload отклоняется.
+- Повторный `review_id` идемпотентен только при совпадении payload и envelope
+  `actor_id`; отличие любого из них отклоняется как конфликт.
 - Review привязан к существующей immutable version. Добавление записи не
   меняет workflow status. Запись и чтение Review history подчиняются lock
   ownership; non-owner не получает Review data заблокированной задачи.
