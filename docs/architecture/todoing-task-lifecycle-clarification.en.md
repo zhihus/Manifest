@@ -1,7 +1,7 @@
 # Todoing Task Lifecycle Clarification for Manifest
 
 # Metadata
-> **Status: draft**  
+> **Status: historical**  
 > **Type: document**  
 > **Version: 1.0.0**  
 > **Updated: 2026-11-24**  
@@ -19,7 +19,7 @@ In particular, the displayed names of all states, transition permissions, and
 the procedural prohibition against an agent authorizing its own task were not
 defined unambiguously.
 
-This document records the user's clarifications from 2026-11-24. When the
+This document preserves the historical record of the user's clarifications from 2026-11-24. Their current normative wording is consolidated in `todoing-contract.en.md`; the contract takes precedence in case of conflict. When the
 Manifest contract and implementation are updated, these rules take precedence
 over earlier ambiguous task-lifecycle wording.
 
@@ -29,7 +29,7 @@ The user-facing task lifecycle consists of the following states:
 
 | Internal ID | Display name | Meaning |
 |---|---|---|
-| `backlog` | Draft | The task is discussed with the user and prepared. Execution is not authorized. |
+| `backlog` | Backlog | The task is discussed with the user and prepared. Execution is not authorized. |
 | `ready` | Ready | The user has authorized the task for execution. |
 | `in_progress` | In Progress | The Orchestrator has assigned the task and work has started. |
 | `review` | In Review | The Executor has finished and submitted the result for independent review. |
@@ -37,7 +37,7 @@ The user-facing task lifecycle consists of the following states:
 | `completed` | Completed | The Orchestrator has performed final checks and confirmed success. |
 | — | Cancelled | The user decided that the task must not be performed; the Orchestrator recorded the cancellation. |
 
-“Draft” is the user-facing name for Todoing state `backlog`, not a
+“Backlog” is the user-facing name for Todoing state `backlog`, not a
 separate state.
 
 “Cancelled” is a user-facing terminal state. In Todoing, cancellation is
@@ -67,7 +67,7 @@ related OpenSpec change.
 
 ### 4.1. Authorization to execute
 
-Only the user may move a task from Draft (`backlog`) to Ready (`ready`).
+Only the user may move a task from Backlog (`backlog`) to Ready (`ready`).
 
 No agent, including the Analyst and the Orchestrator, may perform this
 transition independently or treat a task as authorized without the user's
@@ -150,7 +150,7 @@ report from a single agent is not sufficient grounds for completion.
    The Todoing representation remains a separate outcome and does not
    overwrite the last workflow status.
 5. Baseline approval is tied directly to the user's transition from
-   “Draft” to “Ready”.
+   “Backlog” to “Ready”.
 
 ## 8. Applying this clarification
 
