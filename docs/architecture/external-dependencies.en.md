@@ -4,7 +4,7 @@
 > **Status: approved**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-23**  
+> **Updated: 2026-11-27**  
 
 # Description
 The single source listing the external binary tools that Manifest
