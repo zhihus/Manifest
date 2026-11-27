@@ -307,6 +307,12 @@ Create this file only when it does not exist. Never apply the snippet automatica
 
 Each call is a separate `todoing api` process: one JSON request on stdin and one JSON response on stdout. The envelope contains `api_version: 1`, `project_id`, `actor_id`, `operation`, and `args`; `lock_token` is supplied only in the envelope of owner requests. Handle errors by machine-readable `code`, never by message text. Never put the token in CLI arguments, a subagent prompt, task content, logs, or Git.
 
+Example: list tasks (replace the Project ID):
+
+```bash
+printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-orchestrator","operation":"task.list","args":{}}' | todoing --json api
+```
+
 One OpenSpec change maps to one Todoing task. When both Todoing and OpenSpec are enabled, the Todoing task title MUST exactly equal the OpenSpec change directory ID; FR tasks inside a change are not separate Todoing tasks:
 - Create the task with `task.create` and status `backlog`.
 - Add a project-scoped reference with `task.external-ref.add`: namespace `openspec.change`, value equal to the change directory ID, relation `implements`, scope `project`.
