@@ -78,19 +78,19 @@ require_text "$TODOING_AGENT" "openspec archive <change-id> --yes" "successful O
 require_text "$TODOING_AGENT" "openspec archive <change-id> --yes --skip-specs" "cancellation archive without spec merge"
 require_text "$TODOING_AGENT" "Only the user may approve it" "user-only cancellation authority"
 require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery reconciliation"
-require_text "$TODOING_AGENT" "If the `task.review.add` response was lost" "Review response recovery"
-require_text "$RU" "Если потерян ответ на `task.review.add`" "Russian Review response recovery"
-require_text "$EN" "If the `task.review.add` response was lost" "English Review response recovery"
-for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after final commit marker" "S4 — after `completed`" "S5 — lease expires" "S6 — failure during cancellation"; do
+require_text "$TODOING_AGENT" 'If the `task.review.add` response was lost' "Review response recovery"
+require_text "$RU" 'Если потерян ответ на `task.review.add`' "Russian Review response recovery"
+require_text "$EN" 'If the `task.review.add` response was lost' "English Review response recovery"
+for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after final commit marker" 'S4 — after `completed`' "S5 — lease expires" "S6 — failure during cancellation"; do
   require_text "$EN" "$scenario" "English recovery parity"
 done
-for scenario in "S1 — после OpenSpec archive" "S2 — после Git merge" "S3 — после final marker" "S4 — после `completed`" "S5 — lease истёк" "S6 — сбой при отмене"; do
+for scenario in "S1 — после OpenSpec archive" "S2 — после Git merge" "S3 — после final marker" 'S4 — после `completed`' "S5 — lease истёк" "S6 — сбой при отмене"; do
   require_text "$RU" "$scenario" "Russian recovery parity"
 done
 
 require_text "$RUNBOOK_SPEC" "Lost Review response" "normative Review response recovery"
 require_text "$TODOING_AGENT" "For standalone Todoing work, omit the OpenSpec archive step" "standalone completion path"
-require_text "$RUNBOOK_SPEC" "records the accepted final Git SHA with `task.commit.finalize`" "standalone final commit marker"
+require_text "$RUNBOOK_SPEC" 'records the accepted final Git SHA with `task.commit.finalize`' "standalone final commit marker"
 for scenario in "After OpenSpec archive but before Git merge" "After Git merge but before final commit marker" "During cancellation"; do
   require_text "$TODOING_AGENT" "$scenario" "partial failure recovery"
 done
@@ -103,7 +103,7 @@ require_text "$TODOING_AGENT" "Todoing/OpenSpec registration" "runtime OpenSpec 
 require_text "$TODOING_AGENT" "task.external-ref.add" "OpenSpec task reference"
 require_text "$TODOING_AGENT" "exact OpenSpec" "OpenSpec change identity"
 require_text "$TODOING_AGENT" "task.version.approve" "approved baseline"
-require_text "$TODOING_AGENT" "exclusively in that change's `tasks.md`" "OpenSpec task decomposition"
+require_text "$TODOING_AGENT" 'exclusively in that change\'s `tasks.md`' "OpenSpec task decomposition"
 forbid_text "$TODOING_AGENT" "frozen next stage" "obsolete runtime OpenSpec boundary"
 require_text "$TODOING_AGENT" "does not modify project context files" "context templates remain untouched"
 require_text "$SKILL" "Do not copy this reference into project context files" "runtime workflow stays in skill package"
@@ -182,12 +182,7 @@ require_order "$TODOING_AGENT" "Agent coordinated completion sequence" \
 require_order "$TODOING_AGENT" "Agent cancellation sequence" \
   "## Cancellation" "task.cancel" "openspec archive <change-id> --yes --skip-specs" \
   "task.lock.release"
-for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after final commit marker" "S4 — after `completed`" "S5 — lease expires" "S6 — failure during cancellation"; do
-  require_text "$EN" "$scenario" "English partial recovery scenario"
-done
-for scenario in "S1 — после OpenSpec archive" "S2 — после Git merge" "S3 — после final marker" "S4 — после перехода" "S5 — lease истёк" "S6 — сбой при отмене"; do
-  require_text "$RU" "$scenario" "Russian partial recovery scenario"
-done
+
 
 
 require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
