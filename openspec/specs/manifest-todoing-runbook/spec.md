@@ -83,7 +83,7 @@ The Orchestrator MUST inspect each task's dependencies before dispatch. Every pr
 
 ### Requirement: Orchestrator-owned lock custody
 
-The runbook MUST define the Orchestrator's procedural responsibility for coordinating Todoing calls and retaining the raw lock token. The task MUST have an explicitly user-approved baseline and all prerequisites MUST have outcome `completed` before lock acquisition. After acquiring the lock, the Orchestrator MUST immediately transition `ready → in_progress` before dispatch. Role agents MUST NOT receive the token or independently invoke Todoing. The Orchestrator MUST heartbeat immediately before each blocking role-agent run and MUST NOT heartbeat while that agent is executing. It MUST use the current owner ID and fencing generation for owner operations, stop using a token after `stale_lock`, and release the lock only after completion/cancellation and cross-system reconciliation. These are procedural boundaries, not technical isolation; the runtime is not required to block direct CLI/API access by role agents.
+The runbook MUST define the Orchestrator's procedural responsibility for coordinating Todoing calls and retaining the raw lock token. The task MUST have an explicitly user-approved baseline and all prerequisites MUST have outcome `completed` before lock acquisition. After acquiring the lock, the Orchestrator MUST immediately transition `ready → in_progress` before dispatch. Role agents MUST NOT receive the token or independently invoke Todoing. The Orchestrator MUST heartbeat immediately before each blocking role-agent run and MUST NOT heartbeat while that agent is executing. It MUST retain the current owner ID and fencing generation, supply them for lock operations whose API contract requires them (`task.lock.heartbeat` and `task.lock.release`), and include `lock_token` in the envelope of owner task requests. It MUST NOT require owner ID or fencing generation in task-operation arguments when the API contract does not define those fields. It MUST stop using a token after `stale_lock` and release the lock only after completion/cancellation and cross-system reconciliation. These are procedural boundaries, not technical isolation; the runtime is not required to block direct CLI/API access by role agents.
 
 #### Scenario: Start approved work
 
@@ -215,6 +215,8 @@ The runbook MUST require reading actual Todoing, OpenSpec, and Git state before 
 - GIVEN the task lease expires while a role agent is running
 - WHEN the recovery grace period has elapsed
 - THEN the Orchestrator uses `task.lock.recover` to obtain a new token and fencing generation
+- AND confirms that the previous role-agent invocation has terminated before dispatching another agent or mutating the shared worktree
+- AND stops and escalates to the user if termination cannot be confirmed
 - AND re-reads the task version and reconciles Git/OpenSpec artifacts before resuming
 
 #### Scenario: Partial cancellation
