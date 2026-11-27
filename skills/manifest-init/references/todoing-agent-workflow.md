@@ -169,6 +169,11 @@ After interruption, reconcile actual state before retrying: Todoing through
 `task.dependency.list`; OpenSpec change/archive state; and Git branch,
 merge, and commit SHAs. Never blindly repeat a non-idempotent operation.
 
+- If the `task.review.add` response was lost, inspect `task.review.list`.
+  If the same `review_id` and exact payload are already present, do not append
+  another record; reconcile task status and perform only the missing transition.
+  If no record exists, retry only after confirming the reviewed version and
+  review ID are still valid. A conflicting payload requires escalation.
 - If the `task.lock.release` response was lost, call
   `task.lock.heartbeat` first. Retry release only if ownership is
   confirmed; otherwise reconcile whether release already succeeded and do not
