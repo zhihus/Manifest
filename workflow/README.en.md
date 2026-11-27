@@ -217,6 +217,8 @@ English.
 
 ## 6. Todoing integration
 
+This section applies only when `components.todoing.enabled: true`. When it is `false`, the Orchestrator does not invoke `todoing`, read `.todoing/`, or perform Todoing operations.
+
 Todoing is the source of truth for task state, versions, history, locks, and Reviews. Manifest owns OpenSpec, Git, and orchestration policy. The main Orchestrator is the only Todoing API client.
 
 ### 6.1. Bootstrap and Project ID
@@ -302,7 +304,7 @@ Create this file only when it does not exist. Never apply the snippet automatica
 
 Each call is a separate `todoing api` process: one JSON request on stdin and one JSON response on stdout. The envelope contains `api_version: 1`, `project_id`, `actor_id`, `operation`, and `args`; `lock_token` is supplied only in the envelope of owner requests. Handle errors by machine-readable `code`, never by message text. Never put the token in CLI arguments, a subagent prompt, task content, logs, or Git.
 
-One OpenSpec change maps to one Todoing task:
+One OpenSpec change maps to one Todoing task. When both Todoing and OpenSpec are enabled, the Todoing task title MUST exactly equal the OpenSpec change directory ID; FR tasks inside a change are not separate Todoing tasks:
 - Create the task with `task.create` and status `backlog`.
 - Add a project-scoped reference with `task.external-ref.add`: namespace `openspec.change`, value equal to the change directory ID, relation `implements`, scope `project`.
 - Allow `backlog → ready` only after explicit user approval. Then record the current version as the baseline with `task.version.approve`.
