@@ -39,3 +39,7 @@
   Stop: regression cases cover all component and control defaults plus
   tamper detection.
   Maps to scenarios: independent component switches; optional controls disabled; mandatory integrity protections
+
+## Verification status
+
+Implementation and regression-case authoring are complete. Tests and validation commands were intentionally not executed; local verification remains with the user after syncing `develop`.
