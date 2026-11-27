@@ -170,13 +170,15 @@ preflight() {
 }
 
 write_config() {
+  local newline
+  newline=$(printf '\n')
+  [[ $PROJECT_NAME != *"$newline"* ]] || { echo "CONFIG_INVALID_NAME: project name must be a single line"; exit 1; }
   mkdir -p "$MK"
   local tmp=$MK/manifest.yaml.tmp
   local yaml_name=$PROJECT_NAME
   # Quote user input as a YAML double-quoted scalar.
   yaml_name=${yaml_name//\\/\\\\}
   yaml_name=${yaml_name//\"/\\\"}
-  yaml_name=${yaml_name//
   yaml_name=${yaml_name//$'\r'/\\r}
   {
     echo "format_version: 1"
@@ -290,7 +292,6 @@ interview
 write_config
 install_templates
 \t'/\\t}
-  yaml_name=${yaml_name//
 
 # Name-mapping table (design D4): installed file <- source template.
 BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
@@ -481,7 +482,6 @@ interview
 write_config
 install_templates
 \t'/\\t}
-  yaml_name=${yaml_name//
   yaml_name=${yaml_name//$'\r'/\\r}
   {
     echo "format_version: 1"
@@ -595,7 +595,6 @@ interview
 write_config
 install_templates
 \t'/\\t}
-  yaml_name=${yaml_name//
 
 # Name-mapping table (design D4): installed file <- source template.
 BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
@@ -899,7 +898,6 @@ interview
 write_config
 install_templates
 \t'/\\t}
-  yaml_name=${yaml_name//
 
 # Name-mapping table (design D4): installed file <- source template.
 BASE_NAMES=(AGENTS.md llms.txt COMMIT_RULES.md VERSION VERSIONING.md)
