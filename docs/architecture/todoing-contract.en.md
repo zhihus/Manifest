@@ -3,24 +3,26 @@
 # Metadata
 > **Status: draft**  
 > **Type: document**  
-> **Version: 1.0.0**  
-> **Updated: 2026-11-23**  
+> **Version: 1.1.0**  
+> **Updated: 2026-11-27**  
 
 # Description
 Target integration specification for Manifest consuming Todoing JSON API v1.
 
-**Baseline:** Todoing `zhihus/todoing-x` main @
-`947048d3864e99c7d0dfcc48889a084e0a99e42d`; Manifest
-`feature/todoing-contract-spec`.
+**Baseline:** Todoing `zhihus/todoing-x` @ `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` (the commit pinned by
+Manifest acceptance CI); the verified descendant is
+`feature/generic-task-references-review-api`. Manifest `develop`.
 
 > This edition replaces the previous CLI + file-WAL target model. It defines the
 > target use of Todoing JSON API v1 and includes requirements for universal Todoing
 > extensions needed to preserve previously approved Manifest decisions. Historical
 > editions v2–v6 remain in separate Git files.
 >
-> **Implementation status:** base API capabilities were confirmed by the audit.
-> External references, review records, and a final-commit marker are required
-> universal Todoing extensions and are not yet implemented.
+> **Implementation status:** the tested Todoing build at `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` implements
+> external references, Review records, and the final-commit marker. The current
+> public Todoing `main` at `714664e53f364d03bb5d4ca19c3a504003101570` does not contain these operations and is
+> incompatible with the full Manifest workflow. Use the pinned commit or a
+> verified descendant.
 
 ## 1. Architecture principle and responsibility boundaries
 
@@ -40,8 +42,7 @@ Manifest, OpenSpec, agent roles, or project policy.
 - Git commit references stored as full SHAs.
 - Versioned CLI and JSON API v1.
 - Store verification, migration, and verified snapshots.
-- Generic external references and structured review history, after the required API
-  extensions are implemented.
+- Generic external references and structured Review history.
 
 ### 1.2. Manifest provides
 
@@ -64,7 +65,7 @@ enforce consumer role policy.
 
 ### 2.1. Normative interface
 
-Manifest uses only the public JSON API v1 through the `todoing api` CLI command.
+Manifest uses only the public JSON API v1 through the `todoing --json api` CLI command.
 Each call is a separate process: one JSON request on stdin and one JSON response
 on stdout. Diagnostics go to stderr.
 
@@ -92,12 +93,13 @@ It MUST NOT probe support by sending a mutating request. Before use, the integra
 checks that the binary is available and that its version is compatible. Runtime
 capabilities discovery is absent from Todoing and is not required for MVP.
 
-### 2.4. Required universal API v1 extensions
+### 2.4. Universal API v1 extensions in the tested build
 
-The current Todoing API v1 implementation does not provide all previously approved
-capabilities. Before Manifest integration, Todoing MUST extend the API and SQLite
-schema with the following universal mechanisms. They MUST NOT contain
-Manifest-specific or OpenSpec-specific fields or rules.
+The Todoing build pinned at `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` provides the following universal
+mechanisms. The current public `main` branch does not include them; the full
+Manifest workflow therefore requires the pinned build or a verified descendant.
+These mechanisms MUST NOT contain Manifest-specific or OpenSpec-specific fields
+or rules.
 
 **External references**
 
