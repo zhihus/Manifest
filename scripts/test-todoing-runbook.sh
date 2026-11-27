@@ -103,7 +103,7 @@ require_text "$TODOING_AGENT" "Todoing/OpenSpec registration" "runtime OpenSpec 
 require_text "$TODOING_AGENT" "task.external-ref.add" "OpenSpec task reference"
 require_text "$TODOING_AGENT" "exact OpenSpec" "OpenSpec change identity"
 require_text "$TODOING_AGENT" "task.version.approve" "approved baseline"
-require_text "$TODOING_AGENT" 'exclusively in that change\'s `tasks.md`' "OpenSpec task decomposition"
+require_text "$TODOING_AGENT" "exclusively in that change's \`tasks.md\`" "OpenSpec task decomposition"
 forbid_text "$TODOING_AGENT" "frozen next stage" "obsolete runtime OpenSpec boundary"
 require_text "$TODOING_AGENT" "does not modify project context files" "context templates remain untouched"
 require_text "$SKILL" "Do not copy this reference into project context files" "runtime workflow stays in skill package"
