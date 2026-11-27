@@ -329,7 +329,7 @@ printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-o
 Один OpenSpec change соответствует одной Todoing task. При включённых Todoing и OpenSpec название задачи Todoing должно в точности совпадать с ID каталога change; FR-задачи внутри change отдельными Todoing-задачами не становятся:
 - Создайте задачу через `task.create` со статусом `backlog`.
 - Добавьте project-scoped reference через `task.external-ref.add`: namespace `openspec.change`, value — ID каталога change, relation `implements`, scope `project`.
-- Переход `backlog → ready` разрешён только после явного одобрения пользователя. После одобрения зафиксируйте baseline текущей версии через `task.version.approve`.
+- Переход `backlog → ready` разрешён только после явного одобрения пользователя. После одобрения зафиксируйте baseline текущей версии через `task.version.approve` до получения lock и запуска реализации.
 - Не запускайте реализацию, не приобретайте lock и не переводите задачу в `in_progress` до одобрения.
 - Зависимости ведите через `task.dependency.add`, `task.dependency.remove`, `task.dependency.list`. Перед запуском проверьте каждую prerequisite-задачу: её outcome должен быть `completed`. Если зависимость заблокирована или её состояние нельзя проверить, работу не начинайте. Todoing хранит связи и запрещает циклы; решение о готовности принимает Manifest.
 - `actor_id` — атрибуция, а не аутентификация. Вызовы отправляет Оркестратор; для Review указывайте стабильный идентификатор роли/сессии Reviewer в envelope.
