@@ -201,7 +201,7 @@ $bad"
   fi
   # Include *.sh scripts and every hook under scripts/hooks/ (including extensionless files).
   local -a script_files=()
-  for f2 in "$scripts_dir"/*.sh "$scripts_dir"/hooks/*; do
+  for f2 in "$scripts_dir"/*.sh "$scripts_dir"/hooks/* "$ROOT"/skills/*/scripts/*.sh "$ROOT"/skills/*/tests/*.sh; do
     [[ -f $f2 ]] && script_files+=("$f2")
   done
   local funcs keywords

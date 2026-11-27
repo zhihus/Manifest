@@ -31,7 +31,7 @@ this file is its translation.
 | `cut` | line-number field extraction from `grep -n` output | test-todoing-runbook.sh | portable system utility |
 | `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
-| `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
+| `chmod` | setting read permissions on staged templates | `skills/manifest-init/scripts/install.sh` | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
 | `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
