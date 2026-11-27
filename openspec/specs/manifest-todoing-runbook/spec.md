@@ -188,6 +188,13 @@ The runbook MUST require reading actual Todoing, OpenSpec, and Git state before 
 - WHEN the Orchestrator resumes
 - THEN it obtains the actual merge SHA and records it with `task.commit.finalize`
 
+#### Scenario: Failure after final commit marker
+
+- GIVEN the final commit marker is recorded but the task is still `verified`
+- WHEN the Orchestrator resumes
+- THEN it verifies that the marker matches the actual merge SHA
+- AND performs only the missing transition to `completed` after final acceptance checks
+
 #### Scenario: Failure after task completion
 
 - GIVEN the task is already `completed` but the lock may still be held
