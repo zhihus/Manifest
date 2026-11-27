@@ -16,7 +16,7 @@ other.
 #### Scenario: Initial component defaults
 
 - **WHEN** a new project is initialized
-- **THEN** Todoing and OpenSpec are both enabled in the generated configuration
+- **THEN** Todoing is enabled and OpenSpec is disabled in the generated configuration
 
 #### Scenario: Todoing disabled independently
 
