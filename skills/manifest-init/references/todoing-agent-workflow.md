@@ -145,7 +145,12 @@ For coordinated Todoing/OpenSpec work, perform these steps in order:
 6. Call `task.status.set` to move the task to `completed`; this records outcome `completed`.
 7. Release the task lock with `task.lock.release`.
 
-For standalone Todoing work, omit the OpenSpec archive step and complete against the accepted final Git revision. A Git commit reference alone never proves acceptance or completion.
+For standalone Todoing work, omit the OpenSpec archive step. After Review approval and acceptance checks:
+1. Merge Git according to the project's rules when a merge is required.
+2. Record the actual accepted final Git SHA with `task.commit.finalize`.
+3. Call `task.status.set` to move the task to `completed`.
+4. Call `task.lock.release`.
+A Git commit reference alone never proves acceptance or completion.
 
 ## Cancellation
 
