@@ -113,48 +113,83 @@ printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-o
 
 The Main Orchestrator is the only Todoing API client and lock-token custodian.
 
-1. Acquire the task lock with `task.lock.acquire`.
-2. Immediately move `ready → in_progress` with `task.status.set`, supplying the
-   token in the request envelope.
-3. Keep `owner_id`, `lock_token`, `fencing_generation`, and expiry in protected
-   Main Orchestrator session state.
-4. Send `task.lock.heartbeat` immediately before each blocking role-agent run.
-   Do not heartbeat while the role agent is running.
-5. Never give the token to a role agent. Every owner operation must include the token
-   in the envelope and the current owner ID/generation in its arguments.
-6. On `stale_lock`, stop using the old token.
+1. Before execution, verify that the task is `ready`, its approved baseline is recorded, and every prerequisite has outcome `completed`.
+2. Acquire the task lock with `task.lock.acquire`.
+3. Immediately move `ready → in_progress` with `task.status.set`, supplying the token in the request envelope.
+4. Keep `owner_id`, `lock_token`, `fencing_generation`, and expiry in protected Main Orchestrator session state. Never place the token in a prompt, environment, task content, logs, or Git.
+5. Send `task.lock.heartbeat` immediately before each blocking role-agent run. Do not heartbeat while the role agent is running.
+6. Every owner operation must include the token in the envelope and the current owner ID/generation in its arguments. On `stale_lock`, stop using the old token.
+7. Release the lock only after the task has reached its terminal outcome and all required cross-system operations have been reconciled.
 
-## Review and completion
+## Independent review and revision loop
 
 1. After implementation, attach meaningful commits with `task.commit.add`.
-2. Before independent review, move the task to `review`.
-3. Record the review with `task.review.add`, linked to the exact reviewed
-   `version_no`. Use a stable `review_id`, reviewer identity, outcome, and ordered
-   comments.
-4. On `approved`, move the task to `verified`.
-5. On `changes_requested`, Todoing increments `revision_count` atomically; return
-   the task to `in_progress` after recording the review.
-6. After acceptance checks, set the final Git revision with
-   `task.commit.finalize`, move the task to `completed`, then release the lock.
-7. In standalone Todoing mode only, do not run OpenSpec archive or create
-   `openspec.change` references. In coordinated mode, follow the OpenSpec
-   lifecycle rules for the linked change.
+2. Before dispatching the independent Reviewer, move `in_progress → review` with `task.status.set`.
+3. Give the Reviewer the exact artifacts and task version to inspect. The Reviewer must be a separate role/session from the Implementer and must not receive the lock token or call Todoing.
+4. The Main Orchestrator records the result with `task.review.add`, including a stable `review_id`, exact reviewed `version_no`, reviewer identity, outcome, and ordered comments. The envelope `actor_id` identifies the Reviewer role/session.
+5. On `approved`, move `review → verified`. Do not mark the task completed yet.
+6. On `changes_requested`, Todoing atomically appends the Review and increments `revision_count` exactly once. Then move `review → in_progress` and return the findings to the Implementer. Preserve the Review record; never edit or delete it.
+7. After corrections, attach the new meaningful commits and repeat the independent review cycle. `revision_count` counts `changes_requested` Review records, not task versions or comments. The same `review_id` and identical payload is idempotent; a different payload with that ID is a conflict.
 
-## Cancellation and recovery
+## Completion
 
-- Only the user may approve cancellation. After approval, call `task.cancel` with a
-  reason. In coordinated mode, retain the external reference and archive the
-  linked change without merging its delta specs; in standalone mode, do not
-  invoke OpenSpec archive.
-- After interruption, reconcile Todoing and Git before retrying operations:
-  `task.get`, `task.version.list`, `task.history.list`, `task.review.list`,
-  `task.dependency.list`, and Git branch/commit state.
-- Never blindly repeat a non-idempotent operation.
-- On `lock_expired`, wait for the lease plus recovery grace, then call
-  `task.lock.recover`; use only the new token and fencing generation.
-- On a lost release response, confirm ownership with `task.lock.heartbeat` before
-  retrying release.
-- Todoing and Git do not share a transaction. Stop and escalate if state is ambiguous.
+A task is eligible for completion only after status `verified` and successful acceptance checks.
+
+For coordinated Todoing/OpenSpec work, perform these steps in order:
+
+1. Verify the Review is approved and the task is `verified`.
+2. Run final consistency checks across Todoing, the linked OpenSpec change, and Git.
+3. Run `openspec archive <change-id> --yes` to merge delta specs into permanent specs and archive the change.
+4. Merge Git according to the project's branch and commit rules.
+5. Record the actual final merge SHA with `task.commit.finalize`.
+6. Move the task to `completed`; this records outcome `completed`.
+7. Release the task lock with `task.lock.release`.
+
+For standalone Todoing work, omit the OpenSpec archive step and complete against the accepted final Git revision. A Git commit reference alone never proves acceptance or completion.
+
+## Cancellation
+
+- Any agent may recommend cancellation with a reason; only the user may approve it.
+- Without explicit user approval, do not call `task.cancel`, change the outcome, or archive the OpenSpec change.
+- After approval, call `task.cancel` with the reason.
+- In coordinated mode, then run `openspec archive <change-id> --yes --skip-specs`, retaining the external reference and leaving permanent specs unchanged.
+- In standalone mode, do not invoke OpenSpec archive.
+- Release the lock after the cancellation and any required archive operation are reconciled. Archiving alone is not cancellation.
+
+## Recovery
+
+After interruption, reconcile actual state before retrying: Todoing through
+`task.get`, `task.version.list`, `task.history.list`,
+`task.review.list`, `task.external-ref.list`, and
+`task.dependency.list`; OpenSpec change/archive state; and Git branch,
+merge, and commit SHAs. Never blindly repeat a non-idempotent operation.
+
+- If the `task.lock.release` response was lost, call
+  `task.lock.heartbeat` first. Retry release only if ownership is
+  confirmed; otherwise reconcile whether release already succeeded and do not
+  reuse the old token.
+- On `lock_expired`, wait for lease expiry plus the configured recovery
+  grace, then call `task.lock.recover`. Use only the new token and
+  fencing generation; re-read the task version and inspect artifacts before
+  continuing. On `stale_lock`, never use the old token again.
+- **After OpenSpec archive but before Git merge:** verify the change is archived
+  and permanent specs contain the delta; do not archive again. Continue with Git
+  merge only after confirming the state.
+- **After Git merge but before final commit marker:** obtain the actual merge SHA
+  and call `task.commit.finalize`. Do not invent or infer the SHA.
+- **After `completed` but before lock release:** verify terminal task state
+  and confirm ownership before retrying release.
+- **During cancellation:** reconcile task outcome, OpenSpec archive, and lock.
+  If outcome is already `cancelled`, do not repeat `task.cancel`;
+  perform only missing archive/release steps. Never merge delta specs for a
+  cancelled change.
+- **If a lease expires during a role-agent run:** recover only after the lease
+  and grace period; use the new fencing generation, re-read the task version,
+  and inspect Git/OpenSpec artifacts before resuming. Do not assume the previous
+  agent stopped or that its work was committed.
+
+Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the
+user if the actual state is ambiguous or cannot be reconciled safely.
 
 ## Trust boundary
 
