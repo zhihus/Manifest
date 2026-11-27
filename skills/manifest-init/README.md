@@ -2,6 +2,13 @@
 
 Standalone skill for connecting Manifest to Git projects and managing standalone Todoing tasks after connection. Context files are individually selectable and none are installed by default.
 
+## Modes
+
+- **Connection:** initialize or repair a Manifest connection without overwriting existing data.
+- **Runtime:** manage standalone Todoing tasks after connection when Todoing is enabled
+  and OpenSpec is disabled. Cross-system Todoing/OpenSpec coordination is not part
+  of this stage.
+
 ## Layout
 
 - SKILL.md — agent workflow and safety contract.
