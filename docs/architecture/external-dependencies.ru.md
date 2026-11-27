@@ -28,6 +28,7 @@
 | `find` | анализ типа проекта (кодовые файлы, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | POSIX-флаги без GNU-only расширений |
 | `basename`, `dirname` | извлечение имени проекта и каталога скрипта | manifest-init.sh, test-manifest-init.sh | переносимые системные утилиты |
 | `head`, `wc` | подсчёт и ограничение строк/слов в проверках и тестах | structure-parser.sh, test-manifest-init.sh | переносимые системные утилиты |
+| `cut` | извлечение номера строки из вывода `grep -n` | test-todoing-runbook.sh | переносимая системная утилита |
 | `sort`, `tr` | сортировка нарушений и обработка токенов/вывода | structure-parser.sh, verify.sh, test-portability.sh | переносимые системные утилиты |
 | `cat` | чтение контрольных файлов в тестах | test-manifest-init.sh | переносимая системная утилита |
 | `chmod` | установка исполняемого бита тестового Perl-stub | test-manifest-init.sh | переносимая системная утилита |
