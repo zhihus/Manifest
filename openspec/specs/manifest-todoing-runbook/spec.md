@@ -166,7 +166,7 @@ For coordinated Todoing/OpenSpec work, the runbook MUST define the ordered succe
 
 ### Requirement: Reconciliation before recovery
 
-The runbook MUST require reading actual Todoing, OpenSpec, and Git state before any retry after interruption. It MUST distinguish idempotent from non-idempotent operations and MUST NOT blindly repeat `task.cancel`, `task.lock.release`, or OpenSpec archive. It MUST describe recovery for partial failure after archive, after Git merge, after finalization, after completion, during lock release, after lease expiry, and during cancellation. Recovery MUST use the current fencing generation and MUST stop for user escalation if the cross-system state is ambiguous.
+The runbook MUST require reading actual Todoing, OpenSpec, and Git state before any retry after interruption. Todoing reconciliation MUST inspect `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list`, and `task.dependency.list`; OpenSpec reconciliation MUST inspect the change and archive state; Git reconciliation MUST inspect branch, merge, and commit SHAs. It MUST distinguish idempotent from non-idempotent operations and MUST NOT blindly repeat `task.cancel`, `task.lock.release`, or OpenSpec archive. It MUST describe recovery for partial failure after archive, after Git merge, after finalization, after completion, during lock release, after lease expiry, and during cancellation. Recovery MUST use the current fencing generation and MUST stop for user escalation if the cross-system state is ambiguous.
 
 #### Scenario: Lost lock-release response
 
