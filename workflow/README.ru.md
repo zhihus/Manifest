@@ -1,7 +1,7 @@
 # Протокол работы OpenSpec
 
 # Метаданные
-> **Status: draft**  
+> **Status: active**  
 > **Type: document**  
 > **Version: 1.1.2**  
 > **Updated: 2026-11-27**  
@@ -71,7 +71,7 @@
 | Шаг | Артефакт | Агент | Вход → Выход |
 |---|---|---|---|
 | — | состояние пайплайна | Оркестратор (всегда GLM-5.3 Flash) | запускает шаги, гейтит переходы |
-| 0 | задача в Todoing (если компонент включён) | Аналитик | Backlog → утверждённая задача «К выполнению» |
+| 0 | задача в Todoing (если компонент включён) | Аналитик | Бэклог → утверждённая задача «К выполнению» |
 | 1 | proposal.md (если OpenSpec включён) | Аналитик | слова пользователя → «зачем / что» |
 | 2 | spec.md (если OpenSpec включён) | Аналитик | proposal → сценарии, граничные случаи, PBT |
 | 3 | design.md (если OpenSpec включён) | Архитектор | proposal + spec → решение (опционально) |
@@ -259,32 +259,32 @@ recovery_grace_seconds = 60
 
 [[statuses]]
 id = "backlog"
-label = "Backlog"
+label = "Бэклог"
 enabled = true
 
 [[statuses]]
 id = "ready"
-label = "Ready"
+label = "К выполнению"
 enabled = true
 
 [[statuses]]
 id = "in_progress"
-label = "In Progress"
+label = "Выполняется"
 enabled = true
 
 [[statuses]]
 id = "review"
-label = "Review"
+label = "На проверке"
 enabled = true
 
 [[statuses]]
 id = "verified"
-label = "Verified"
+label = "Проверено"
 enabled = true
 
 [[statuses]]
 id = "completed"
-label = "Completed"
+label = "Завершена"
 enabled = true
 outcome = "completed"
 
