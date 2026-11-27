@@ -191,7 +191,10 @@ route back and re-run the affected step.
 
 Run this stage only when `components.openspec.enabled: true`; otherwise do not run OpenSpec archive. When Todoing is enabled, this is the same archive operation in the ordered completion sequence in §6.5; do not run it a second time or outside that sequence.
 
-Triggered only after verify is all ✅. The delta-spec from
+Trigger only after all applicable gates have passed. If
+`checks.review_gate.enabled` is false, skip this optional OpenSpec verify gate;
+the mandatory Todoing Review in §6.4 and the ordered completion checks in §6.5
+still apply whenever Todoing is enabled. The delta-spec from
 `changes/<name>/specs/` merges into the permanent `openspec/specs/`,
 the change folder moves to `changes/archive/<date>-<name>/`.
 Mechanical, usually a CLI operation (`openspec archive <name>`). From
