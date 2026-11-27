@@ -118,7 +118,7 @@ The Main Orchestrator is the only Todoing API client and lock-token custodian.
 3. Immediately move `ready → in_progress` with `task.status.set`, supplying the token in the request envelope.
 4. Keep `owner_id`, `lock_token`, `fencing_generation`, and expiry in protected Main Orchestrator session state. Never place the token in a prompt, environment, task content, logs, or Git.
 5. Send `task.lock.heartbeat` immediately before each blocking role-agent run. Do not heartbeat while the role agent is running.
-6. Every owner operation must include the token in the envelope and the current owner ID/generation in its arguments. On `stale_lock`, stop using the old token.
+6. Every owner task request must include `lock_token` in the envelope. Supply `owner_id` and `fencing_generation` only for operations whose API contract requires them, namely `task.lock.heartbeat` and `task.lock.release`; do not add unsupported fields to other operation arguments. On `stale_lock`, stop using the old token.
 7. Release the lock only after the task has reached its terminal outcome and all required cross-system operations have been reconciled.
 
 ## Independent review and revision loop
@@ -195,8 +195,11 @@ merge, and commit SHAs. Never blindly repeat a non-idempotent operation.
   perform only missing archive/release steps. Never merge delta specs for a
   cancelled change.
 - **If a lease expires during a role-agent run:** recover only after the lease
-  and grace period; use the new fencing generation, re-read the task version,
-  and inspect Git/OpenSpec artifacts before resuming. Do not assume the previous
+  and grace period; use the new fencing generation and re-read the task version.
+  Before dispatching another agent or mutating the shared worktree, confirm that
+  the previous role-agent invocation has terminated. If termination cannot be
+  confirmed, stop and escalate to the user; never allow overlapping writers.
+  Inspect Git/OpenSpec artifacts before resuming. Do not assume the previous
   agent stopped or that its work was committed.
 
 Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the
