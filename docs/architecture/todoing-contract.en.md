@@ -552,7 +552,7 @@ recovery. It MUST NOT claim cross-system atomicity.
 
 1. **Status model:** the six workflow statuses are `backlog` (Backlog), `ready` (Ready), `in_progress` (In Progress), `review` (In Review), `verified` (Verified), and `completed` (Completed). Cancellation is not a workflow status: it is recorded as `outcome=cancelled` while preserving the last workflow status.
 2. **Authority:** only the user authorizes execution through `backlog → ready`. The Orchestrator performs subsequent transitions according to the lifecycle. Role agents have no independent authority to change task statuses. This is a procedural boundary, not technical isolation.
-3. **Baseline:** after confirmed user authorization through `backlog → ready`, Manifest records the current version with `task.version.approve`. `actor_id` is not proof of user consent.
+3. **Baseline:** after confirmed user authorization through `backlog → ready`, Manifest records the current version with `task.version.approve` before acquiring the lock or dispatching implementation. `actor_id` is not proof of user consent.
 4. **Generic API mechanisms:** external references, Review records, and the final commit marker are general Todoing capabilities; they contain no Manifest/OpenSpec-specific semantics. Manifest's use of them is defined by this contract.
 5. **Identifiers:** the Project ID is a UUIDv4 (RFC 4122), created once during bootstrap and stored in `.manifest/project-id`. `actor_id` is a stable role/session identifier of no more than 128 characters. These values identify the store and attribute an operation; they do not authenticate the caller.
 
