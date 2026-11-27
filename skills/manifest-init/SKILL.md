@@ -5,7 +5,7 @@ description: Connect Manifest to a Git project, or manage its standalone Todoing
 
 # Manifest Init
 
-Use when the user asks to connect, initialize, install, or repair Manifest, or to manage Todoing tasks in a connected project.
+Use when the user asks to connect, initialize, install, or repair Manifest, or to manage work in a connected Todoing project, with or without OpenSpec.
 
 ## Contract
 
@@ -28,7 +28,7 @@ Use when the user asks to connect, initialize, install, or repair Manifest, or t
 
 Choose exactly one procedure:
 - For a connection, initialization, installation, or repair request, use the Connection procedure.
-- For task work in an already connected project, use Ongoing Todoing task management.
+- For task work in an already connected project, use Ongoing Todoing task management; follow the standalone or Todoing/OpenSpec coordination path according to the enabled component switches.
 - Do not run the installer as part of ordinary task management.
 
 ## Connection procedure
@@ -48,9 +48,10 @@ update, review, complete, or cancel project work.
 1. Do not rerun the installer for ordinary task work.
 2. Verify `.manifest/manifest.yaml` and its checksum; require
    `components.todoing.enabled: true`.
-3. This runtime workflow is limited to standalone Todoing mode:
-   `components.openspec.enabled: false`. If OpenSpec is enabled, stop and report
-   that Todoing/OpenSpec coordination belongs to the frozen next stage.
+3. Read both component switches. If OpenSpec is enabled, use the one-to-one
+   Todoing/OpenSpec coordination procedure in `references/todoing-agent-workflow.md`.
+   If OpenSpec is disabled, use standalone Todoing mode. Never treat enabled
+   OpenSpec as a reason to stop or bypass Todoing task registration.
 4. Verify the Project ID, existing Todoing config/store, and compatible binary.
    If bootstrap is incomplete, follow `references/todoing-bootstrap.md` only when
    the user explicitly asks to initialize Todoing.
