@@ -39,12 +39,15 @@ grep -A1 '^  openspec:' "$TMP/neither/.manifest/manifest.yaml" | grep -q 'enable
 [[ ! -e "$TMP/neither/.todoing" ]] || { echo "FAIL disabled mode created Todoing store"; fails=$((fails+1)); }
 
 new_repo "$TMP/openspec-preserve"
+printf 'user-rule/\n' >"$TMP/openspec-preserve/.gitignore"
 mkdir -p "$TMP/openspec-preserve/openspec/specs/owned"
 printf 'user-owned config\n' >"$TMP/openspec-preserve/openspec/config.yaml"
 printf 'user-owned spec\n' >"$TMP/openspec-preserve/openspec/specs/owned/spec.md"
 run "$TMP/openspec-preserve" --todoing disabled --openspec enabled >"$TMP/openspec-preserve.out"
 grep -q '^user-owned config$' "$TMP/openspec-preserve/openspec/config.yaml" || { echo "FAIL existing OpenSpec config overwritten"; fails=$((fails+1)); }
 grep -q '^user-owned spec$' "$TMP/openspec-preserve/openspec/specs/owned/spec.md" || { echo "FAIL existing OpenSpec spec changed"; fails=$((fails+1)); }
+grep -q '^user-rule/$' "$TMP/openspec-preserve/.gitignore" || { echo "FAIL existing gitignore rule removed"; fails=$((fails+1)); }
+grep -q '^temp/$' "$TMP/openspec-preserve/.gitignore" || { echo "FAIL temp exclusion missing"; fails=$((fails+1)); }
 
 new_repo "$TMP/single"
 run "$TMP/single" --context-file agents=enabled >"$TMP/single.out"
