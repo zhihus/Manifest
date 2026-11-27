@@ -13,6 +13,13 @@ for id in agents llm-navigation versioning releases logging code-rules test-rule
 done
 for f in AGENTS.md llms.txt VERSIONING.md RELEASES.md LOG_RULES.md CODE_RULES.md TEST_RULES.md COMMIT_RULES.md VERSION .llmignore openspec/config.yaml; do [[ ! -e "$TMP/fresh/$f" ]] || { echo "FAIL unexpected optional file $f"; fails=$((fails+1)); }; done
 grep -q '^temp/$' "$TMP/fresh/.gitignore" || { echo "FAIL temp ignore"; fails=$((fails+1)); }
+new_repo "$TMP/single"
+run "$TMP/single" --context-file agents=enabled >"$TMP/single.out"
+[[ -f "$TMP/single/AGENTS.md" ]] || { echo "FAIL selected single file not installed"; fails=$((fails+1)); }
+for f in llms.txt VERSIONING.md RELEASES.md LOG_RULES.md CODE_RULES.md TEST_RULES.md COMMIT_RULES.md VERSION .llmignore; do
+ [[ ! -e "$TMP/single/$f" ]] || { echo "FAIL unselected file installed: $f"; fails=$((fails+1)); }
+done
+
 new_repo "$TMP/partial"; mkdir -p "$TMP/partial/.manifest"; printf 'owned\n' >"$TMP/partial/AGENTS.md"
 run "$TMP/partial" --context-file agents=enabled --context-file code-rules=enabled >"$TMP/partial.out"
 grep -q '^owned$' "$TMP/partial/AGENTS.md" || { echo "FAIL existing file overwritten"; fails=$((fails+1)); }
