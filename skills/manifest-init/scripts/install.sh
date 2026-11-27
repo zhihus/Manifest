@@ -97,6 +97,7 @@ if (( ! config_exists )); then
  hash=$(sha256_of "$CONFIG"); tmp=$(mktemp "$MK/.checksum.XXXXXX"); printf 'sha256sum:%s\n' "$hash" >"$tmp"
  ln "$tmp" "$CHECKSUM" 2>/dev/null || { rm -f "$tmp"; fail CHECKSUM_RACE; }; rm -f "$tmp"
  INSTALLED+=(".manifest/manifest.yaml" ".manifest/manifest.yaml.checksum")
+ context_settings_present=1
 else SKIPPED+=(".manifest/manifest.yaml (preserved; checksum valid)")
 fi
 tmpdir=$(mktemp -d "$PROJECT/.manifest-stage.XXXXXX") || fail STAGING_FAILED; trap 'rm -rf "$tmpdir"' EXIT
