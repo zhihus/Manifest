@@ -438,6 +438,11 @@ After interruption, first reconcile actual state: Todoing via `task.get`,
 archive state; and Git branch, merge, and commit SHAs. Never blindly repeat a
 non-idempotent operation.
 
+- If the `task.review.add` response was lost, inspect `task.review.list`.
+  If the same `review_id` and exact payload are already present, do not append
+  another record; reconcile task status and perform only the missing transition.
+  If no record exists, retry only after confirming the reviewed version and
+  review ID are still valid. A conflicting payload requires escalation.
 - If the `task.lock.release` response was lost:
   1. Call `task.lock.heartbeat` first.
   2. Retry release only after successful ownership confirmation. If ownership
@@ -450,25 +455,26 @@ non-idempotent operation.
   while a subsequent call receives `task_locked`. Re-read the current task
   version and inspect artifacts before continuing.
 - On `stale_lock`, never use the old token again.
-- **S1 — after OpenSpec archive, before Git merge:** verify that the change is
-  archived and permanent specs contain the delta. Do not archive again; continue
-  with Git merge only after confirming the state.
-- **S2 — after Git merge, before final commit marker:** obtain the actual merge
-  SHA and call `task.commit.finalize`. Never infer or invent the SHA.
-- **S3 — after final commit marker, before `completed`:** verify that the stored
-  SHA equals the actual merge SHA and the task remains `verified`; do not replace
-  the marker. After final acceptance checks, perform only the missing transition
-  to `completed`.
-- **S4 — after `completed`, before lock release:** verify terminal task state
-  and confirm ownership before retrying release.
-- **S5 — lease expires during a role-agent run:** recover only after lease
-  expiry and grace; use the new fencing generation, re-read the task version,
-  and inspect Git/OpenSpec artifacts. Do not assume the previous agent stopped
-  or that its work was committed.
-- **S6 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
-  and lock. If outcome is already `cancelled`, do not repeat `task.cancel`;
-  perform only missing archive/release steps. Never merge delta specs for a
-  cancelled change.
+- Partial-failure scenarios:
+  - **S1 — after OpenSpec archive, before Git merge:** verify that the change is
+    archived and permanent specs contain the delta. Do not archive again; continue
+    with Git merge only after confirming the state.
+  - **S2 — after Git merge, before final commit marker:** obtain the actual merge
+    SHA and call `task.commit.finalize`. Never infer or invent the SHA.
+  - **S3 — after final commit marker, before `completed`:** verify that the stored
+    SHA equals the actual merge SHA and the task remains `verified`; do not replace
+    the marker. After final acceptance checks, perform only the missing transition
+    to `completed`.
+  - **S4 — after `completed`, before lock release:** verify terminal task state
+    and confirm ownership before retrying release.
+  - **S5 — lease expires during a role-agent run:** recover only after lease
+    expiry and grace; use the new fencing generation, re-read the task version,
+    and inspect Git/OpenSpec artifacts. Do not assume the previous agent stopped
+    or that its work was committed.
+  - **S6 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
+    and lock. If outcome is already `cancelled`, do not repeat `task.cancel`;
+    perform only missing archive/release steps. Never merge delta specs for a
+    cancelled change.
 
 Todoing, OpenSpec, and Git do not share a transaction. Stop and escalate to the
 user if the actual state is ambiguous or cannot be reconciled safely.
