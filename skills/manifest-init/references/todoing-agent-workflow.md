@@ -32,6 +32,10 @@ Apply this section only when both `components.todoing.enabled: true` and
    `task.list` and `task.external-ref.list`. Reuse the task already linked to
    this change. If multiple tasks are linked, a title/reference disagrees, or
    the state is hidden or uncertain, stop and reconcile; never create a duplicate.
+   In particular, if a task title matches the change ID but lacks the exact
+   reference, or the exact reference belongs to a task with a different title,
+   treat it as an ambiguous candidate and stop; do not create or repair a link
+   automatically.
 3. If no task is linked and absence is confirmed, create exactly one task with
    `task.create` in `backlog`. Its title MUST exactly equal the OpenSpec
    change directory ID. Keep the change goal, scope, and acceptance criteria
