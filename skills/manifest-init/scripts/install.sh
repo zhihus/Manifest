@@ -77,8 +77,8 @@ fi
 NAMES=(AGENTS.md llms.txt VERSIONING.md RELEASES.md LOG_RULES.md CODE_RULES.md TEST_RULES.md COMMIT_RULES.md VERSION .llmignore)
 SOURCES=(agents.template.md llm.template.txt versioning.template.md code-releases.template.md code-log-rules.template.md code-rules.template.md code-test-rules.template.md commit-rules.template.md version.template llmignore.template)
 tmpdir=$(mktemp -d "$PROJECT/.manifest-stage.XXXXXX") || fail STAGING_FAILED; trap 'rm -rf "$tmpdir"' EXIT
-for i in "\${!NAMES[@]}"; do
- name=\${NAMES[$i]}; src=$TEMPLATES/\${SOURCES[$i]}
+for i in "${!NAMES[@]}"; do
+ name=${NAMES[$i]}; src=$TEMPLATES/${SOURCES[$i]}
  [[ -f $src ]] || fail "TEMPLATE_MISSING: $src"
  if [[ -e $PROJECT/$name ]]; then
   if [[ -f $PROJECT/$name || -L $PROJECT/$name ]]; then SKIPPED+=("$name (already exists; preserved)"); else CONFLICTS+=("$name (path exists but is not a regular file)"); fi
@@ -122,9 +122,9 @@ if grep -A1 '^  todoing:' "$CONFIG" | grep -q 'enabled: true'; then
 fi
 if [[ -n $(git -C "$PROJECT" ls-files -- temp/) ]]; then PENDING+=("temp/ contains Git-tracked files; installer did not untrack or delete them"); fi
 echo "== MANIFEST CONNECTION REPORT =="
-echo "== INSTALLED (\${#INSTALLED[@]})"; printf '  %s\n' "\${INSTALLED[@]}"
-echo "== PRESERVED (\${#SKIPPED[@]})"; printf '  %s\n' "\${SKIPPED[@]}"
-echo "== PENDING (\${#PENDING[@]})"; printf '  %s\n' "\${PENDING[@]}"
-echo "== CONFLICTS (\${#CONFLICTS[@]})"; printf '  %s\n' "\${CONFLICTS[@]}"
-if (( \${#CONFLICTS[@]} > 0 )); then exit 3; fi
+echo "== INSTALLED (${#INSTALLED[@]})"; printf '  %s\n' "${INSTALLED[@]}"
+echo "== PRESERVED (${#SKIPPED[@]})"; printf '  %s\n' "${SKIPPED[@]}"
+echo "== PENDING (${#PENDING[@]})"; printf '  %s\n' "${PENDING[@]}"
+echo "== CONFLICTS (${#CONFLICTS[@]})"; printf '  %s\n' "${CONFLICTS[@]}"
+if (( ${#CONFLICTS[@]} > 0 )); then exit 3; fi
 echo "INIT OK"
