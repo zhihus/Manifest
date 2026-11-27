@@ -55,6 +55,10 @@ forbid_text "$CONTRACT_RU" "todoing api --json" "incorrect Russian contract CLI 
 forbid_text "$CONTRACT_EN" "todoing api --json" "incorrect English contract CLI syntax"
 
 require_text "$SKILL" "manage Todoing tasks in a connected project" "runtime skill trigger"
+require_text "$SKILL" "Choose exactly one procedure" "skill mode selection"
+require_text "$SKILL" "Connection procedure" "skill connection mode"
+require_text "$SKILL" "Do not run the installer as part of ordinary task management" "no installer rerun"
+
 require_text "$SKILL" "references/todoing-agent-workflow.md" "runtime skill reference"
 require_text "$TODOING_AGENT" "todoing --json api" "runtime JSON API CLI syntax"
 require_text "$TODOING_AGENT" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "runtime compatible Todoing build"
