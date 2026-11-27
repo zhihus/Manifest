@@ -462,4 +462,4 @@ Manifest не зависит от Todoing hooks/events. SQLite backend Todoing �
 - architecture-roadmap.ru.md §1–3;
 - todoing-implementation-audit.ru.md.
 
-Спецификация пересмотрена по документам и реализации Todoing на HEAD 580370f (ветка feature/generic-task-references-review-api). Пересмотр — документальная сверка с API schemas, operations.md и src/api.rs; полный набор тестов Todoing в рамках этого пересмотра не запускался. Перед утверждением независимый Reviewer должен сверить каждый нормативный тезис с API schema, implementation и тестами. Если Todoing изменит API v1, спецификацию требуется пересмотреть до изменения интеграционного кода.
+Базовая реализация Todoing для интеграции закреплена на commit 6acca6087fbd4b39ad0dcd5f12db52dc4d84b163, который собирает Manifest acceptance CI. Acceptance-сценарии проверяют интеграционный путь Manifest; полный набор тестов Todoing в рамках этой проверки не запускается. Перед утверждением независимый Reviewer должен сверить каждый нормативный тезис с API schema, implementation и тестами. Если Todoing изменит API v1, спецификацию требуется пересмотреть до изменения интеграционного кода.
