@@ -1,0 +1,32 @@
+schema: spec-driven
+
+context: |
+  Before creating any artifact (proposal/PRD, specs, design, tasks): check the
+  OpenSpec CLI version (`openspec --version`). If it is older than the latest
+  published version, update it (`npm install -g @fission-ai/openspec@latest`)
+  and re-run `openspec init` to refresh project scaffolding before proceeding.
+  
+  Task-size calibration (measured on the sequential-ratio-compression run, Qwen3.8-27B): a doc-editing task takes the executor about 2-3 minutes; a code task with a scripted verification scenario takes about 5-8 minutes.
+  When unsure about task size, split by deliverable files, not by characters.
+  The executor commits after each completed stage - never accumulate all work until the end of the task (protection against the ZCode 600 s subagent watchdog bug).
+  Heavy verification is split into its own task, not attached to the implementation task.
+  If an executor exceeds the 10-minute limit, the task is too large: split it in the next spec revision and record the fact in tasks.md.
+
+rules:
+  tasks:
+  - 'Name tasks per openspec-rules.md: prefix FR, numbering FR N.M (N = wave group, M = task within group), kebab-case, no spaces, no file references in the name.'
+  - 'Real invariants: one task = one executor run, completable in under 10 minutes, with a mechanical stop criterion.'
+  - 'Task size (new/edited text): above 6000 characters - split (hard limit); a new-file task estimated above 5000 - split.'
+  - Below 2000 - merge with a related task of the same group, but only if the task is not independently verifiable. A coherent, verifiable task below 2000 stays whole. Trivial tasks (< 500) merge.
+  - A single-task change is exempt from the lower bound entirely.
+  - In the task body state exact file paths, what to insert/change, and a stop criterion (when the task is done).
+  - 'Task text is self-contained: no external references (see <doc>); inline all values, lists, commands.'
+  - 'Code task ceiling: 4000 characters (hard). Implementation and its scripted verification scenario are one pair; above the ceiling the verification scenario becomes its own task.'
+  - 'A task body may end with one line "Maps to scenarios: <names>" - not an external reference; all other values stay inlined.'
+  - Implementation language and stack come from design.md Decisions, never inferred.
+  - 'A task may depend on a rule formalized in a later wave: inline the rule itself and note "rule formalized in FR x.y".'
+operations:
+  apply:
+    guidance:
+    - 'Feed the executor only the current task: its text, the spec scenarios it maps to, and the relevant project files. Never feed the whole change.'
+    - Verification must be mechanical (wc -m, grep, comparisons), not an opinion.
