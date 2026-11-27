@@ -386,7 +386,7 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 2. Immediately after acquisition, move the task `ready → in_progress` with `task.status.set`, supplying the token in the envelope.
 3. Call `task.lock.heartbeat` immediately before each blocking subagent run. A 720-second lease covers the 600-second hard timeout plus 120 seconds of margin.
 4. Do not send heartbeats while the subagent is running. Never give the token to a role agent; role agents never call Todoing.
-5. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
+5. Include `lock_token` in the envelope of every owner task request. Supply `owner_id` and `fencing_generation` only for operations whose API contract requires them—`task.lock.heartbeat` and `task.lock.release`; do not add unsupported fields to other operation arguments. On `stale_lock`, stop using the old token.
 6. Release the lock with `task.lock.release` only after task completion or confirmed cancellation and reconciliation of all required Todoing, OpenSpec, and Git operations.
 
 `actor_id` is attribution, not authentication. The rule that the Main Orchestrator coordinates Todoing calls is the agreed procedural authority boundary. Technical isolation of role agents is intentionally not implemented and is not a workflow compliance criterion: Todoing does not block direct API calls from another process. Do not claim that direct access is technically denied; assess compliance with the procedural rule from agent actions.
@@ -468,9 +468,12 @@ non-idempotent operation.
   - **S4 — after `completed`, before lock release:** verify terminal task state
     and confirm ownership before retrying release.
   - **S5 — lease expires during a role-agent run:** recover only after lease
-    expiry and grace; use the new fencing generation, re-read the task version,
-    and inspect Git/OpenSpec artifacts. Do not assume the previous agent stopped
-    or that its work was committed.
+    expiry and grace; use the new fencing generation and re-read the task version.
+    Before dispatching another agent or mutating the shared worktree, confirm that
+    the previous role-agent invocation has terminated. If termination cannot be
+    confirmed, stop and escalate to the user; never allow overlapping writers.
+    Then inspect Git/OpenSpec artifacts. Do not assume the previous agent's work
+    was committed.
   - **S6 — failure during cancellation:** reconcile task outcome, OpenSpec archive,
     and lock. If outcome is already `cancelled`, do not repeat `task.cancel`;
     perform only missing archive/release steps. Never merge delta specs for a
