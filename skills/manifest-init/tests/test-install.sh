@@ -8,6 +8,10 @@ new_repo "$TMP/fresh"; run "$TMP/fresh" >"$TMP/fresh.out"
 for f in .manifest/manifest.yaml .manifest/manifest.yaml.checksum; do [[ -f "$TMP/fresh/$f" ]] || { echo "FAIL fresh missing $f"; fails=$((fails+1)); }; done
 grep -A1 '^  todoing:' "$TMP/fresh/.manifest/manifest.yaml" | grep -q 'enabled: true' || { echo "FAIL Todoing default"; fails=$((fails+1)); }
 grep -A1 '^  openspec:' "$TMP/fresh/.manifest/manifest.yaml" | grep -q 'enabled: false' || { echo "FAIL OpenSpec default"; fails=$((fails+1)); }
+before_rerun=$(sha256sum "$TMP/fresh/.manifest/manifest.yaml" "$TMP/fresh/.manifest/manifest.yaml.checksum")
+run "$TMP/fresh" >"$TMP/fresh-rerun.out"
+after_rerun=$(sha256sum "$TMP/fresh/.manifest/manifest.yaml" "$TMP/fresh/.manifest/manifest.yaml.checksum")
+[[ "$before_rerun" == "$after_rerun" ]] || { echo "FAIL fresh rerun changed config"; fails=$((fails+1)); }
 for id in agents llm-navigation versioning releases logging code-rules test-rules commit-rules version llmignore; do
  grep -A2 "^  $id:" "$TMP/fresh/.manifest/manifest.yaml" | grep -q 'enabled: false' || { echo "FAIL context default $id"; fails=$((fails+1)); }
 done
