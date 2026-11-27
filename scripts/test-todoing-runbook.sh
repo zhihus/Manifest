@@ -78,6 +78,8 @@ require_text "$TODOING_AGENT" "openspec archive <change-id> --yes" "successful O
 require_text "$TODOING_AGENT" "openspec archive <change-id> --yes --skip-specs" "cancellation archive without spec merge"
 require_text "$TODOING_AGENT" "Only the user may approve it" "user-only cancellation authority"
 require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery reconciliation"
+require_text "$TODOING_AGENT" "For standalone Todoing work, omit the OpenSpec archive step" "standalone completion path"
+require_text "$RUNBOOK_SPEC" "records the accepted final Git SHA with `task.commit.finalize`" "standalone final commit marker"
 for scenario in "After OpenSpec archive but before Git merge" "After Git merge but before final commit marker" "During cancellation"; do
   require_text "$TODOING_AGENT" "$scenario" "partial failure recovery"
 done
