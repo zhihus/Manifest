@@ -224,7 +224,7 @@ Todoing is the source of truth for task state, versions, history, locks, and Rev
 
 ### 6.1. Bootstrap and Project ID
 
-1. Verify that the user-installed binary is available with `todoing version`. Manifest does not install or update Todoing.
+1. Verify that the user-installed binary is available with `todoing version` and is compatible with the baseline build below. Stop with a diagnostic if the binary is missing or incompatible. Manifest does not install or update Todoing. Invoke the JSON API as `todoing --json api`: send one JSON request on stdin and read one JSON response from stdout. For an existing store, call `store.info` and `store.verify`; for a new store, the single `store.init` call verifies API availability and must be followed by `store.info` and `store.verify`.
 
 The full Manifest workflow requires a Todoing build from commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant. Manifest's acceptance CI pins this commit. The current public `todoing-x/main` does not contain `task.external-ref.*`, `task.review.*`, or `task.commit.finalize`; a binary built from that branch is incompatible with the full workflow. `todoing version` confirms CLI availability but may not identify its source commit, so verify build provenance separately.
 2. If both `.manifest/project-id` and the SQLite store are absent, generate a UUIDv4 and create the file atomically without overwriting an existing file.
