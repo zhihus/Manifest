@@ -158,10 +158,12 @@ or rules.
 
 - `task.commit.finalize` accepts `task_id` and `revision`, resolves the Git
   revision to a full SHA, and sets or updates the single current final commit reference.
-- The operation requires the current owner's active lock and creates an immutable
-  version and append-only history event. Repeating the same SHA is a no-op. A new
-  SHA may replace the previous marker only for an active (reopened) task; the old
-  value remains in prior immutable versions and history.
+- The operation honors active task-lock ownership: an unlocked task may be
+  modified without a token; when locked, only the owner with a valid token may set
+  the marker. It creates an immutable version and append-only history event.
+  Repeating the same SHA is a no-op. A new SHA may replace the previous marker
+  only for an active (reopened) task; the old value remains in prior immutable
+  versions and history.
 - Ordinary commit references remain separate traceability references.
 
 ## 3. Task and status model
