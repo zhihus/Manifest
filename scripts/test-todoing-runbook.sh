@@ -79,6 +79,15 @@ require_text "$TODOING_AGENT" "openspec archive <change-id> --yes --skip-specs" 
 require_text "$TODOING_AGENT" "Only the user may approve it" "user-only cancellation authority"
 require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery reconciliation"
 require_text "$TODOING_AGENT" "If the `task.review.add` response was lost" "Review response recovery"
+require_text "$RU" "Если потерян ответ на `task.review.add`" "Russian Review response recovery"
+require_text "$EN" "If the `task.review.add` response was lost" "English Review response recovery"
+for scenario in "S1 — after OpenSpec archive" "S2 — after Git merge" "S3 — after final commit marker" "S4 — after `completed`" "S5 — lease expires" "S6 — failure during cancellation"; do
+  require_text "$EN" "$scenario" "English recovery parity"
+done
+for scenario in "S1 — после OpenSpec archive" "S2 — после Git merge" "S3 — после final marker" "S4 — после `completed`" "S5 — lease истёк" "S6 — сбой при отмене"; do
+  require_text "$RU" "$scenario" "Russian recovery parity"
+done
+
 require_text "$RUNBOOK_SPEC" "Lost Review response" "normative Review response recovery"
 require_text "$TODOING_AGENT" "For standalone Todoing work, omit the OpenSpec archive step" "standalone completion path"
 require_text "$RUNBOOK_SPEC" "records the accepted final Git SHA with `task.commit.finalize`" "standalone final commit marker"
