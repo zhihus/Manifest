@@ -70,7 +70,7 @@ def api(root: Path, operation: str, args: dict, *, token: str | None = None,
 
 def write_change(root: Path, change_id: str, title: str) -> None:
     change = root / "openspec" / "changes" / change_id
-    (change / "specs" / "acceptance-fixture").mkdir(parents=True)
+    (change / "specs" / change_id).mkdir(parents=True)
     (change / "proposal.md").write_text(
         f"# {title}\n\n## Why\nAcceptance fixture.\n\n"
         "## What Changes\nExercise the documented archive path.\n",
@@ -80,7 +80,7 @@ def write_change(root: Path, change_id: str, title: str) -> None:
         "# Tasks\n\n- [x] Verify the isolated acceptance scenario.\n",
         encoding="utf-8",
     )
-    (change / "specs" / "acceptance-fixture" / "spec.md").write_text(
+    (change / "specs" / change_id / "spec.md").write_text(
         "# Acceptance Fixture\n\n## ADDED Requirements\n\n"
         "### Requirement: Acceptance fixture\n"
         "The temporary project can archive an isolated change.\n\n"
@@ -384,13 +384,14 @@ to = "completed"
             "outcome": "changes_requested",
             "comments": [{"path": "tracked.txt", "comment": "Revise the fixture."}],
         }
-        owner_call(root, "task.review.add", review_args, grant,
-                   actor="acceptance-reviewer")
+        first_review = owner_call(root, "task.review.add", review_args, grant,
+                                  actor="acceptance-reviewer")
         after_first_review = api(root, "task.get", {"task_id": task_id},
                                  token=grant["lock_token"])["task"]
         assert after_first_review["revision_count"] == 1
-        owner_call(root, "task.review.add", review_args, grant,
-                   actor="acceptance-reviewer")
+        retry_review = owner_call(root, "task.review.add", review_args, grant,
+                                  actor="acceptance-reviewer")
+        assert retry_review["no_op"] is True
         after_retry = api(root, "task.get", {"task_id": task_id},
                           token=grant["lock_token"])["task"]
         assert after_retry["revision_count"] == 1
@@ -423,6 +424,8 @@ to = "completed"
         }, grant)
 
         run(["openspec", "archive", "acceptance-main", "--yes"], root)
+        assert not (root / "openspec" / "changes" / "acceptance-main").exists()
+        assert (root / "openspec" / "specs" / "acceptance-main" / "spec.md").is_file()
         (root / "tracked.txt").write_text("final accepted fixture\n", encoding="utf-8")
         run(["git", "add", "-A"], root)
         run(["git", "commit", "-m", "test: finalize accepted change"], root)
@@ -431,11 +434,32 @@ to = "completed"
             "task_id": task_id,
             "revision": final_sha,
         }, grant)
+        before_completed = api(
+            root, "task.get", {"task_id": task_id}, token=grant["lock_token"]
+        )["task"]
+        assert before_completed["status_id"] == "verified"
+        assert before_completed["final_commit_sha"] == final_sha
         owner_call(root, "task.status.set", {
             "task_id": task_id,
             "status_id": "completed",
         }, grant)
+        terminal_before_release = api(
+            root, "task.get", {"task_id": task_id}, token=grant["lock_token"]
+        )["task"]
+        assert terminal_before_release["outcome"] == "completed"
         release(root, task_id, grant)
+        lost_release_response = api(
+            root,
+            "task.lock.heartbeat",
+            {
+                "task_id": task_id,
+                "owner_id": grant["owner_id"],
+                "fencing_generation": grant["fencing_generation"],
+            },
+            token=grant["lock_token"],
+            expect_ok=False,
+        )
+        assert lost_release_response["error"]["code"] in {"lock_not_found", "lock_expired", "stale_lock"}
 
         completed = api(root, "task.get", {"task_id": task_id})["task"]
         assert completed["outcome"] == "completed"
@@ -464,6 +488,8 @@ to = "completed"
             "reason": "User-approved acceptance cancellation",
         }, cancel_grant)
         run(["openspec", "archive", "acceptance-cancel", "--yes", "--skip-specs"], root)
+        assert not (root / "openspec" / "changes" / "acceptance-cancel").exists()
+        assert not (root / "openspec" / "specs" / "acceptance-cancel").exists()
         release(root, cancel_id, cancel_grant)
         cancelled = api(root, "task.get", {"task_id": cancel_id})["task"]
         assert cancelled["outcome"] == "cancelled"
