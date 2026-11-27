@@ -36,6 +36,18 @@ When the project already contains user files or some Manifest components, initia
 
 A valid existing .manifest/manifest.yaml and checksum MUST remain byte-identical. An invalid checksum or unsupported schema MUST stop initialization before any write.
 
+#### Scenario: Valid existing configuration
+
+- WHEN initialization runs in a project with a valid existing configuration and checksum
+- THEN both files remain byte-identical
+- AND only missing items explicitly enabled by that configuration may be added
+
+#### Scenario: Invalid existing configuration
+
+- WHEN the checksum is invalid or the configuration schema is unsupported
+- THEN initialization stops before writing any project file
+- AND reports the integrity or compatibility error
+
 ### Requirement: No automatic conflict resolution
 
 The initializer MUST NOT archive, overwrite, merge, or delete conflicting files. It MUST report them for explicit user resolution.

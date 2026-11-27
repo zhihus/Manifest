@@ -17,7 +17,7 @@ Before using Todoing in a connected project:
    If bootstrap is incomplete, follow `todoing-bootstrap.md` only when the user
    explicitly asks to initialize Todoing. Never overwrite or migrate existing data.
 5. Require a Todoing build from source commit
-   `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant.
+   `653788a954d2a120db1beba854308982814d8222` or a verified descendant.
    The current public `todoing-x/main` does not provide the external-reference,
    Review, and final-commit operations used by the full Manifest API workflow.
    Manifest does not install or update the binary.
@@ -118,12 +118,12 @@ The Main Orchestrator is the only Todoing API client and lock-token custodian.
 
 ## Trust boundary
 
-`actor_id` is attribution, not authentication. The rule that only the Main
-Orchestrator calls Todoing is procedural unless the execution environment also
-restricts direct CLI access for role agents. Never claim that Todoing authenticates
-actors or that instructions alone prevent another process from invoking the API.
-If role agents have unrestricted CLI access, report that strict role isolation is
-not technically enforced.
+`actor_id` is attribution, not authentication. The Main Orchestrator coordinates
+Todoing operations under the agreed procedural authority boundary. Role agents
+must not independently call Todoing or receive the lock token. This rule is
+procedural; technical isolation is intentionally not implemented, and the runtime
+does not block another process from invoking the API. Never claim that Todoing
+authenticates actors or technically prevents direct calls.
 
 This workflow does not modify project context files, enable context-file switches,
 or implement Todoing/OpenSpec coordination.

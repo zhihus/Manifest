@@ -234,7 +234,7 @@ An incompatible version is a hard stop: the resolver never silently falls back t
 
 1. Verify that the resolver found a binary and that `todoing version` matches the required version (currently `1.2.0`), and that the binary is compatible with the baseline build below. Stop with a diagnostic if the binary is missing or incompatible. Manifest does not install or update Todoing. Invoke the JSON API as `todoing --json api`: send one JSON request on stdin and read one JSON response from stdout.
 
-The full Manifest workflow requires a Todoing build from commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant. Manifest's acceptance CI pins this commit. The current public `todoing-x/main` does not contain `task.external-ref.*`, `task.review.*`, or `task.commit.finalize`; a binary built from that branch is incompatible with the full workflow. `todoing version` confirms CLI availability but may not identify its source commit, so verify build provenance separately.
+The full Manifest workflow requires a Todoing build from commit `653788a954d2a120db1beba854308982814d8222` or a verified descendant. Manifest's acceptance CI pins this commit. The current public `todoing-x/main` does not contain `task.external-ref.*`, `task.review.*`, or `task.commit.finalize`; a binary built from that branch is incompatible with the full workflow. `todoing version` confirms CLI availability but may not identify its source commit, so verify build provenance separately.
 2. If both `.manifest/project-id` and the SQLite store are absent, generate a UUIDv4 and create the file atomically without overwriting an existing file.
 3. If the store exists but the Project ID is missing, stop. Do not generate a replacement ID or call `store.init`.
 4. If the Project ID exists, reuse it unchanged. For an existing store, call `store.info` and `store.verify`; an ID mismatch or integrity failure is a hard stop.
@@ -389,7 +389,7 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 5. Include the token in the envelope of every owner request and use the current owner ID and generation in args. On `stale_lock`, stop using the old token.
 6. Release the lock with `task.lock.release` after task completion or confirmed cancellation.
 
-`actor_id` is attribution, not authentication. The rule that only the Main Orchestrator calls Todoing is procedural, not technical enforcement: Todoing does not block direct API calls from another process. If the runtime gives role agents direct CLI access, strict role isolation and prevention of agent-initiated `backlog → ready` are not technically enforced. Do not claim otherwise; report and escalate this limitation.
+`actor_id` is attribution, not authentication. The rule that the Main Orchestrator coordinates Todoing calls is the agreed procedural authority boundary. Technical isolation of role agents is intentionally not implemented and is not a workflow compliance criterion: Todoing does not block direct API calls from another process. Do not claim that direct access is technically denied; assess compliance with the procedural rule from agent actions.
 
 ### 6.4. Status and Review
 

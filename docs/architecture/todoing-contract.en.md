@@ -9,7 +9,7 @@
 # Description
 Target integration specification for Manifest consuming Todoing JSON API v1.
 
-**Baseline:** Todoing `zhihus/todoing-x` @ `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` (the commit pinned by
+**Baseline:** Todoing `zhihus/todoing-x` @ `653788a954d2a120db1beba854308982814d8222` (the commit pinned by
 Manifest acceptance CI); the verified descendant is
 `feature/generic-task-references-review-api`. Manifest `develop`.
 
@@ -18,7 +18,7 @@ Manifest acceptance CI); the verified descendant is
 > extensions needed to preserve previously approved Manifest decisions. Historical
 > editions v2–v6 remain in separate Git files.
 >
-> **Implementation status:** the tested Todoing build at `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` implements
+> **Implementation status:** the tested Todoing build at `653788a954d2a120db1beba854308982814d8222` implements
 > external references, Review records, and the final-commit marker. The current
 > public Todoing `main` at `714664e53f364d03bb5d4ca19c3a504003101570` does not contain these operations and is
 > incompatible with the full Manifest workflow. Use the pinned commit or a
@@ -56,6 +56,15 @@ Manifest, OpenSpec, agent roles, or project policy.
 - Consistency across Todoing, OpenSpec, and Git.
 - Actor authentication and secure custody of lock tokens.
 - Backup destination, location, and retention policy.
+
+Under the agreed procedure, the Main Orchestrator coordinates Todoing
+operations, observes user approvals, and checks whether transitions are
+permitted. Role agents should not independently change task states or perform
+Todoing operations outside their assigned responsibilities. This is a
+procedural authority boundary, not technical isolation: this contract does not
+assume that the environment blocks agents from directly accessing the Todoing
+CLI/API. Todoing does not authenticate actors; `actor_id` is caller-supplied
+attribution, not proof of identity or user approval.
 
 Todoing does not parse OpenSpec or enforce Git workflow. It stores only generic
 external references and commit references. It does not authenticate actors or
@@ -95,7 +104,7 @@ capabilities discovery is absent from Todoing and is not required for MVP.
 
 ### 2.4. Universal API v1 extensions in the tested build
 
-The Todoing build pinned at `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` provides the following universal
+The Todoing build pinned at `653788a954d2a120db1beba854308982814d8222` provides the following universal
 mechanisms. The current public `main` branch does not include them; the full
 Manifest workflow therefore requires the pinned build or a verified descendant.
 These mechanisms MUST NOT contain Manifest-specific or OpenSpec-specific fields
@@ -583,7 +592,7 @@ Manifest requirement sources:
 - `architecture-roadmap.ru.md` §1–3
 - `todoing-implementation-audit.ru.md`
 
-The Todoing integration baseline is pinned to commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163`, which is built
+The Todoing integration baseline is pinned to commit `653788a954d2a120db1beba854308982814d8222`, which is built
 by Manifest acceptance CI. The acceptance scenarios verify the Manifest integration
 path; the full Todoing test suite is not run by this check. Before approval, an
 independent Reviewer must compare every normative claim with the API schemas,

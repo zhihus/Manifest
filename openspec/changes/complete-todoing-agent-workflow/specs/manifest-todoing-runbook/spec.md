@@ -91,7 +91,7 @@ being enabled or copied into the connected project.
 ### Requirement: Compatible Todoing API build
 
 The full Manifest Todoing workflow MUST use Todoing source commit
-`6acca6087fbd4b39ad0dcd5f12db52dc4d84b163` or a verified descendant because
+`653788a954d2a120db1beba854308982814d8222` or a verified descendant because
 the required external-reference, Review, and final-commit operations are absent
 from the current public Todoing `main` branch.
 

@@ -48,13 +48,21 @@ The Orchestrator MUST inspect each task's dependencies before dispatch. Every pr
 
 ### Requirement: Orchestrator-owned lock custody
 
-The runbook MUST specify that only the Orchestrator calls Todoing and holds the raw lock token. It MUST specify a 720-second lease, heartbeat immediately before each blocking role-agent run, no heartbeat while that agent is executing, and explicit recovery after lease expiry plus grace. Role agents MUST NOT receive the token.
+The runbook MUST define the Orchestrator's procedural responsibility for coordinating Todoing calls and retaining the raw lock token. Role agents MUST follow the procedural boundary: they must not independently invoke Todoing or receive the token. This is not technical isolation, and the runtime is not required to block direct CLI/API access by role agents. Compliance is evaluated from the recorded and observable actions of the agents, not from an access-control test. The runbook MUST also specify a 720-second lease, heartbeat immediately before each blocking role-agent run, no heartbeat while that agent is executing, and explicit recovery after lease expiry plus grace.
 
 #### Scenario: Role agent execution
 
 - GIVEN the Orchestrator owns a valid task lock
 - WHEN it dispatches a role agent
 - THEN the token remains in protected Orchestrator session state and is not included in the agent's prompt or environment
+- AND the runbook identifies this as a procedural boundary rather than a technical access restriction
+
+#### Scenario: Direct Todoing access is not technically blocked
+
+- GIVEN the runtime permits a role agent to invoke the Todoing CLI/API directly
+- WHEN the integration's authority boundary is assessed
+- THEN the runbook does not claim that direct access is technically prevented
+- AND compliance is assessed against the procedural instructions and observed agent actions
 
 ### Requirement: Traceable task lifecycle and review
 

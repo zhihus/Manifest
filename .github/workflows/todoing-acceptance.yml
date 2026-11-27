@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: zhihus/todoing-x
-          ref: 6acca6087fbd4b39ad0dcd5f12db52dc4d84b163
+          ref: 653788a954d2a120db1beba854308982814d8222
           path: todoing
 
       - name: Set up Rust

@@ -95,6 +95,12 @@ Manifest MUST NOT download or update the Todoing binary and MUST NOT initialize 
 
 Every completed run MUST report installed, preserved, pending, and conflicting items separately.
 
+#### Scenario: Categorized connection report
+
+- WHEN an initialization run completes with installed items, existing items, unavailable prerequisites, and path conflicts
+- THEN the report lists them under installed, preserved, pending, and conflicting categories respectively
+- AND does not classify an existing or conflicting item as installed
+
 ### Requirement: Install-time dependencies are declared
 
 The installer MUST use only external binaries declared in the external dependency register, including Bash, Git, Perl, SHA-256 tooling, mktemp, awk, grep, sed, find, ln, chmod, and date where invoked.

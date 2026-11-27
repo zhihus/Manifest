@@ -37,7 +37,7 @@ one active global task and one Main Orchestrator.
 ## API compatibility
 
 Manifest acceptance CI builds Todoing from
-`6acca6087fbd4b39ad0dcd5f12db52dc4d84b163`. This commit contains the generic
+`653788a954d2a120db1beba854308982814d8222`. This commit contains the generic
 external-reference, Review, and final-commit operations required by the full
 Manifest workflow. The current public Todoing `main` branch does not contain those
 operations. A compatible build must use the pinned commit or a verified descendant.

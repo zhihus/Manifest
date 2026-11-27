@@ -16,7 +16,7 @@ fully describe the task lifecycle. Some agreements were not recorded explicitly,
 and some provisions were interpreted incorrectly.
 
 In particular, the displayed names of all states, transition permissions, and
-the technical prohibition against an agent authorizing its own task were not
+the procedural prohibition against an agent authorizing its own task were not
 defined unambiguously.
 
 This document records the user's clarifications from 2026-11-24. When the
@@ -94,23 +94,15 @@ its own work.
 Only the Orchestrator may move a task from `verified` to `completed`,
 and only after final checks confirm successful execution.
 
-### 4.3. Technical enforcement of permissions
+### 4.3. Procedural enforcement of permissions
 
-The prohibition against agents moving a task to `ready` must be enforced
-technically, not merely stated in agent prompts.
+Role-based authority in Manifest is enforced as a procedural rule followed by the Orchestrator and role agents; it is not implemented through technical isolation from the Todoing CLI/API.
 
-The Orchestrator must be the only component that performs mutating Todoing
-calls on behalf of Manifest. Role agents must not have direct access to the
-Todoing CLI/API or receive credentials or permissions that let them change
-task states directly.
+Only the user may authorize the transition from `backlog` to `ready`. The Orchestrator must obtain the user's explicit confirmation and must not treat an agent recommendation or action as that confirmation.
 
-The Orchestrator exposes only limited role-specific actions to agents:
-submitting work for review or submitting a review result. Before every state
-change, the Orchestrator validates the permitted transition and its source.
+Under the agreed procedure, the Orchestrator coordinates Todoing changes and checks whether each transition is permitted. Role agents should not independently change task states or perform Todoing operations outside their assigned responsibilities. This is an organizational requirement; it does not mean that the environment technically blocks an agent's direct access to the CLI/API.
 
-If the execution environment cannot technically prevent agents from accessing
-Todoing directly, the integration cannot be considered compliant with this
-requirement. Agent instructions alone are insufficient.
+Todoing does not authenticate users or agents. The `actor_id` field records the technical actor asserted by the caller, but does not by itself prove the identity of the decision-maker or the existence of user approval. Where reliable attribution of a user decision is required, Manifest must retain a separate reference to the user's confirmation rather than treating `actor_id` as proof.
 
 ## 5. Cancellation by user decision
 
@@ -167,6 +159,6 @@ historical record of earlier decisions.
 
 When `todoing-contract.ru.md`, the status configuration, and the Manifest
 runbook are next updated, they must be aligned with this document. Until then,
-the absence of an explicit technical restriction must not be interpreted as
+the absence of explicit user approval must not be interpreted as
 permission for agents to change the `ready` state.
 

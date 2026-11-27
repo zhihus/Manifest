@@ -61,7 +61,7 @@ require_text "$SKILL" "Do not run the installer as part of ordinary task managem
 
 require_text "$SKILL" "references/todoing-agent-workflow.md" "runtime skill reference"
 require_text "$TODOING_AGENT" "todoing --json api" "runtime JSON API CLI syntax"
-require_text "$TODOING_AGENT" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "runtime compatible Todoing build"
+require_text "$TODOING_AGENT" "653788a954d2a120db1beba854308982814d8222" "runtime compatible Todoing build"
 require_text "$TODOING_AGENT" "task.list" "runtime task discovery"
 require_text "$TODOING_AGENT" "task.create" "runtime task creation"
 require_text "$TODOING_AGENT" "task.update" "runtime task updates"
@@ -77,13 +77,13 @@ require_text "$SKILL" "Do not copy this reference into project context files" "r
 forbid_text "$TODOING_AGENT" "todoing api --json" "incorrect runtime JSON API CLI syntax"
 
 require_text "$BOOTSTRAP" "todoing --json api" "bootstrap JSON API CLI syntax"
-require_text "$BOOTSTRAP" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "bootstrap compatible Todoing build"
+require_text "$BOOTSTRAP" "653788a954d2a120db1beba854308982814d8222" "bootstrap compatible Todoing build"
 forbid_text "$BOOTSTRAP" "todoing api --json" "incorrect bootstrap JSON API CLI syntax"
 
 for file in "$RU" "$EN"; do
   require_text "$file" "todoing --json api" "JSON API CLI syntax"
   forbid_text "$file" "todoing api --json" "incorrect JSON API CLI syntax"
-  require_text "$file" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "compatible Todoing build"
+  require_text "$file" "653788a954d2a120db1beba854308982814d8222" "compatible Todoing build"
 done
 
 for file in "$RU" "$EN"; do
@@ -128,8 +128,8 @@ require_text "$RU" "store уже существует, а конфиг отсу�
 require_text "$EN" "only after explicit user approval" "user approval gate"
 require_text "$EN" "Never give the token to a role agent" "token custody"
 require_text "$RU" "actor_id" "actor attribution boundary"
-require_text "$RU" "процедурным, а не технической защитой" "honest role-access boundary"
-require_text "$EN" "procedural, not technical enforcement" "honest role-access boundary"
+require_text "$RU" "принятой процедурной границей полномочий" "honest role-access boundary"
+require_text "$EN" "agreed procedural authority boundary" "honest role-access boundary"
 
 require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"

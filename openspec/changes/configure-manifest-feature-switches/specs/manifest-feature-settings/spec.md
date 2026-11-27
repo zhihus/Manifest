@@ -5,7 +5,7 @@
 Define the project-level switches in `.manifest/manifest.yaml` and the
 workflow behavior controlled by them.
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Independent component switches
 

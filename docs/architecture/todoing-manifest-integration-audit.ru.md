@@ -1,3 +1,5 @@
+> **Исторический аудит прототипа.** Документ сохраняется как запись ранней оценки и не является нормативным описанием текущей интеграции. Актуальные требования находятся в [контракте Todoing для Manifest](todoing-contract.ru.md), [уточнении жизненного цикла](todoing-task-lifecycle-clarification.ru.md) и действующих OpenSpec specifications.
+
 # Аудит интеграции Todoing и Manifest
 
 **Источники:** brief v0.2.0; audit; decisions v0.1.0; факт: todoing-x.
