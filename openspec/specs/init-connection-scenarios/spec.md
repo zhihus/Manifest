@@ -28,7 +28,7 @@ When the project already contains user files or some Manifest components, initia
 
 #### Scenario: Partial connection
 
-- WHEN some mandatory context files, .manifest/, or OpenSpec configuration already exist
+- WHEN some context files, .manifest/, or OpenSpec configuration already exist
 - THEN only missing items are added
 - AND existing files/configuration are preserved
 
