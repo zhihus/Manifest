@@ -1,0 +1,55 @@
+name: OpenSpec Validation
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+    paths:
+      - "openspec/**"
+      - "openspec-rules.md"
+      - "workflow/README.*"
+      - "scripts/test-todoing-runbook.sh"
+      - "scripts/test-todoing-config.py"
+      - ".github/workflows/openspec-validation.yml"
+  pull_request:
+    branches: [develop]
+    paths:
+      - "openspec/**"
+      - "openspec-rules.md"
+      - "workflow/README.*"
+      - "scripts/test-todoing-runbook.sh"
+      - ".github/workflows/openspec-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.16.0
+
+      - name: Check bilingual Todoing runbook contract
+        run: bash scripts/test-todoing-runbook.sh
+
+      - name: Validate active changes and specs
+        run: openspec validate --all

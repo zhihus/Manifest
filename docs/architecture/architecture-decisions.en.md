@@ -2,7 +2,7 @@
 
 **Statuses:** **Accepted** (A), **Preliminary** (P), **Deferred** (D),
 **Unresolved** (U), **Done** (DN — analytical/documentation work),
-**Not implemented** (NI). Sources: brief v0.4.0, the 2026-11-22
+**Not implemented** (NI). Sources: brief v0.4.2, the 2026-11-22
 protocol (`architecture-session-2026-11-22.ru.md`), audits, Todoing
 decisions (PR #1 todoing-x: PRODUCT.md, docs/architecture/decisions.md),
 discussions of 2026-11-20/21. Auditor recommendations are not
@@ -74,8 +74,9 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
 ## 4. Todoing
 
 - A: Each project gets its own task store. A shared overview is D.
-- A: Two result statuses: "Done" and "Cancelled" — statuses, not
-  archiving functions.
+- A: Completion and cancellation are separate terminal outcomes (`completed`,
+  `cancelled`), not archive functions. Workflow status and outcome are independent;
+  explicit cancellation does not change workflow status.
 - A: Project identifier: mandatory at integration; the CLI must
   receive it. U: the way to pass/pin/protect it in the AI harness is
   undefined; AI-harness configuration is outside Manifest.
@@ -104,7 +105,9 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   restrictions apply only under integration.
 - A: Full export/import is architecturally agreed; D: implementation
   is outside the MVP.
-- P: SQLite is a preliminary choice, pending a technical check.
+- Fact from the current Todoing implementation: SQLite project store. This is a
+  Todoing implementation choice, not a consumer constraint; Manifest uses only the
+  public CLI/JSON API.
 - D: GUI, shared task overview.
 - U: Manifest status map (6) ↔ Todoing. Decided 2026-11-22: Todoing
   is the single source of the task status; Manifest does not
@@ -112,23 +115,32 @@ role-model-decisions.ru.md; the target Todoing documents in PR #1.
   Manifest's internal stages are kept.
 - Decided 2026-11-22, task cancellation: any agent may recommend
   cancelling a task with a rationale; only the user confirms the
-  cancellation; after the confirmation the orchestrator changes the
-  task status in Todoing and archives the related OpenSpec change via
-  the standard Archive mechanism; the main OpenSpec specifications
+  cancellation; after confirmation the orchestrator records outcome `cancelled` through
+  `task.cancel` (workflow status remains unchanged) and archives the related
+  OpenSpec change through the standard Archive mechanism; the main OpenSpec specifications
   are not updated.
-- NI (not implemented in todoing-x): history, versions, dependencies,
-  locks, archiving, the new versioned API, Project ID. The current
-  implementation is a prototype.
+- I (implemented in todoing-x at HEAD 947048d): SQLite JSON API v1, Project ID,
+  task CRUD/status/outcome, immutable versions, append-only operation history,
+  approval baseline, dependencies, exclusive locks/fencing, archive/restore,
+  Git SHA references, verify/migrate/snapshot.
+- NI (requires a universal Todoing extension under the target contract): generic
+  external references, structured Review records + revision_count, and a final
+  commit marker. These mechanisms must contain no Manifest/OpenSpec-specific rules.
 
 ## 5. OpenSpec and Todoing
 
-- A: One Todoing global task = one OpenSpec global task; Todoing
-  stores links to the change and the final commit/merge.
-- U: Status synchronization across the three systems (transitions,
-  owner, source of truth); the term "global task". The Manifest ↔
-  Todoing status map was dropped by the 2026-11-22 decision —
-  synchronization concerns stages and ownership, not status
-  duplication.
+- A: One Todoing global task = one OpenSpec global task; Todoing stores the link
+  through a generic external reference and the final commit/merge through a generic
+  final-commit marker. Todoing does not parse OpenSpec or define Git workflow. The
+  required external-reference/final-commit API is absent from current API v1 and
+  must be implemented universally.
+- A: Todoing is the single source of workflow status and task outcome; no separate
+  status map is required. Manifest controls transitions under its approved policy
+  and ensures consistency with OpenSpec/Git.
+- A: Reviewer remarks/history and `revision_count` are universal task data in
+  Todoing. `revision_count` increases exactly once for each new Review record with
+  outcome `changes_requested`; multiple comments in one record count once. The API
+  v1 extension is not yet implemented.
 
 ## 6. Roles and powers
 

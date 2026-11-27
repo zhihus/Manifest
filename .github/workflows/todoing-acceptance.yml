@@ -1,0 +1,93 @@
+name: Todoing Manifest Acceptance
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+    paths:
+      - "scripts/test-todoing-acceptance.py"
+      - "workflow/README.*"
+      - "openspec/config.yaml"
+      - "openspec/**"
+      - ".github/workflows/todoing-acceptance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    if: ${{ !contains(github.event.head_commit.message, 'archive implement-todoing-manifest-workflow') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Manifest
+        uses: actions/checkout@v4
+
+      - name: Check out Todoing feature branch
+        uses: actions/checkout@v4
+        with:
+          repository: zhihus/todoing-x
+          ref: 6acca6087fbd4b39ad0dcd5f12db52dc4d84b163
+          path: todoing
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@1.96.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.16.0
+
+      - name: Build Todoing
+        run: cargo build --release --manifest-path todoing/Cargo.toml
+
+      - name: Run real API and OpenSpec acceptance lifecycle
+        env:
+          TODOING_BIN: ${{ github.workspace }}/todoing/target/release/todoing
+        run: python scripts/test-todoing-acceptance.py
+
+  archive-completed-change:
+    needs: acceptance
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[archive-openspec]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.16.0
+      - name: Validate active OpenSpec changes
+        run: openspec validate --all
+      - name: Archive verified change
+        run: openspec archive implement-todoing-manifest-workflow --yes
+      - name: Validate archived specifications
+        run: openspec validate --all
+      - name: Commit archive
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- openspec/specs openspec/changes
+          if git diff --cached --quiet; then
+            echo "No OpenSpec archive changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(openspec): archive implement-todoing-manifest-workflow"
+          git push origin "HEAD:${{ github.ref_name }}"

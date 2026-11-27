@@ -4,6 +4,7 @@ docs/project-manifest.md
 docs/templates/
 *.ru.md
 !docs/architecture/*.ru.md
+!workflow/README.ru.md
 temp/
 logs/
 target/

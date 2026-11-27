@@ -1,0 +1,83 @@
+name: tz-rezultat-hz Windows validation
+
+on:
+  pull_request:
+    paths:
+      - 'skills/tz-rezultat-hz/**'
+      - 'scripts/install-skill.ps1'
+      - 'tests/tz-rezultat-hz/**'
+      - '.github/workflows/tz-rezultat-hz-windows.yml'
+  push:
+    branches:
+      - 'feature/add-tz-rezultat-hz-windows'
+    paths:
+      - 'skills/tz-rezultat-hz/**'
+      - 'scripts/install-skill.ps1'
+      - 'tests/tz-rezultat-hz/**'
+      - '.github/workflows/tz-rezultat-hz-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate PowerShell syntax
+        shell: pwsh
+        run: |
+          $files = @(
+            'scripts/install-skill.ps1',
+            'skills/tz-rezultat-hz/bootstrap.ps1'
+          )
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file).Path, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error $_.Message }
+              exit 1
+            }
+          }
+
+      - name: Test safe skill installation
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'manifest-skill-install-test'
+          if (Test-Path $root) { Remove-Item $root -Recurse -Force }
+          $target = Join-Path $root 'agent-skills'
+          & ./scripts/install-skill.ps1 -TargetRoot $target
+          $installed = Join-Path $target 'tz-rezultat-hz'
+          if (-not (Test-Path (Join-Path $installed 'SKILL.md'))) { throw 'SKILL.md missing' }
+          if (-not (Test-Path (Join-Path $installed 'bootstrap.ps1'))) { throw 'bootstrap.ps1 missing' }
+          $before = (Get-FileHash (Join-Path $installed 'SKILL.md') -Algorithm SHA256).Hash
+          $failed = $false
+          try { & ./scripts/install-skill.ps1 -TargetRoot $target } catch { $failed = $true }
+          if (-not $failed) { throw 'Second installation must refuse to overwrite the existing skill' }
+          $after = (Get-FileHash (Join-Path $installed 'SKILL.md') -Algorithm SHA256).Hash
+          if ($before -ne $after) { throw 'Existing skill was modified by refused reinstall' }
+
+      - name: Verify bootstrap plan and approval gate
+        shell: pwsh
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./skills/tz-rezultat-hz/bootstrap.ps1 -Plan
+          if ($LASTEXITCODE -ne 0) { throw "bootstrap.ps1 -Plan failed: $LASTEXITCODE" }
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./skills/tz-rezultat-hz/bootstrap.ps1
+          if ($LASTEXITCODE -ne 4) { throw "Default bootstrap must stop for explicit approval (expected 4, got $LASTEXITCODE)" }
+          $global:LASTEXITCODE = 0
+
+      - name: Run bootstrap regression tests
+        shell: pwsh
+        run: |
+          py -3 tests/tz-rezultat-hz/test_bootstrap.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

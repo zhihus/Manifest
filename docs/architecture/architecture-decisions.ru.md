@@ -2,7 +2,7 @@
 
 **Статусы:** **Принято** (П), **Предварительно** (ПП), **Отложено** (О),
 **Не решено** (Н), **Выполнено** (В — аналитическая/документальная работа),
-**Не реализовано** (НР). Источники: brief v0.4.0, протокол 22.11.2026
+**Не реализовано** (НР). Источники: brief v0.4.2, протокол 22.11.2026
 (`architecture-session-2026-11-22.ru.md`), аудиты, решения по Todoing
 (PR #1 todoing-x: PRODUCT.md, docs/architecture/decisions.md), обсуждения
 20–21.11.2026. Рекомендации аудиторов — не решения. Принятие решения ≠
@@ -71,8 +71,7 @@ role-model-decisions.ru.md; целевые документы Todoing в PR #1.
 ## 4. Todoing
 
 - П: Каждому проекту — отдельное хранилище задач. Общий обзор — О.
-- П: Два статуса результата: «Завершена» и «Отменена» — статусы, не функции
-  архивирования.
+- П: Результаты завершения и отмены — отдельные terminal outcomes (`completed`, `cancelled`), не функции архивирования. Workflow status и outcome независимы; явная отмена не меняет workflow status.
 - П: Идентификатор проекта: при интеграции обязателен, CLI должен его
   получать. Н: способ передачи/закрепления/защиты в AI-harness не определён;
   настройка AI-harness — вне Manifest.
@@ -99,7 +98,7 @@ role-model-decisions.ru.md; целевые документы Todoing в PR #1.
 - П: Самостоятельное использование Todoing не требует интеграции; ограничения
   Manifest — только при интеграции.
 - П: Полный экспорт/импорт согласован архитектурно; О: реализация — вне MVP.
-- ПП: SQLite — предварительный выбор, до технической проверки.
+- Факт реализации Todoing на актуальном HEAD: SQLite project store. Это выбор реализации Todoing, а не ограничение для потребителя; Manifest использует только публичный CLI/JSON API.
 - О: GUI, общий обзор задач.
 - Н: Карта статусов Manifest (6) ↔ Todoing. Решено 22.11.2026:
   Todoing — единственный источник статуса задачи; Manifest статусы не
@@ -107,21 +106,32 @@ role-model-decisions.ru.md; целевые документы Todoing в PR #1.
   этапы Manifest сохраняются.
 - Решено 22.11.2026, отмена задач: любой агент может рекомендовать
   отмену с обоснованием; отмену подтверждает только пользователь;
-  после подтверждения оркестратор меняет статус задачи в Todoing и
-  архивирует связанное OpenSpec change штатным механизмом Archive;
+  после подтверждения оркестратор фиксирует outcome `cancelled` через
+  `task.cancel` (workflow status не меняется) и архивирует связанное OpenSpec
+  change штатным механизмом Archive;
   основные спецификации OpenSpec не обновляются.
-- НР (не реализовано в todoing-x): история, версии, зависимости, блокировки,
-  архивирование, новый версионируемый API, Project ID. Текущая реализация —
-  прототип.
+- В (реализовано в todoing-x на HEAD 947048d): SQLite JSON API v1, Project ID,
+  task CRUD/status/outcome, immutable versions, append-only operation history,
+  approval baseline, dependencies, exclusive locks/fencing, archive/restore,
+  Git SHA references, verify/migrate/snapshot.
+- НР (требуется универсальное расширение Todoing по целевому контракту): generic
+  external references, structured Review records + revision_count, final commit
+  marker. Эти механизмы не должны содержать Manifest/OpenSpec-specific semantics.
 
 ## 5. OpenSpec и Todoing
 
 - П: Одна глобальная задача Todoing = одна глобальная задача OpenSpec;
-  Todoing хранит связи с change и итоговым commit/merge.
-- Н: Синхронизация статусов трёх систем (переходы, владелец, источник
-  истины); термин «глобальная задача». Статусная карта Manifest ↔
-  Todoing снята решением 22.11.2026 — синхронизация касается этапов
-  и владения, не дублирования статусов.
+  Todoing хранит связь через generic external reference и итоговый commit/merge
+  через generic final commit marker. Todoing не парсит OpenSpec и не определяет
+  Git workflow. Требуемые external-reference/final-commit API отсутствуют в
+  текущем Todoing API v1 и должны быть реализованы универсально.
+- П: Todoing — единственный источник workflow status и outcome задачи;
+  отдельная карта статусов не требуется. Manifest управляет переходами по
+  утверждённой политике и обеспечивает согласованность OpenSpec/Git.
+- П: Reviewer remarks/history и `revision_count` — универсальные данные задачи
+  в Todoing. `revision_count` увеличивается ровно на один на каждую новую
+  запись Review с outcome `changes_requested`; несколько комментариев в одной
+  записи дают одно увеличение. API v1 extension пока не реализован.
 
 ## 6. Роли и полномочия
 

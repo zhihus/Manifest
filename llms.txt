@@ -18,7 +18,14 @@ Entry point: `AGENTS.md`
 * `docs/architecture/` — architecture documents and audits
   (architecture brief, decision registers, MVP/roadmap split, role
   model, integration audits, external dependency register:
-  `docs/architecture/external-dependencies.ru.md`). Russian editions
+  `docs/architecture/external-dependencies.ru.md`), the target
+  Todoing integration contract (`todoing-contract.ru.md`, historical
+  editions `contract-spec-final.ru.md`, `contract-spec-v3.ru.md`,
+  `contract-spec-v4.ru.md`, `contract-spec-v5.ru.md`), and the
+  Todoing task lifecycle clarification
+  (`todoing-task-lifecycle-clarification.ru.md`) and connected-project
+  structure proposal (`project-structure-design.ru.md`), and approved connected-project
+  structure (`connected-project-structure.ru.md`). Russian editions
   are authoritative (`*.ru.md`); English versions (`*.en.md`) are
   translations.
   Historical decision records; do not delete.

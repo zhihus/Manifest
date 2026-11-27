@@ -4,7 +4,7 @@
 > **Status: draft**  
 > **Type: document**  
 > **Version: 1.1.1**  
-> **Updated: 2026-11-22**  
+> **Updated: 2026-11-24**  
 
 # Описание
 Процесс работы с LLM-агентами на пайплайне OpenSpec; правила задач —
@@ -170,3 +170,166 @@ stories, сценарии `GIVEN / WHEN / THEN`, граничные случаи
 3. Вы вмешиваетесь только когда гейт проваливается настолько, что
    Оркестратор маршрутизирует возврат к вам (вопросы объёма, конфликты
    спек) либо на финальном verify ✅.
+
+
+## 6. Интеграция с Todoing
+
+Todoing — источник истины для состояния задач, версий, истории, блокировок и Review. Manifest владеет OpenSpec, Git и политикой оркестрации. Единственный клиент Todoing API — основной Оркестратор.
+
+### 6.1. Bootstrap и Project ID
+
+1. Убедитесь, что установленный пользователем бинарный файл доступен: `todoing version`. После чтения и проверки `.manifest/project-id` отправьте через `todoing api --json` запрос `store.info` с этим Project ID. Валидный JSON-ответ, включая структурированную ошибку состояния хранилища, подтверждает доступность API; отсутствие бинарного файла, транспортная ошибка или некорректный ответ означают остановку с диагностикой. Manifest не устанавливает и не обновляет Todoing.
+2. Если `.manifest/project-id` и SQLite store отсутствуют, сгенерируйте UUIDv4 и создайте файл атомарно, без перезаписи существующего файла.
+3. Если store существует, а Project ID отсутствует — остановитесь. Не генерируйте новый ID и не вызывайте `store.init`.
+4. Если Project ID существует, используйте его без изменения. После подключения к существующему store вызовите `store.info` и `store.verify`; несовпадение ID или ошибка целостности означает остановку.
+5. Проверьте `.todoing/config.toml`. Если store уже существует, а конфиг отсутствует — остановитесь: не создавайте конфигурацию с неизвестной политикой поверх существующего store. Если store отсутствует, создайте конфигурацию только при отсутствии legacy Markdown-задач и `index.json`: записывайте её атомарно через временный файл и rename, только если целевой файл всё ещё отсутствует. Существующий конфиг не перезаписывайте: проверьте его и остановитесь при несовместимости.
+6. Рекомендуемая конфигурация: `format_version = 1`; статусы `backlog`, `ready`, `in_progress`, `review`, `verified`, `completed`; только `completed` имеет `outcome = "completed"`. Разрешённые переходы: `backlog → ready → in_progress → review`; из `review` — в `in_progress` или `verified`; из `verified` — в `completed`.
+7. В `[locking]` задайте `lease_seconds = 720`, `heartbeat_seconds = 60`, `recovery_grace_seconds = 60`. Значения обязательны для описанного ниже режима блокировки.
+
+Рекомендуемое содержимое `.todoing/config.toml` для нового проекта:
+
+```toml
+format_version = 1
+
+[locking]
+lease_seconds = 720
+heartbeat_seconds = 60
+recovery_grace_seconds = 60
+
+[[statuses]]
+id = "backlog"
+label = "Backlog"
+enabled = true
+
+[[statuses]]
+id = "ready"
+label = "Ready"
+enabled = true
+
+[[statuses]]
+id = "in_progress"
+label = "In Progress"
+enabled = true
+
+[[statuses]]
+id = "review"
+label = "Review"
+enabled = true
+
+[[statuses]]
+id = "verified"
+label = "Verified"
+enabled = true
+
+[[statuses]]
+id = "completed"
+label = "Completed"
+enabled = true
+outcome = "completed"
+
+[[transitions]]
+from = "backlog"
+to = "ready"
+
+[[transitions]]
+from = "ready"
+to = "in_progress"
+
+[[transitions]]
+from = "in_progress"
+to = "review"
+
+[[transitions]]
+from = "review"
+to = "in_progress"
+
+[[transitions]]
+from = "review"
+to = "verified"
+
+[[transitions]]
+from = "verified"
+to = "completed"
+```
+
+Создавайте этот файл только если его ещё нет. При существующем конфиге не применяйте snippet автоматически.
+8. Для нового проекта вызовите `store.init` ровно один раз с Project ID. Затем проверьте `store.info` и `store.verify`. При существующем store повторный `store.init` запрещён. Legacy-данные не мигрируйте автоматически: сначала dry-run и отдельное подтверждение пользователя.
+
+### 6.2. Контракт API и задача
+
+Каждый вызов — отдельный процесс `todoing api`, одна JSON-команда через stdin и один JSON-ответ через stdout. Envelope содержит `api_version: 1`, `project_id`, `actor_id`, `operation`, `args`; `lock_token` передаётся только в envelope owner-запроса. Ошибки определяйте по машинному `code`, не по тексту сообщения. Токен нельзя помещать в аргументы CLI, prompt субагента, task content, логи или Git.
+
+Один OpenSpec change соответствует одной Todoing task:
+- Создайте задачу через `task.create` со статусом `backlog`.
+- Добавьте project-scoped reference через `task.external-ref.add`: namespace `openspec.change`, value — ID каталога change, relation `implements`, scope `project`.
+- Переход `backlog → ready` разрешён только после явного одобрения пользователя. После одобрения зафиксируйте baseline текущей версии через `task.version.approve`.
+- Не запускайте реализацию, не приобретайте lock и не переводите задачу в `in_progress` до одобрения.
+- Зависимости ведите через `task.dependency.add`, `task.dependency.remove`, `task.dependency.list`. Перед запуском проверьте каждую prerequisite-задачу: её outcome должен быть `completed`. Если зависимость заблокирована или её состояние нельзя проверить, работу не начинайте. Todoing хранит связи и запрещает циклы; решение о готовности принимает Manifest.
+- `actor_id` — атрибуция, а не аутентификация. Вызовы отправляет Оркестратор; для Review указывайте стабильный идентификатор роли/сессии Reviewer в envelope.
+
+### 6.3. Lock custody и исполнение
+
+Оркестратор — единственный владелец Todoing API и lock token:
+1. Перед работой вызовите `task.lock.acquire`; сохраните `owner_id`, `lock_token`, `fencing_generation`, `expires_at` в защищённом состоянии основной сессии.
+2. Сразу после acquire переведите задачу `ready → in_progress` через `task.status.set`, передав token в envelope.
+3. Перед каждым блокирующим запуском субагента выполните `task.lock.heartbeat`. Lease 720 секунд покрывает hard timeout 600 секунд и запас 120 секунд.
+4. Во время выполнения субагента heartbeat не отправляется. Субагент не получает token и не вызывает Todoing.
+5. Все owner-запросы передают token в envelope и актуальные `owner_id`/generation в args. При `stale_lock` прекратите операции со старым token.
+6. После завершения задачи или подтверждённой отмены освободите lock через `task.lock.release`.
+
+### 6.4. Статусы и Review
+
+- Перед передачей результата Reviewer переведите задачу в `review` через `task.status.set`.
+- Review запишите через `task.review.add`: стабильный `review_id`, проверяемый `version_no`, `reviewer`, outcome и упорядоченный массив `comments`.
+- При `approved` переведите задачу в `verified`.
+- При `changes_requested` Todoing атомарно увеличивает `revision_count` один раз; после записи Review верните задачу в `in_progress`.
+- Повтор с тем же `review_id` и payload — no-op; иной payload с тем же ID — конфликт. Не имитируйте счётчик числом версий.
+
+### 6.5. Завершение и отмена
+
+Успешное завершение выполняется строго по порядку:
+1. Review approved, статус `verified`.
+2. Acceptance checks Todoing ↔ OpenSpec ↔ Git.
+3. Выполните `openspec archive <change-id> --yes`: delta specs вливаются в permanent specs.
+4. Git merge согласно правилам проекта.
+5. `task.commit.finalize` с SHA итогового merge commit.
+6. `task.status.set` → `completed` (переход сам устанавливает outcome `completed`).
+7. `task.lock.release`.
+
+Любой агент может рекомендовать отмену с обоснованием; подтвердить её может только пользователь. После подтверждения выполните строго по порядку:
+1. `task.cancel` с причиной.
+2. Выполните `openspec archive <change-id> --yes --skip-specs`: change архивируется без изменения permanent specs.
+3. `task.lock.release`.
+
+Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
+
+### 6.6. Snapshot и восстановление
+
+- Создавайте snapshot через `store.snapshot`, а не копированием активного SQLite-файла.
+- Перед передачей или восстановлением проверьте его через `store.snapshot.verify`; сохраняйте SHA-256.
+- `store.snapshot` и `store.snapshot.restore` запрещены при активных task locks.
+- `store.snapshot.restore` восстанавливает только Todoing SQLite, требует snapshot того же Project ID и схемы, создаёт safety snapshot в `.todoing/backups/`.
+- Restore — разрушающая операция: выполняйте её только по явному разрешению пользователя, передавая сохранённый `expected_sha256`.
+- Restore не отменяет Git commits и OpenSpec archive. После восстановления обязательно сверьте Todoing, OpenSpec и Git до продолжения работы.
+
+### 6.7. Recovery
+
+Восстановление Todoing из snapshot откатывает только SQLite-состояние Todoing; оно не отменяет OpenSpec archive и Git commits. После restore сверяйте все три системы до любых повторных операций.
+
+После прерывания сначала сверяйте фактическое состояние: Todoing через `task.get`, `task.version.list`, `task.history.list`, `task.review.list`, `task.external-ref.list` и `task.dependency.list`; OpenSpec (change и archive); Git (ветка, merge, SHA). Не повторяйте non-idempotent операции вслепую.
+- Если ответ на `task.lock.release` потерян:
+  1. Сначала выполните `task.lock.heartbeat`.
+  2. Повторите release только после успешного подтверждения владения.
+- `lock_expired`: дождитесь истечения lease и recovery grace (60 секунд), затем вызовите `task.lock.recover`; используйте только новый token и fencing generation. Recovery атомарен: конкурирующие вызовы сериализуются транзакцией и CAS по `fencing_generation`; первый успешный вызов получает новый token, последующий получает `task_locked`. После recovery проверьте актуальную версию задачи и состояние артефактов до продолжения работы.
+- `stale_lock`: старый token больше не использовать.
+- Сценарии частичного сбоя:
+- **S1 — после OpenSpec archive, до Git merge:** не повторяйте archive; проверьте, что change находится в архиве и permanent specs обновлены, затем выполните Git merge.
+- **S2 — после Git merge, до final marker:** получите фактический SHA merge commit и вызовите `task.commit.finalize`; повтор с тем же SHA безопасен.
+- **S3 — после перехода в `completed`, до release:** проверьте владение через `task.lock.heartbeat`; повторяйте release только после успешного heartbeat. `stale_lock` означает, что старый token больше не действителен.
+- **S4 — lease истёк во время субагента:** после lease expiry и recovery grace выполните явный `task.lock.recover`, получите новый token/generation, проверьте версию задачи и артефакты; старый token не используйте.
+- **S5 — сбой при отмене:** сверяйте outcome, archive и lock. Если outcome уже `cancelled`, не повторяйте `task.cancel`; завершите только недостающие шаги. При отмене delta specs не вливаются в permanent specs.
+- После merge без final marker получите фактический merge SHA и вызовите `task.commit.finalize`.
+- После `completed` не повторяйте `task.status.set` или `task.complete`; проверьте состояние и освободите lock после проверки владения.
+- При отмене не повторяйте `task.cancel`, если outcome уже `cancelled`; продолжайте только недостающие шаги после сверки.
+
+Todoing, OpenSpec и Git не образуют общей транзакции. При неоднозначном состоянии остановитесь и эскалируйте пользователю.

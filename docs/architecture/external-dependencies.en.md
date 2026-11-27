@@ -4,7 +4,7 @@
 > **Status: approved**  
 > **Type: document**  
 > **Version: 1.0.0**  
-> **Updated: 2026-11-22**  
+> **Updated: 2026-11-23**  
 
 # Description
 The single source listing the external binary tools that Manifest
@@ -28,10 +28,12 @@ this file is its translation.
 | `find` | project type analysis (code files, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | POSIX flags without GNU-only extensions |
 | `basename`, `dirname` | project and script directory name extraction | manifest-init.sh, test-manifest-init.sh | portable system utilities |
 | `head`, `wc` | line/word counting and output limiting in checks and tests | structure-parser.sh, test-manifest-init.sh | portable system utilities |
+| `cut` | line-number field extraction from `grep -n` output | test-todoing-runbook.sh | portable system utility |
 | `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
 | `env` | resolving Bash from PATH in shebangs | all executable shell scripts | system utility |
+| `ln` | creating a symbolic link to test symlink-file exclusion | test-structure-parser.sh | POSIX utility; available in Unix-like environments and Git for Windows |
 | `install`, `cp`, `rm`, `mv`, `mkdir`, `ls` | file install, rollback and inspection | manifest-init.sh, test scripts | coreutils / Git for Windows |
 
 ## 1. Removed dependencies
