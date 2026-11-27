@@ -13,7 +13,7 @@ The system MUST provide one command that analyzes the project, obtains confirmat
 #### Scenario: New project
 
 - WHEN the command runs in a Git project without Manifest files and the user confirms the proposed metadata
-- THEN the Manifest configuration, mandatory context files, and enabled component scaffolding are created
+- THEN the Manifest configuration and explicitly enabled component scaffolding and context files are created
 - AND the final report lists every created item
 
 ### Requirement: Working directory and configuration location
@@ -75,12 +75,12 @@ For a project without an existing Manifest configuration, the system MUST derive
 
 ### Requirement: Component defaults and independence
 
-New configuration MUST enable Todoing and OpenSpec independently by default and MUST disable all seven optional controls by default. Explicit component selections may override only the corresponding component default.
+New configuration MUST enable Todoing and disable OpenSpec by default. Both component switches remain independent. It MUST define a separate boolean switch for each supported context file, all disabled by default. All seven optional controls remain disabled by default.
 
 #### Scenario: Default switches
 
 - WHEN a new configuration is generated without component overrides
-- THEN Todoing and OpenSpec are enabled and workflow_preflight, git_hooks, git_checks, openspec_validation, tests, review_gate, and additional_gates are disabled
+- THEN Todoing is enabled, OpenSpec is disabled, every context-file switch is disabled, and workflow_preflight, git_hooks, git_checks, openspec_validation, tests, review_gate, and additional_gates are disabled
 
 ### Requirement: Todoing bootstrap is non-destructive
 
@@ -103,3 +103,31 @@ The installer MUST use only external binaries declared in the external dependenc
 
 - WHEN the installer runs
 - THEN every external binary it invokes is documented with its purpose, scope, and detection method
+
+### Requirement: Context files are individually selectable
+
+The configuration MUST define a separate boolean setting for every supported context file under `context_files.<id>.enabled`. The installer MUST create a context file only when its own setting is true. Disabling a setting MUST NOT delete an existing file.
+
+#### Scenario: All context files disabled by default
+
+- WHEN a new project is connected without context-file selections
+- THEN every context-file switch is false
+- AND no context template is installed
+
+#### Scenario: One context file enabled
+
+- WHEN exactly one context-file switch is true
+- THEN only the corresponding missing file is installed
+- AND all other context files remain untouched
+
+#### Scenario: Existing file with enabled switch
+
+- WHEN a context-file switch is true and its target path already exists
+- THEN the existing file is preserved byte-for-byte and reported
+
+#### Scenario: Legacy configuration without per-file settings
+
+- WHEN an existing valid configuration has no context_files section
+- THEN the configuration remains unchanged
+- AND no context files are installed
+- AND the report states that explicit migration is required
