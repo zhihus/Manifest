@@ -62,7 +62,17 @@ if [[ -e $CONFIG ]]; then
  [[ $actual == "$expected" ]] || fail "CHECKSUM_MISMATCH: $CONFIG"
  grep -q '^format_version: 1$' "$CONFIG" || fail "CONFIG_UNSUPPORTED: explicit migration required"
  for key in todoing openspec; do grep -A1 "^  $key:" "$CONFIG" | grep -Eq '^[[:space:]]+enabled: (true|false)$' || fail "CONFIG_INVALID: components.$key.enabled"; done
- for key in workflow_preflight git_hooks git_checks openspec_validation tests review_gate additional_gates; do grep -A1 "^  $key:" "$CONFIG" | grep -Eq '^[[:space:]]+enabled: (true|false)
+ for key in workflow_preflight git_hooks git_checks openspec_validation tests review_gate additional_gates; do
+  grep -A1 "^  $key:" "$CONFIG" | grep -Eq '^[[:space:]]+enabled: (true|false)$' || fail "CONFIG_INVALID: checks.$key.enabled"
+ done
+ if grep -q '^context_files:$' "$CONFIG"; then
+  context_settings_present=1
+  for key in "${CONTEXT_IDS[@]}"; do
+   grep -A2 "^  $key:" "$CONFIG" | grep -Eq '^[[:space:]]+enabled: (true|false)$' || fail "CONFIG_INVALID: context_files.$key.enabled"
+  done
+ else
+  PENDING+=("context_files settings absent in existing config; context installation skipped pending explicit migration")
+ fi
 elif [[ -e $CHECKSUM ]]; then fail CHECKSUM_ORPHANED
 fi
 if (( ! config_exists )); then
