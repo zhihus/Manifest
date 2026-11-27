@@ -13,7 +13,7 @@ The configuration MUST define independent boolean switches for the Todoing
 and OpenSpec components. Todoing MUST default to enabled and OpenSpec MUST default to disabled for newly initialized projects. Disabling one component MUST NOT implicitly disable or enable the
 other.
 
-#### Scenario: Both components enabled by default
+#### Scenario: Initial component defaults
 
 - **WHEN** a new project is initialized
 - **THEN** Todoing and OpenSpec are both enabled in the generated configuration

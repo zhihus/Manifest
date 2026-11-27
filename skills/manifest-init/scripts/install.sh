@@ -57,6 +57,7 @@ CONFIG=$MK/manifest.yaml; CHECKSUM=$MK/manifest.yaml.checksum; config_exists=0
 if [[ -e $CONFIG ]]; then
  [[ -f $CONFIG ]] || fail CONFIG_PATH_CONFLICT
  config_exists=1
+ ((${#CONTEXT_OVERRIDES[@]} == 0)) || fail "EXISTING_CONFIG_IMMUTABLE: context-file overrides require explicit migration"
  [[ -f $CHECKSUM ]] || fail "CHECKSUM_MISSING: refusing writes"
  expected=$(sed 's/^[^:]*://' "$CHECKSUM"); actual=$(sha256_of "$CONFIG")
  [[ $actual == "$expected" ]] || fail "CHECKSUM_MISMATCH: $CONFIG"

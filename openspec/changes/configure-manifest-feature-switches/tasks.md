@@ -43,3 +43,10 @@
 ## Verification status
 
 Implementation and regression-case authoring are complete. Tests and validation commands were intentionally not executed; local verification remains with the user after syncing `develop`.
+
+
+- [ ] fr-1.2-add-context-file-switches
+  Add independent boolean settings for each context file, all defaulting to
+  false. Install only the selected files; never delete existing files when a
+  switch is disabled. Preserve legacy configs without automatic migration.
+  Stop: the installer and runbooks agree on the per-file schema and defaults.
