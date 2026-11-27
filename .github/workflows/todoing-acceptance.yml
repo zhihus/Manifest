@@ -69,6 +69,9 @@ jobs:
       - name: Build Todoing
         run: cargo build --release --manifest-path todoing/Cargo.toml
 
+      - name: Run pinned Todoing unit and recovery tests
+        run: cargo test --manifest-path todoing/Cargo.toml
+
       - name: Run real API and OpenSpec acceptance lifecycle
         env:
           TODOING_BIN: ${{ github.workspace }}/todoing/target/release/todoing
