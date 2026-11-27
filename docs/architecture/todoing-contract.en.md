@@ -54,7 +54,7 @@ Manifest, OpenSpec, agent roles, or project policy.
 - Git branch, review, and merge policy.
 - Review workflow and Reviewer authority.
 - Consistency across Todoing, OpenSpec, and Git.
-- Actor authentication and secure custody of lock tokens.
+- Actor trust policy and action attribution, plus secure custody of lock tokens.
 - Backup destination, location, and retention policy.
 
 Under the agreed procedure, the Main Orchestrator coordinates Todoing
@@ -324,10 +324,10 @@ mechanism. Base OpenSpec specifications remain unchanged.
 ### 4.3. Execution and locking
 
 1. The orchestrator selects an approved task.
-2. The agent acquires a lock through `task.lock.acquire`.
+2. The Main Orchestrator acquires a lock through `task.lock.acquire`.
 3. Manifest keeps owner ID, token, and fencing generation in protected session
    state and passes the token with every owner request.
-4. The agent renews the lease through `task.lock.heartbeat` while work continues.
+4. The Main Orchestrator renews the lease through `task.lock.heartbeat` while it is active.
 5. Manifest moves the task to `in_progress` and performs permitted operations.
 6. The agent releases the lock through `task.lock.release` when finished.
 
@@ -524,7 +524,7 @@ recovery. It MUST NOT claim cross-system atomicity.
    rejected.
 2. Analyst creates a Backlog task; user approval moves it to Ready.
 3. The orchestrator cannot start an unapproved task.
-4. An agent acquires a lock; another actor cannot read or mutate that task.
+4. The Main Orchestrator acquires a lock; another actor cannot read or mutate that task.
 5. Heartbeat renews a lease; an expired lease cannot be renewed.
 6. Recovery creates a new fencing generation; the former owner cannot continue.
 7. Todoing rejects an invalid status transition; Manifest does not bypass it.
