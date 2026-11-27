@@ -141,8 +141,8 @@ or rules.
   role or display name.
 - `task.review.list`: accepts `task_id`, optional `before_record_id`, and
   `limit`; returns append-only review history with pagination.
-- Repeating a `review_id` with the same payload is idempotent. Reusing it with a
-  different payload is rejected.
+- Repeating a `review_id` is idempotent only when both the payload and envelope
+  `actor_id` match; a difference in either is rejected as a conflict.
 - A review references an existing immutable task version. Adding a review does not
   change workflow status. Review creation and listing obey lock ownership; a
   non-owner cannot read Review data from a locked task.
