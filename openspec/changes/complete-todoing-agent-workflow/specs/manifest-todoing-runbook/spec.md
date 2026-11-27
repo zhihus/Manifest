@@ -22,6 +22,22 @@ external references, or archive operations.
 - THEN the Orchestrator creates one task in `backlog`
 - AND keeps implementation substeps inside that task
 
+#### Scenario: Update an existing task
+
+- GIVEN a matching active task already exists
+- WHEN its title, goal, boundaries, or acceptance criteria need correction
+- THEN the Orchestrator reads it and updates only the supported fields through
+  `task.update`
+- AND a material change after approval requires explicit user re-approval and a
+  new approved baseline
+
+#### Scenario: Gate on task dependencies
+
+- GIVEN a task has prerequisite tasks
+- WHEN the Orchestrator prepares to start it
+- THEN it verifies every prerequisite through `task.dependency.list`
+- AND it does not dispatch work unless every prerequisite outcome is `completed`
+
 #### Scenario: Preserve user approval
 
 - GIVEN a task is in `backlog`
