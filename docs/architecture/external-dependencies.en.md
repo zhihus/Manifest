@@ -28,6 +28,7 @@ this file is its translation.
 | `find` | project type analysis (code files, docs/) | manifest-init.sh (`analyze_project`), verify.sh, test-portability.sh | POSIX flags without GNU-only extensions |
 | `basename`, `dirname` | project and script directory name extraction | manifest-init.sh, test-manifest-init.sh | portable system utilities |
 | `head`, `wc` | line/word counting and output limiting in checks and tests | structure-parser.sh, test-manifest-init.sh | portable system utilities |
+| `cut` | line-number field extraction from `grep -n` output | test-todoing-runbook.sh | portable system utility |
 | `sort`, `tr` | violation sorting and token/output processing | structure-parser.sh, verify.sh, test-portability.sh | portable system utilities |
 | `cat` | reading fixture files in tests | test-manifest-init.sh | portable system utility |
 | `chmod` | setting the executable bit on the Perl test stub | test-manifest-init.sh | portable system utility |
