@@ -43,12 +43,12 @@ When it is `false`, the stage, command, hook, or subagent is not launched;
 the stage is recorded as `SKIPPED`, not `PASSED`. One switch never changes
 the value of another.
 
-If Todoing is enabled while OpenSpec is disabled, tasks are managed in Todoing
-without a required OpenSpec reference. If OpenSpec is enabled while Todoing is
-disabled, changes are managed in OpenSpec without Todoing calls. When both
-components are enabled, one Todoing task corresponds to one OpenSpec change:
-the Todoing task title MUST exactly equal the change directory ID, and the
-`openspec.change` reference is mandatory.
+| Todoing | OpenSpec | Behavior |
+|---|---|---|
+| Enabled | Disabled | Standalone Todoing tasks; no `openspec.change` reference or OpenSpec archive. |
+| Disabled | Enabled | OpenSpec-only: changes use OpenSpec without Todoing calls or a Todoing store prerequisite. |
+| Enabled | Enabled | Coordinated mode: exactly one Todoing task per OpenSpec change; title equals the change directory ID and a project-scoped `openspec.change` reference is required. Reuse the existing task; keep FRs and checklist items in `tasks.md`. |
+| Disabled | Disabled | Neither Todoing nor OpenSpec is invoked; no tasks or changes are created in either system. |
 
 The `workflow_preflight` switch controls only the workflow Preflight stage.
 The mandatory safety checks performed by `manifest-init.sh` (Git work tree,
@@ -69,7 +69,7 @@ gates the transition to the next step. This preserves the core invariant:
 | Step | Artifact | Agent | Input → Output |
 |---|---|---|---|
 | — | pipeline state | Orchestrator (always GLM-5.3 Flash) | runs steps, gates transitions |
-| 0 | task in Todoing (when enabled) | Analyst | Backlog → approved task, "Ready" |
+| 0 | Todoing task (when enabled) | Analyst drafts; Orchestrator records | Backlog → Ready only after explicit user approval |
 | 1 | proposal.md (when OpenSpec is enabled) | Analyst | user's words → "why / what" |
 | 2 | spec.md (when OpenSpec is enabled) | Analyst | proposal → scenarios, edge cases, PBT |
 | 3 | design.md (when OpenSpec is enabled) | Architect | proposal + spec → solution (optional) |
@@ -77,7 +77,16 @@ gates the transition to the next step. This preserves the core invariant:
 | 5.1 | tests (when checks.tests.enabled) | Tester | spec properties → tests before code |
 | 5.2 | code or document | Implementer / Documenter | tasks + spec → implementation |
 | 6 | verify.md (when checks.review_gate.enabled) | Reviewer | artifacts + spec → ✅/❌ report |
-| 7 | archive (when OpenSpec is enabled) | Orchestrator | verify all ✅ → specs updated |
+| 7 | archive (when OpenSpec is enabled) | Orchestrator | after applicable gates; with Todoing, follow §6.5 order |
+
+For step 0, the Analyst only drafts the task content. The Main Orchestrator
+checks existing tasks and references, creates or reuses the record, and performs
+all Todoing API calls. Only the user authorizes `backlog → ready` and confirms
+cancellation. Role agents do not call Todoing, change task statuses, or receive
+a lock token.
+
+Step 6 is the optional OpenSpec verify gate. It does not replace or disable the
+mandatory independent Todoing Review in §6.4 when Todoing is enabled.
 
 Each role runs in its own agent session (subagent run); the same model
 may serve different roles, model-per-role assignment is not fixed. The
@@ -321,8 +330,18 @@ Example: list tasks (replace the Project ID):
 printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-orchestrator","operation":"task.list","args":{}}' | todoing --json api
 ```
 
-One OpenSpec change maps to one Todoing task. When both Todoing and OpenSpec are enabled, the Todoing task title MUST exactly equal the OpenSpec change directory ID; FR tasks inside a change are not separate Todoing tasks:
-- Create the task with `task.create` and status `backlog`.
+One OpenSpec change maps to exactly one Todoing task. Before creating, inspect
+`task.list` and `task.external-ref.list`; reuse the single task with the exact
+`openspec.change` reference. If multiple tasks are linked, metadata conflicts,
+a task is hidden by a lock, or state is ambiguous, stop and reconcile. Create a
+task only after confirming that no linked task exists. If task creation succeeds
+but adding the reference fails, reconcile actual state before retrying; never
+create a second task.
+
+The Todoing task title MUST exactly equal the change directory ID. Keep FRs,
+checkboxes, and implementation steps exclusively in `tasks.md`; they are not
+separate Todoing tasks:
+- Create the task with `task.create` and status `backlog` only after confirming absence.
 - Add a project-scoped reference with `task.external-ref.add`: namespace `openspec.change`, value equal to the change directory ID, relation `implements`, scope `project`.
 - Allow `backlog → ready` only after explicit user approval. Then record the current version as the baseline with `task.version.approve` before acquiring the lock or dispatching implementation.
 - Do not dispatch implementation, acquire a lock, or move the task to `in_progress` before approval.
