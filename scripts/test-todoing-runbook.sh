@@ -6,6 +6,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 RU="$ROOT/workflow/README.ru.md"
 EN="$ROOT/workflow/README.en.md"
 BOOTSTRAP="$ROOT/skills/manifest-init/references/todoing-bootstrap.md"
+CONTRACT_RU="$ROOT/docs/architecture/todoing-contract.ru.md"
+CONTRACT_EN="$ROOT/docs/architecture/todoing-contract.en.md"
 FAIL=0
 
 fail() {
@@ -44,6 +46,11 @@ require_order() {
     previous=$line
   done
 }
+
+require_text "$CONTRACT_RU" "`todoing --json api`" "Russian contract JSON API CLI syntax"
+require_text "$CONTRACT_EN" "`todoing --json api`" "English contract JSON API CLI syntax"
+forbid_text "$CONTRACT_RU" "todoing api --json" "incorrect Russian contract CLI syntax"
+forbid_text "$CONTRACT_EN" "todoing api --json" "incorrect English contract CLI syntax"
 
 require_text "$BOOTSTRAP" "todoing --json api" "bootstrap JSON API CLI syntax"
 require_text "$BOOTSTRAP" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "bootstrap compatible Todoing build"
