@@ -193,7 +193,7 @@ require_text "$CONTRACT_RU" "непосредственно перед кажд�
 require_text "$CONTRACT_RU" "Во время выполнения агента heartbeat не отправляется" "Russian no-heartbeat-during-execution rule"
 forbid_text "$CONTRACT_EN" "renew the lease while it is active" "obsolete heartbeat timing"
 require_text "$CONTRACT_EN" "implemented in Todoing as generic mechanisms" "implemented generic Todoing APIs"
-require_text "$CONTRACT_EN" "an unlocked task may be modified without a token" "final commit marker lock semantics"
+require_text "$CONTRACT_EN" "modified without a token; when locked" "final commit marker lock semantics"
 
 require_order "$TODOING_AGENT" "Agent coordinated completion sequence" \
   "## Completion" "openspec archive <change-id> --yes" "Merge Git" \
