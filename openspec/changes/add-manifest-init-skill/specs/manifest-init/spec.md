@@ -2,7 +2,13 @@
 
 ### Requirement: Init entry point performs the connection cycle
 
-The system MUST provide one command that analyzes the project, confirms new metadata, validates integrity, adds missing items, and reports installed, preserved, and pending components.
+The system MUST provide one command that analyzes the project, obtains confirmation for new project metadata, validates safety and integrity, adds missing components, and produces a connection report.
+
+#### Scenario: New project
+
+- WHEN the command runs in a Git project without Manifest files and the user confirms the proposed metadata
+- THEN the Manifest configuration and explicitly enabled component scaffolding and context files are created
+- AND the final report lists every created item
 
 #### Scenario: Connection cycle and report
 
@@ -34,7 +40,7 @@ The system MUST report installed items, preserved existing items, pending extern
 
 ### Requirement: Additive and idempotent connection
 
-New projects receive the complete mandatory context and enabled component scaffolding. Existing projects receive only missing items. No existing file is automatically overwritten, merged, archived, or deleted.
+The initializer MUST add only missing Manifest files and components. It MUST NOT overwrite, merge, archive, or delete existing user files automatically.
 
 #### Scenario: Existing project contains user files
 
