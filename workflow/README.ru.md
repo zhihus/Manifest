@@ -446,9 +446,10 @@ Orchestrator на проект; параллельные оркестратор�
 - Сценарии частичного сбоя:
 - **S1 — после OpenSpec archive, до Git merge:** не повторяйте archive; проверьте, что change находится в архиве и permanent specs обновлены, затем выполните Git merge.
 - **S2 — после Git merge, до final marker:** получите фактический SHA merge commit и вызовите `task.commit.finalize`; повтор с тем же SHA безопасен.
-- **S3 — после перехода в `completed`, до release:** проверьте владение через `task.lock.heartbeat`; повторяйте release только после успешного heartbeat. `stale_lock` означает, что старый token больше не действителен.
-- **S4 — lease истёк во время субагента:** после lease expiry и recovery grace выполните явный `task.lock.recover`, получите новый token/generation, проверьте версию задачи и артефакты; старый token не используйте.
-- **S5 — сбой при отмене:** сверяйте outcome, archive и lock. Если outcome уже `cancelled`, не повторяйте `task.cancel`; завершите только недостающие шаги. При отмене delta specs не вливаются в permanent specs.
+- **S3 — после final marker, до `completed`:** проверьте, что сохранённый SHA совпадает с фактическим merge SHA, а задача остаётся в `verified`; marker не перезаписывайте. После итоговых acceptance checks выполните только недостающий переход в `completed`.
+- **S4 — после перехода в `completed`, до release:** проверьте владение через `task.lock.heartbeat`; повторяйте release только после успешного heartbeat. `stale_lock` означает, что старый token больше не действителен.
+- **S5 — lease истёк во время субагента:** после lease expiry и recovery grace выполните явный `task.lock.recover`, получите новый token/generation, проверьте версию задачи и артефакты; старый token не используйте.
+- **S6 — сбой при отмене:** сверяйте outcome, archive и lock. Если outcome уже `cancelled`, не повторяйте `task.cancel`; завершите только недостающие шаги. При отмене delta specs не вливаются в permanent specs.
 - После merge без final marker получите фактический merge SHA и вызовите `task.commit.finalize`.
 - После `completed` не повторяйте `task.status.set` или `task.complete`; проверьте состояние и освободите lock после проверки владения.
 - При отмене не повторяйте `task.cancel`, если outcome уже `cancelled`; продолжайте только недостающие шаги после сверки.
