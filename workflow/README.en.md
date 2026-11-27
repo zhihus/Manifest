@@ -348,9 +348,11 @@ tasks; OpenSpec is not a required dependency.
    not implementation approval. After approval, call `task.status.set` to
    `ready`, read the current version with `task.get`, and record it with
    `task.version.approve`.
-5. Before starting, inspect dependencies with `task.dependency.list`.
-   Every prerequisite must have outcome `completed`. Do not start when a
-   dependency is incomplete, locked, or cannot be verified.
+5. Add or remove prerequisite links with `task.dependency.add` and
+   `task.dependency.remove` only for real dependencies between independent
+   tasks. Before starting, inspect them with `task.dependency.list`. Every
+   prerequisite must have outcome `completed`. Do not start when a dependency
+   is incomplete, locked, or cannot be verified.
 6. Then follow §6.3: acquire the lock, transition `ready → in_progress`,
    and heartbeat before each blocking role-agent run. Only the Main
    Orchestrator calls the Todoing API.
