@@ -34,12 +34,12 @@
 
 ## 3. Environment verification
 
-- [ ] fr-3.1-run-ci-acceptance
+- [x] fr-3.1-run-ci-acceptance
   Confirm the GitHub Actions run for this change passes against the pinned Todoing
   build. Do not mark this task complete based on source inspection alone.
   Stop: acceptance workflow reports success.
 
-- [ ] fr-3.2-verify-role-access-boundary
+- [x] fr-3.2-verify-role-access-boundary
   Verify whether the user's agent runtime prevents role agents from invoking the
   Todoing CLI directly. If it does not, report the limitation; do not claim that
   `actor_id` or workflow instructions provide technical authentication.
