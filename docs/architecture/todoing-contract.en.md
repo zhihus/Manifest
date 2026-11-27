@@ -583,8 +583,9 @@ Manifest requirement sources:
 - `architecture-roadmap.ru.md` §1–3
 - `todoing-implementation-audit.ru.md`
 
-This specification was prepared against Todoing HEAD `947048d`. The full Todoing
-test suite was not run during the audit. Before approval, an independent Reviewer
-must compare every normative claim with the API schemas, implementation, and tests.
-If Todoing changes API v1, this specification must be reviewed before integration
-code changes.
+The Todoing integration baseline is pinned to commit `6acca6087fbd4b39ad0dcd5f12db52dc4d84b163`, which is built
+by Manifest acceptance CI. The acceptance scenarios verify the Manifest integration
+path; the full Todoing test suite is not run by this check. Before approval, an
+independent Reviewer must compare every normative claim with the API schemas,
+implementation, and tests. If Todoing changes API v1, this specification must be
+reviewed before integration code changes.
