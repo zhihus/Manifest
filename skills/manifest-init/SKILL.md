@@ -24,7 +24,14 @@ Use when the user asks to connect, initialize, install, or repair Manifest, or t
 - temp/ must be excluded from Git; add the rule only if absent.
 - Todoing's binary is installed/updated by the user. Never download it or initialize over an existing store/legacy data.
 
-## Procedure
+## Select the mode
+
+Choose exactly one procedure:
+- For a connection, initialization, installation, or repair request, use the Connection procedure.
+- For task work in an already connected project, use Ongoing Todoing task management.
+- Do not run the installer as part of ordinary task management.
+
+## Connection procedure
 
 1. Inspect Git status and project structure. Identify existing Manifest files, OpenSpec state, Todoing binary/config/database/legacy tasks, hooks and local conventions.
 2. Run scripts/install.sh --project <path>. For a new project, component defaults may be overridden with --todoing enabled|disabled and --openspec enabled|disabled. Select individual context files during first-time initialization with repeated `--context-file ID=enabled|disabled`. For an existing configuration, edit only the chosen `context_files.<id>.enabled` value and recalculate the checksum sidecar (`sha256sum .manifest/manifest.yaml | awk '{print "sha256sum:" $1}' > .manifest/manifest.yaml.checksum`, or use `shasum -a 256` where `sha256sum` is unavailable); installer overrides are rejected for existing configurations. Existing configurations are immutable under automatic initialization; legacy configurations without per-file settings are preserved and require a separate explicit migration. For a new connection, confirm project name, purpose and tracks before writing. Existing valid project metadata is not re-interviewed.
