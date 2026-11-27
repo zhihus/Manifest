@@ -130,7 +130,7 @@ wave structure valid. Fail → back to Planner.
 
 ### 2.5. Apply (Tester → Implementer / Documenter)
 
-Two distinct roles, in that order.
+Two distinct roles, in that order. Launch the Tester only when `checks.tests.enabled: true`; when `false`, skip step 5.1 and the Tester with status `SKIPPED`. Implementation continues without running tests.
 
 #### 2.5.1. The Tester writes tests before implementation
 
