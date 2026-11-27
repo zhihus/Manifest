@@ -156,10 +156,10 @@ require_text "$EN" "Never give the token to a role agent" "token custody"
 require_text "$RU" "actor_id" "actor attribution boundary"
 require_text "$RU" "принятой процедурной границей полномочий" "honest role-access boundary"
 require_text "$EN" "agreed procedural authority boundary" "honest role-access boundary"
-for file in "$CONTRACT_RU" "$CONTRACT_EN"; do
-  require_text "$file" "immediately before each blocking role-agent run" "heartbeat timing contract"
-  require_text "$file" "Do not heartbeat while the role agent is executing" "no heartbeat during execution"
-done
+require_text "$CONTRACT_EN" "immediately before each blocking role-agent run" "English heartbeat timing contract"
+require_text "$CONTRACT_EN" "Do not heartbeat while the role agent is executing" "English no-heartbeat-during-execution rule"
+require_text "$CONTRACT_RU" "непосредственно перед каждым блокирующим запуском агента" "Russian heartbeat timing contract"
+require_text "$CONTRACT_RU" "Во время выполнения агента heartbeat не отправляется" "Russian no-heartbeat-during-execution rule"
 forbid_text "$CONTRACT_EN" "renew the lease while it is active" "obsolete heartbeat timing"
 require_text "$CONTRACT_EN" "implemented in Todoing as generic mechanisms" "implemented generic Todoing APIs"
 
