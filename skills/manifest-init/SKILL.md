@@ -18,6 +18,7 @@ Use when the user asks to connect, initialize, install, or repair Manifest in a 
 - No automatic migration.
 - Todoing is enabled and OpenSpec is disabled by default; their switches are independent.
 - Each context file has an independent `context_files.<id>.enabled` switch. All context-file switches default to false; disabling a switch never deletes an existing file.
+- Supported IDs: `agents` (AGENTS.md), `llm-navigation` (llms.txt), `versioning` (VERSIONING.md), `releases` (RELEASES.md), `logging` (LOG_RULES.md), `code-rules` (CODE_RULES.md), `test-rules` (TEST_RULES.md), `commit-rules` (COMMIT_RULES.md), `version` (VERSION), `llmignore` (.llmignore).
 - Seven optional controls default to false: workflow preflight, Git hooks/checks, OpenSpec validation, tests, review gate, additional gates.
 - Mandatory integrity and installer safety checks are never switchable.
 - temp/ must be excluded from Git; add the rule only if absent.
