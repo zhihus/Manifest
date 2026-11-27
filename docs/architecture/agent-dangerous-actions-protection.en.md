@@ -104,19 +104,23 @@ enforcement mechanisms are harness-dependent.
 
 The priority of enforcement mechanisms is aligned with the Manifest
 decision (see `architecture-brief.ru.md`, section «Автоматизированный
-контроль»):
+контроль»), but the two levels have different scopes:
 
 - first level — universal Git mechanisms (Git Hooks and control
-  scripts, installed by `manifest-init`);
+  scripts, installed by `manifest-init`). They control Git operations
+  and lifecycle events within the capabilities of Git hooks; they do
+  not intercept arbitrary tool calls or commands before execution;
 - second level — mechanisms of a specific AI-harness (for example,
-  ZCode); for the other harnesses the principles and an example
-  implementation are fixed.
+  ZCode). Pre-execution interception of arbitrary tool calls belongs
+  to this level; for other harnesses the principles and an example
+  implementation are documented.
 
-Manifest does not develop its own hooks manager and does not manage
-the settings of a specific AI-harness. The protection behavior is not
-guaranteed identical on all harnesses: it is identical where the
-universal level (Git) acts, and depends on the capabilities of the
-specific harness at the second level.
+Git mechanisms provide universal control over Git operations and
+complement tool-level protection, but cannot by themselves block
+arbitrary file, network, or shell actions. Manifest does not develop
+its own hooks manager and does not manage the settings of a specific
+AI-harness. The actual protection coverage depends on the capabilities
+and installed mechanisms of each level.
 
 ### 3.4. Lifecycle of the `allow` / `ask` / `deny` Decisions
 
@@ -162,15 +166,17 @@ reject.
 
 ## 5. Handling the User's Response
 
-The user's response to an `ask` decision reaches the agent through two
-paths:
+The result of an `ask` decision is passed to the agent according to
+the user's response:
 
-- as the rejection reason (the agent sees why the action was not
-  performed);
-- as additional context (the agent sees the user-set response).
+- on confirmation, the call is released for execution; if the user
+  added a comment, it is passed to the agent as additional context;
+- on rejection, the call is not performed and the rejection reason
+  is passed to the agent;
+- on an empty response, timeout, or unavailable confirmation channel,
+  the call is rejected and a system message is passed to the agent.
 
-For an empty response, the behavior is defined by policy (see §9):
-the default is to reject with a system message.
+Confirmation is not accompanied by a rejection reason.
 
 ## 6. Interaction with Agents and Tools
 
@@ -189,14 +195,14 @@ the default is to reject with a system message.
 
 1. "Danger" is determined by patterns, not by semantics: false
    positives and misses are possible.
-2. Interception is synchronous: the mechanism must be fast so it does
-   not block the agent's work.
-3. The protection behavior is not identical on all harnesses: the
-   universal level (Git) acts identically, the second level depends
-   on the capabilities of the specific harness.
-4. If the confirmation channel is unavailable (the user did not
-   respond), the action is not performed: the safe default behavior
-   is to reject.
+2. Call inspection and rule evaluation are synchronous and must be
+   fast. On an `ask` decision, execution of the call is suspended
+   while waiting for the user's response; this wait is not part of
+   inspection time. On timeout or channel unavailability, the call
+   is rejected.
+3. Universal Git mechanisms are limited to Git operations and Git
+   lifecycle events. Interception of arbitrary tool calls depends on
+   the capabilities of the specific AI-harness.
 
 Interception of user prompts and the agent's own messages is outside
 the boundaries of the current function (protection of tool calls) and
@@ -232,14 +238,13 @@ Additionally:
    and the decision for each category.
 2. The channel for passing the request to the user (interface, field,
    notification).
-3. Behavior on an empty response: reject or let it pass.
-4. The audit composition: whether interception events are logged,
+3. The audit composition: whether interception events are logged,
    which metadata, and where they are stored.
-5. Extending to semantic analysis of intent (beyond patterns).
-6. Rewriting the call input (replacing a dangerous path with a safe
+4. Extending to semantic analysis of intent (beyond patterns).
+5. Rewriting the call input (replacing a dangerous path with a safe
    one).
-7. Interface localization (en/ru).
-8. The method of binding a confirmation to a specific call: excluding
+6. Interface localization (en/ru).
+7. The method of binding a confirmation to a specific call: excluding
    re-execution and applying the confirmation to another call.
 
 ## 10. Possible Implementation Stages
