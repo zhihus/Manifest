@@ -334,7 +334,10 @@ One OpenSpec change maps to exactly one Todoing task. Before creating, inspect
 `task.list` and `task.external-ref.list`; reuse the single task with the exact
 `openspec.change` reference. If multiple tasks are linked, metadata conflicts,
 a task is hidden by a lock, or state is ambiguous, stop and reconcile. Create a
-task only after confirming that no linked task exists. If task creation succeeds
+task only after confirming that no linked task or ambiguous candidate exists.
+If a task title matches the change ID but lacks the exact reference, or the exact
+reference belongs to a task with a different title, stop and reconcile; do not
+create a task or repair the reference automatically. If task creation succeeds
 but adding the reference fails, reconcile actual state before retrying; never
 create a second task.
 
