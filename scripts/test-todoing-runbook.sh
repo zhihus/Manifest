@@ -51,6 +51,25 @@ require_order() {
   done
 }
 
+require_order_from_section() {
+  local file=$1 label=$2 section=$3
+  shift 3
+  local previous line needle
+  previous=$(grep -nF -- "$section" "$file" | head -n 1 | cut -d: -f1 || true)
+  if [[ -z $previous ]]; then
+    fail "$label: missing section '$section'"
+    return
+  fi
+  for needle in "$@"; do
+    line=$(awk -v start="$previous" -v needle="$needle" 'NR > start && index($0, needle) { print NR; exit }' "$file")
+    if [[ -z $line ]]; then
+      fail "$label: missing '$needle' after '$section'"
+      return
+    fi
+    previous=$line
+  done
+}
+
 require_text "$CONTRACT_RU" '`todoing --json api`' "Russian contract JSON API CLI syntax"
 require_text "$CONTRACT_EN" '`todoing --json api`' "English contract JSON API CLI syntax"
 forbid_text "$CONTRACT_RU" "todoing api --json" "incorrect Russian contract CLI syntax"
@@ -64,7 +83,7 @@ require_text "$SKILL" "Do not run the installer as part of ordinary task managem
 require_text "$SKILL" "references/todoing-agent-workflow.md" "runtime skill reference"
 require_text "$SKILL" "The Main Orchestrator is the sole Todoing API client" "Main Orchestrator API custody"
 require_text "$SKILL" "Only the user authorizes" "user-only execution and cancellation authority"
-require_text "$SKILL" "exactly one task per" "one-to-one task mapping"
+require_text "$SKILL" "maintain exactly one Todoing task per" "one-to-one task mapping"
 require_text "$FEATURE_SETTINGS_SPEC" "#### Scenario: Both components enabled" "coordinated component mode"
 require_text "$FEATURE_SETTINGS_SPEC" "#### Scenario: Both components disabled" "both components disabled mode"
 require_text "$RUNBOOK_SPEC" "#### Scenario: Ambiguous task candidate" "ambiguous duplicate candidate handling"
@@ -98,10 +117,10 @@ require_text "$TODOING_AGENT" "revision_count" "revision counter semantics"
 require_text "$TODOING_AGENT" "review → in_progress" "review return transition"
 require_text "$TODOING_AGENT" "openspec archive <change-id> --yes" "successful OpenSpec archive"
 require_text "$TODOING_AGENT" "openspec archive <change-id> --yes --skip-specs" "cancellation archive without spec merge"
-require_text "$TODOING_AGENT" "Only the user may approve it" "user-only cancellation authority"
+require_text "$TODOING_AGENT" "only the user may approve it" "user-only cancellation authority"
 require_text "$TODOING_AGENT" "task.external-ref.list" "cross-system recovery reconciliation"
 require_text "$TODOING_AGENT" 'If the `task.review.add` response was lost' "Review response recovery"
-require_text "$TODOING_AGENT" "confirm that the previous role-agent invocation has terminated" "recovery waits for previous agent termination"
+require_text "$TODOING_AGENT" "previous role-agent invocation has terminated" "recovery waits for previous agent termination"
 require_text "$TODOING_AGENT" 'envelope `actor_id` match' "Review retry actor identity"
 require_text "$RUNBOOK_SPEC" 'envelope `actor_id` match' "normative Review retry actor identity"
 require_text "$CONTRACT_RU" "незаблокированная задача изменяется без" "Russian final commit marker lock semantics"
@@ -209,10 +228,10 @@ forbid_text "$CONTRACT_EN" "renew the lease while it is active" "obsolete heartb
 require_text "$CONTRACT_EN" "implemented in Todoing as generic mechanisms" "implemented generic Todoing APIs"
 require_text "$CONTRACT_EN" "modified without a token; when locked" "final commit marker lock semantics"
 
-require_order "$TODOING_AGENT" "Agent coordinated completion sequence" \
+require_order_from_section "$TODOING_AGENT" "Agent coordinated completion sequence" \
   "## Completion" "openspec archive <change-id> --yes" "Merge Git" \
   "task.commit.finalize" "task.status.set" "task.lock.release"
-require_order "$TODOING_AGENT" "Agent cancellation sequence" \
+require_order_from_section "$TODOING_AGENT" "Agent cancellation sequence" \
   "## Cancellation" "task.cancel" "openspec archive <change-id> --yes --skip-specs" \
   "task.lock.release"
 
@@ -284,7 +303,7 @@ require_order "$EN_CANCELLATION" "English cancellation sequence" \
 require_order "$RU_RECOVERY" "Russian lost-release recovery" \
   "task.lock.heartbeat" "успешного подтверждения владения"
 require_order "$EN_RECOVERY" "English lost-release recovery" \
-  "task.lock.heartbeat" "ownership is confirmed"
+  "task.lock.heartbeat" "Retry release only if ownership is"
 
 if (( FAIL )); then
   exit 1
