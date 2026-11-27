@@ -164,7 +164,7 @@ Fail → back to step 5.
 
 ### 2.6. Verify (Reviewer)
 
-Run this stage only when `checks.review_gate.enabled: true`; otherwise skip the separate Review/verify gate and Reviewer with status `SKIPPED`.
+Run this stage only when `checks.review_gate.enabled: true`; otherwise skip the separate OpenSpec Review/verify gate and Reviewer with status `SKIPPED`. This optional gate does not disable the mandatory independent Todoing Review in §6.4 when Todoing is enabled.
 
 A conformance check against the spec, not a style review. For each
 scenario and property: covered by a test and passing on the
@@ -180,7 +180,7 @@ route back and re-run the affected step.
 
 ### 2.7. Archive (Orchestrator / automation)
 
-Run this stage only when `components.openspec.enabled: true`; otherwise do not run OpenSpec archive.
+Run this stage only when `components.openspec.enabled: true`; otherwise do not run OpenSpec archive. When Todoing is enabled, this is the same archive operation in the ordered completion sequence in §6.5; do not run it a second time or outside that sequence.
 
 Triggered only after verify is all ✅. The delta-spec from
 `changes/<name>/specs/` merges into the permanent `openspec/specs/`,
@@ -392,6 +392,8 @@ The Orchestrator is the sole Todoing API client and lock-token custodian:
 `actor_id` is attribution, not authentication. The rule that the Main Orchestrator coordinates Todoing calls is the agreed procedural authority boundary. Technical isolation of role agents is intentionally not implemented and is not a workflow compliance criterion: Todoing does not block direct API calls from another process. Do not claim that direct access is technically denied; assess compliance with the procedural rule from agent actions.
 
 ### 6.4. Status and Review
+
+Todoing Review is mandatory when Todoing is enabled and is independent of `checks.review_gate.enabled`. It is a separate independent result review, not the optional OpenSpec verify gate in §2.6. The Reviewer runs in a separate role/session from the Implementer, receives the exact artifacts and task version under review, receives no lock token, and does not call the Todoing API.
 
 - Before handing work to the Reviewer, move the task to `review` using `task.status.set`.
 - Record the Review with `task.review.add`: stable `review_id`, reviewed `version_no`, `reviewer`, outcome, and ordered `comments` array.
