@@ -76,9 +76,8 @@ optional stage and be reported; it MUST NOT be interpreted as enabled.
 ### Requirement: Mandatory integrity protections remain active
 
 Configuration checksum verification, protection against overwriting an existing
-configuration, refusal to reinitialize an initialized project, and mandatory
-installer safety preconditions MUST remain active regardless of optional
-workflow switches. These protections MUST NOT be configurable off.
+configuration, additive reconnection, and mandatory installer safety
+preconditions MUST remain active regardless of optional workflow switches. These protections MUST NOT be configurable off.
 
 #### Scenario: Optional checks disabled but configuration tampered
 
@@ -100,9 +99,9 @@ Any migration of an existing configuration requires a separate explicit action.
 
 #### Scenario: Existing configuration
 
-- **WHEN** a project already has `.manifest/manifest.yaml`
-- **THEN** initialization refuses reinitialization and leaves the configuration
-  and checksum byte-identical
+- **WHEN** a project already has a valid `.manifest/manifest.yaml`
+- **THEN** initialization preserves the configuration and checksum byte-identically
+- **AND** may add only missing items selected by the existing settings
 
 ### Requirement: Todoing task identity matches the OpenSpec change
 
