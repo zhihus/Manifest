@@ -314,13 +314,45 @@ to = "completed"
             "body": "Exercise Todoing and Manifest contract.",
         })
         task_id = created["task"]["id"]
-        api(root, "task.external-ref.add", {
+        assert created["task"]["title"] == "acceptance-main"
+        reference_args = {
             "task_id": task_id,
             "namespace": "openspec.change",
             "value": "acceptance-main",
             "relation": "implements",
             "scope": "project",
-        })
+        }
+        api(root, "task.external-ref.add", reference_args)
+        references = api(root, "task.external-ref.list", {"task_id": task_id})["references"]
+        assert len(references) == 1
+        assert references[0]["namespace"] == "openspec.change"
+        assert references[0]["value"] == "acceptance-main"
+        assert references[0]["relation"] == "implements"
+        assert references[0]["scope"] == "project"
+
+        # Project-scoped OpenSpec references must not be attachable to a second task.
+        duplicate = api(root, "task.create", {
+            "title": "acceptance-main",
+            "status_id": "backlog",
+            "body": "Deliberate duplicate candidate for acceptance coverage.",
+        })["task"]
+        duplicate_result = api(
+            root,
+            "task.external-ref.add",
+            {**reference_args, "task_id": duplicate["id"]},
+            expect_ok=False,
+        )
+        assert duplicate_result["error"]["code"] == "external_ref_conflict"
+        linked_tasks = api(root, "task.list", {"query": "acceptance-main"})["tasks"]
+        assert sum(
+            1 for item in linked_tasks
+            if item.get("external_references", [])
+            and any(ref.get("namespace") == "openspec.change"
+                    and ref.get("value") == "acceptance-main"
+                    and ref.get("scope") == "project"
+                    for ref in item["external_references"])
+        ) == 1
+
         api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
         ready_version = api(root, "task.get", {"task_id": task_id})["version_no"]
         api(root, "task.version.approve", {
