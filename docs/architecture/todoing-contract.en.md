@@ -390,8 +390,7 @@ Cancellation is not equivalent to archiving: moving an OpenSpec change to the ar
 Manifest manages dependencies through `task.dependency.add`,
 `task.dependency.remove`, and `task.dependency.list`. External artifact links and
 Review records are stored in Todoing through the generic API extensions in §2.4.
-Those operations are absent from the current implementation and MUST be added to
-Todoing without Manifest-specific semantics.
+Those operations are implemented in Todoing as generic mechanisms and MUST remain free of Manifest-specific semantics.
 
 - A dependency means that a task must not start until its prerequisite is complete
   according to Manifest policy.
