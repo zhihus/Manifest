@@ -90,6 +90,16 @@ done
   { ok=0; FAIL+=("fresh: legacy key=value format remains"); }
 ((ok)) && PASS+=("fresh")
 
+# Regression: project names containing quotes and backslashes remain valid YAML scalars.
+mkdir -p "$TMP/yaml-name" && git -C "$TMP/yaml-name" init -q
+out=$(bash "$INIT" --templates "$TEMPLATES" --project "$TMP/yaml-name" \
+  --project-name 'demo "quoted" \path' --tracks mixed 2>&1) && rc=0 || rc=$?
+ok=1
+[[ $rc -eq 0 ]] || { ok=0; FAIL+=("yaml-name: exit $rc != 0"); }
+grep -Fq '  name: "demo \"quoted\" \\path"' "$TMP/yaml-name/.manifest/manifest.yaml" ||
+  { ok=0; FAIL+=("yaml-name: project name is not escaped as a YAML scalar"); }
+((ok)) && PASS+=("yaml-name")
+
 # Fixture 2: project with AGENTS.md and VERSIONING.md already present.
 mkdir -p "$TMP/conflict" && git -C "$TMP/conflict" init -q
 printf 'existing agents\n' >"$TMP/conflict/AGENTS.md"
