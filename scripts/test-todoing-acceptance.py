@@ -309,7 +309,7 @@ to = "completed"
         api(root, "store.verify", {"deep": True})
 
         created = api(root, "task.create", {
-            "title": "Main lifecycle acceptance",
+            "title": "acceptance-main",
             "status_id": "backlog",
             "body": "Exercise Todoing and Manifest contract.",
         })
