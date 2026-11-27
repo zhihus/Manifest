@@ -144,6 +144,22 @@ def run_todoing_only_acceptance(parent: Path, config: str) -> None:
     listed = api(root, "task.list", {"status_id": "backlog"})["tasks"]
     assert any(item["id"] == task_id for item in listed)
 
+    prerequisite = api(root, "task.create", {
+        "title": "Standalone prerequisite",
+        "status_id": "backlog",
+    })["task"]
+    api(root, "task.dependency.add", {
+        "task_id": task_id,
+        "depends_on_task_id": prerequisite["id"],
+    })
+    dependencies = api(root, "task.dependency.list", {"task_id": task_id})
+    assert prerequisite["id"] in dependencies["dependencies"]
+    api(root, "task.dependency.remove", {
+        "task_id": task_id,
+        "depends_on_task_id": prerequisite["id"],
+    })
+    assert not api(root, "task.dependency.list", {"task_id": task_id})["dependencies"]
+
     # This API sequence represents an explicit user approval of the task.
     api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
     ready = api(root, "task.get", {"task_id": task_id})["task"]
