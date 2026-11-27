@@ -71,7 +71,7 @@ project/
 | RELEASES.md | Version preparation and release rules. |
 | .llmignore | Restrictions on files agents may read. |
 
-These files form the primary visible root layout. The final list of mandatory context files is governed by a separate approved Manifest decision. This decision does not revoke or shorten the previously approved list of mandatory files, including specialized development, testing, and logging rules. Until conflicts are resolved separately, the existing frozen list in docs/project-manifest.md remains in force. Specialized documents must not duplicate AGENTS.md.
+These are supported context files, not a mandatory baseline. Each file is enabled independently through `context_files.<id>.enabled` in `.manifest/manifest.yaml`; all context-file switches default to `false`. The installer creates only explicitly selected files and never overwrites existing content. Specialized documents must not duplicate AGENTS.md.
 
 ### 3.2. .manifest directory
 
