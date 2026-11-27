@@ -168,6 +168,12 @@ forbid_text "$TODOING_AGENT" "todoing api --json" "incorrect runtime JSON API CL
 
 require_text "$BOOTSTRAP" "todoing --json api" "bootstrap JSON API CLI syntax"
 require_text "$BOOTSTRAP" "653788a954d2a120db1beba854308982814d8222" "bootstrap compatible Todoing build"
+require_text "$BOOTSTRAP" "If `TODOING_BIN` is set" "explicit Todoing binary override"
+require_text "$BOOTSTRAP" "resolve `todoing` from the connected project's `PATH`" "Todoing PATH resolution"
+forbid_text "$BOOTSTRAP" "scripts/resolve-todoing.sh" "no external shell resolver dependency"
+forbid_text "$BOOTSTRAP" "scripts/resolve-todoing.py" "no external Python resolver dependency"
+forbid_text "$BOOTSTRAP" ".todoing-cache" "no external release cache dependency"
+forbid_text "$BOOTSTRAP" "portable cache" "no portable cache dependency"
 forbid_text "$BOOTSTRAP" "todoing api --json" "incorrect bootstrap JSON API CLI syntax"
 
 for file in "$RU" "$EN"; do
