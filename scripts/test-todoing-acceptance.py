@@ -162,7 +162,7 @@ def run_todoing_only_acceptance(parent: Path, config: str) -> None:
 
     # This API sequence represents an explicit user approval of the task.
     api(root, "task.status.set", {"task_id": task_id, "status_id": "ready"})
-    ready = api(root, "task.get", {"task_id": task_id})["task"]
+    ready = api(root, "task.get", {"task_id": task_id})
     api(root, "task.version.approve", {
         "task_id": task_id,
         "version_no": ready["version_no"],
@@ -184,7 +184,7 @@ def run_todoing_only_acceptance(parent: Path, config: str) -> None:
 
     reviewed_version = api(
         root, "task.get", {"task_id": task_id}, token=grant["lock_token"]
-    )["task"]["version_no"]
+    )["version_no"]
     owner_call(root, "task.review.add", {
         "task_id": task_id,
         "review_id": "todoing-only-approved-review",
