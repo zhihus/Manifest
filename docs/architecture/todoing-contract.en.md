@@ -185,8 +185,8 @@ validates and preserves an existing `config.toml`.
 |---|---|---|
 | `backlog` | Backlog | Discussion and task refinement |
 | `ready` | Ready | User approved the task |
-| `in_progress` | In progress | Agent is executing the task |
-| `review` | In review | Result submitted to Reviewer |
+| `in_progress` | In Progress | Agent is executing the task |
+| `review` | In Review | Result submitted to Reviewer |
 | `verified` | Verified | Reviewer approved the result |
 | `completed` | Completed | Orchestrator passed final checks |
 
