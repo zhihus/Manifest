@@ -11,7 +11,7 @@ workflow stages can still run when the user intends to defer them.
 
 - Extend the generated Manifest configuration with independent component and
   control switches.
-- Enable Todoing and OpenSpec by default.
+- Enable Todoing and disable OpenSpec by default for new projects.
 - Disable optional workflow checks by default for this rollout.
 - Make the Main Orchestrator branch explicitly on each switch and report skipped
   stages without treating them as passed.
