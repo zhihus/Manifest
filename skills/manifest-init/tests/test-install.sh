@@ -69,6 +69,11 @@ if run "$TMP/partial" --context-file version=enabled >"$TMP/override.out" 2>&1; 
  echo "FAIL existing config accepted context override"; fails=$((fails+1))
 else
  grep -q EXISTING_CONFIG_IMMUTABLE "$TMP/override.out" || { echo "FAIL existing config override diagnostic"; fails=$((fails+1)); }
+if run "$TMP/partial" --todoing disabled >"$TMP/component-override.out" 2>&1; then
+ echo "FAIL existing config accepted component override"; fails=$((fails+1))
+else
+ grep -q EXISTING_CONFIG_IMMUTABLE "$TMP/component-override.out" || { echo "FAIL component override diagnostic"; fails=$((fails+1)); }
+fi
 fi
 
 echo "Regression failures: $fails"
