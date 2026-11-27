@@ -45,6 +45,12 @@ require_order() {
 }
 
 for file in "$RU" "$EN"; do
+  require_text "$file" "todoing --json api" "JSON API CLI syntax"
+  forbid_text "$file" "todoing api --json" "incorrect JSON API CLI syntax"
+  require_text "$file" "6acca6087fbd4b39ad0dcd5f12db52dc4d84b163" "compatible Todoing build"
+done
+
+for file in "$RU" "$EN"; do
   [[ -f $file ]] || { fail "missing runbook: $file"; continue; }
   for op in \
     store.init store.info store.verify task.create task.external-ref.add \
@@ -89,10 +95,28 @@ require_text "$EN" "Never overwrite an existing config" "no-overwrite rule"
 require_text "$EN" "first reconcile actual" "reconciliation before retry"
 require_text "$EN" 'outcome `completed`' "dependency readiness gate"
 require_text "$EN" "store already exists but the config is missing, stop" "existing store configuration guard"
+require_text "$RU" "Режим Todoing без OpenSpec" "Todoing-only workflow"
+require_text "$RU" "task.list" "Todoing-only task discovery"
+require_text "$RU" "самостоятельного результата работы" "no subtask explosion"
+require_text "$RU" "task.commit.add" "Todoing-only commit traceability"
+require_text "$RU" "не используются" "no OpenSpec dependency"
+require_text "$EN" "Todoing-only mode (OpenSpec disabled)" "Todoing-only workflow"
+require_text "$EN" "independently meaningful" "no subtask explosion"
+require_text "$EN" "task.commit.add" "Todoing-only commit traceability"
+require_text "$EN" "Do not run OpenSpec archive" "no OpenSpec dependency"
+
 forbid_text "$RU" 'автоматически выполните `store.init`' "no store overwrite"
 forbid_text "$EN" 'automatically run `store.init` over an existing store' "no store overwrite"
 forbid_text "$RU" 'выполните `task.lock.release` без проверки владения' "no blind lock release"
 forbid_text "$EN" 'release the lock without confirming ownership' "no blind lock release"
+
+RU_TODOING_ONLY=$(mktemp)
+EN_TODOING_ONLY=$(mktemp)
+sed -n '/^### 6\.2\.1\./,/^### 6\.3\./p' "$RU" > "$RU_TODOING_ONLY"
+sed -n '/^### 6\.2\.1\./,/^### 6\.3\./p' "$EN" > "$EN_TODOING_ONLY"
+if grep -Fq 'openspec archive <change-id>' "$RU_TODOING_ONLY" "$EN_TODOING_ONLY"; then
+  fail "Todoing-only mode must not execute OpenSpec archive"
+fi
 
 RU_COMPLETION=$(mktemp)
 EN_COMPLETION=$(mktemp)
@@ -100,7 +124,7 @@ RU_RECOVERY=$(mktemp)
 EN_RECOVERY=$(mktemp)
 RU_CANCELLATION=$(mktemp)
 EN_CANCELLATION=$(mktemp)
-trap 'rm -f "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY" "$RU_CANCELLATION" "$EN_CANCELLATION"' EXIT
+trap 'rm -f "$RU_TODOING_ONLY" "$EN_TODOING_ONLY" "$RU_COMPLETION" "$EN_COMPLETION" "$RU_RECOVERY" "$EN_RECOVERY" "$RU_CANCELLATION" "$EN_CANCELLATION"' EXIT
 
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$RU" > "$RU_COMPLETION"
 sed -n '/^### 6\.5\./,/^### 6\.6\./p' "$EN" > "$EN_COMPLETION"
