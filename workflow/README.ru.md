@@ -394,7 +394,7 @@ Orchestrator на проект; параллельные оркестратор�
 3. Перед каждым блокирующим запуском субагента выполните `task.lock.heartbeat`. Lease 720 секунд покрывает hard timeout 600 секунд и запас 120 секунд.
 4. Во время выполнения субагента heartbeat не отправляется. Субагент не получает token и не вызывает Todoing.
 5. Все owner-запросы передают token в envelope и актуальные `owner_id`/generation в args. При `stale_lock` прекратите операции со старым token.
-6. После завершения задачи или подтверждённой отмены освободите lock через `task.lock.release`.
+6. Освободите lock через `task.lock.release` только после завершения задачи или подтверждённой отмены и сверки всех обязательных операций Todoing, OpenSpec и Git.
 
 `actor_id` — атрибуция, а не аутентификация. Правило «Todoing API вызывает Main Orchestrator» является принятой процедурной границей полномочий. Техническая изоляция ролевых агентов не реализуется и не является критерием соответствия workflow: Todoing не блокирует прямые вызовы другого процесса. Не заявляйте, что прямой доступ технически запрещён; соблюдение процедурного правила оценивается по действиям агентов.
 
@@ -408,21 +408,21 @@ Orchestrator на проект; параллельные оркестратор�
 
 ### 6.5. Завершение и отмена
 
-Успешное завершение выполняется строго по порядку:
+Успешное завершение связанной Todoing/OpenSpec-задачи выполняется строго по порядку:
 1. Review approved, статус `verified`.
 2. Acceptance checks Todoing ↔ OpenSpec ↔ Git.
-3. Выполните `openspec archive <change-id> --yes`: delta specs вливаются в permanent specs.
+3. При включённом OpenSpec выполните `openspec archive <change-id> --yes`: delta specs вливаются в permanent specs. Для standalone Todoing-задачи этот шаг пропускается.
 4. Git merge согласно правилам проекта.
-5. `task.commit.finalize` с SHA итогового merge commit.
+5. `task.commit.finalize` с фактическим SHA итогового merge commit.
 6. `task.status.set` → `completed` (переход сам устанавливает outcome `completed`).
 7. `task.lock.release`.
 
 Любой агент может рекомендовать отмену с обоснованием; подтвердить её может только пользователь. После подтверждения выполните строго по порядку:
 1. `task.cancel` с причиной.
-2. Выполните `openspec archive <change-id> --yes --skip-specs`: change архивируется без изменения permanent specs.
+2. Если OpenSpec включён, выполните `openspec archive <change-id> --yes --skip-specs`: change архивируется без изменения permanent specs. Для standalone Todoing-задачи этот шаг пропускается.
 3. `task.lock.release`.
 
-Не удаляйте external reference. Не заменяйте отмену одним лишь архивированием.
+Не удаляйте существующий external reference. Не заменяйте отмену одним лишь архивированием.
 
 ### 6.6. Snapshot и восстановление
 
