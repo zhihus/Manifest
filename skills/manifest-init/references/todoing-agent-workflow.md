@@ -113,6 +113,28 @@ printf '%s' '{"api_version":1,"project_id":"<PROJECT_ID>","actor_id":"manifest-o
 - Every prerequisite must have outcome `completed`.
 - If a prerequisite is incomplete, locked, or cannot be verified, do not start work.
 
+## Single active task
+
+The Main Orchestrator drives at most one task through execution at a time.
+
+- An **active task** is one whose status is `in_progress`, `review`, or
+  `verified` — a task that has been started but has not reached a terminal
+  outcome of `completed` or `cancelled`. A task in `backlog` or `ready` is not
+  active; a task with outcome `completed` or `cancelled` is not active.
+- The Main Orchestrator MUST NOT start executing another task while a current
+  task is active. "Start executing" means acquiring the lock and moving the
+  task to `in_progress` (or any later execution state). Creating a task in
+  `backlog` or moving it to `ready` is allowed and does not count as starting
+  execution.
+- The only exception is an explicit user instruction to start another task.
+  A request to discuss, analyze, draft, or prepare is not such an instruction.
+- The rule applies regardless of who initiated the task and by what method:
+  user, agent, subagent, CLI, JSON API, or any other invocation path.
+  `actor_id` is attribution, not an exemption.
+- When the constraint blocks a new task, report the active task it conflicts
+  with and wait for the user's decision. Do not silently drop or reorder the
+  request.
+
 ## Execution and lock custody
 
 The Main Orchestrator is the only Todoing API client and lock-token custodian.
