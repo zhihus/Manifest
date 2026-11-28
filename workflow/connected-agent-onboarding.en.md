@@ -50,12 +50,13 @@ string alone does not prove build provenance.
 
 The mode is determined only by the project's actual configuration:
 
-| Todoing | OpenSpec | Agent responsibilities |
-|---|---|---|
-| enabled | enabled | Coordinated mode: one Todoing task per OpenSpec change; maintain the link and shared lifecycle. |
-| enabled | disabled | Todoing-only: manage standalone tasks; do not create OpenSpec changes or fake openspec.change references. |
-| disabled | enabled | OpenSpec-only: manage specifications without Todoing calls or a Todoing-store prerequisite. |
-| disabled | disabled | Invoke neither Todoing nor OpenSpec. |
+- **Both enabled:** coordinated mode; one Todoing task per OpenSpec change,
+  with a maintained link and shared lifecycle.
+- **Todoing enabled, OpenSpec disabled:** Todoing-only mode; manage standalone
+  tasks, without OpenSpec changes or fake `openspec.change` references.
+- **Todoing disabled, OpenSpec enabled:** OpenSpec-only mode; manage
+  specifications without Todoing calls or a Todoing-store prerequisite.
+- **Both disabled:** invoke neither Todoing nor OpenSpec.
 
 If a user request requires a specification while OpenSpec is disabled, report
 the disabled component and request authorization to enable it. Do not bypass
