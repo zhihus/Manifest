@@ -38,6 +38,11 @@ Entry point: `AGENTS.md`
   startup checks, component modes, OpenSpec ↔ Todoing mapping, agent
   responsibilities, lifecycle, and recovery until per-context-file generation
   is implemented.
+  One-run consumer onboarding plan:
+  `workflow/connected-agent-integration-plan.ru.md` (authoritative RU) and
+  `workflow/connected-agent-integration-plan.en.md` (EN translation). It audits
+  the consumer, configures enabled components, transfers agent context, and
+  verifies readiness without creating tasks or publishing changes.
   Naming rules for files and directories:
   `workflow/naming-rules.en.md`. Structure of Markdown documents
   (metadata block, status list, section numbering):
