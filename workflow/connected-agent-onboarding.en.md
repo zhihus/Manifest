@@ -15,7 +15,10 @@ The Main Orchestrator must:
 1. Read consumer AGENTS.md and check .llmignore access rules.
 2. Validate .manifest/manifest.yaml, checksum, format_version, and switches
    against the installed Manifest schema.
-3. Select the OpenSpec/Todoing mode from actual switches.
+3. Check OpenSpec/Todoing switches. OpenSpec must be enabled by default for
+   every new consumer connection; disable it only on the user's explicit
+   decision. If OpenSpec is unavailable or the schema does not support enabling
+   it, stop and report the limitation.
 4. If Todoing is enabled, verify binary, Project ID, config, and store per
    §6.1 of workflow/README.en.md.
 
@@ -31,6 +34,10 @@ A version string does not prove provenance.
 ## 2. Operating modes
 
 - **Both enabled:** coordinated mode; one Todoing task per OpenSpec change.
+- OpenSpec is enabled by default for new connections. An existing
+  `enabled: false` is not proof of an intentional user opt-out: enable it during
+  onboarding using the schema and recalculate the checksum. Never disable it
+  without the user's explicit decision.
 - **Todoing only:** standalone tasks; no OpenSpec changes or fake
   `openspec.change` references.
 - **OpenSpec only:** specifications without Todoing API/store.
