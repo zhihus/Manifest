@@ -16,11 +16,13 @@ One-run setup of Manifest, OpenSpec, and Todoing guidance in a consumer project.
    checksum, format_version, switches, OpenSpec, Todoing, Project ID, config,
    and store. Use read/verify operations only on an existing database.
 
-2. **Mode.** Compare switches with the user's instruction. Coordinated work
-   requires both OpenSpec and Todoing enabled. Change only authorized switches
-   using the actual Manifest schema; recalculate checksum with the supported
-   method. Stop on unknown schema, damaged store, uncertain binary provenance,
-   or conflicting project rules.
+2. **Mode.** OpenSpec is enabled by default for a new consumer connection; do not treat
+   an existing `enabled: false` as user opt-out. During onboarding, enable it
+   using the actual Manifest schema and recalculate the checksum with the
+   supported method. Disable it only on the user's explicit decision. Todoing
+   is also required for coordinated mode. Stop on unknown schema, inability to
+   enable OpenSpec, damaged store, uncertain binary provenance, or conflicting
+   project rules.
 
 3. **Agent context.** Create a concise consumer-specific guide based on
    `workflow/connected-agent-onboarding.ru.md`. Retain artifact-creation rules,
