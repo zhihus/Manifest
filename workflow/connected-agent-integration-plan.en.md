@@ -7,7 +7,7 @@
 > **Updated: 2026-11-28**  
 
 # Description
-A single-run plan for connecting Manifest, OpenSpec, and Todoing guidance to a consumer project's agent.
+A one-run plan for connecting Manifest, OpenSpec, and Todoing to a consumer agent.
 
 ## 1. Goal
 
