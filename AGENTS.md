@@ -46,6 +46,12 @@ temporary mandatory guide until Manifest generates and attaches separate
 context files by role and process. It does not override consumer-project
 instructions, user decisions, component switches, or normative contracts.
 
+**Connected-project integration.** When asked to onboard a consumer project,
+follow `workflow/connected-agent-integration-plan.en.md`; its Russian edition
+(`workflow/connected-agent-integration-plan.ru.md`) is authoritative. Execute
+the plan in one controlled run, preserve consumer autonomy, and do not create
+user tasks or publish changes unless separately authorized.
+
 **Plans.** Plan files live in `docs/plans/`. Plan files are stored
 compressed; the agent must perform context compression before storing
 or updating a plan, using an available context-compression skill or
