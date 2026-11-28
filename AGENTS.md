@@ -22,22 +22,37 @@ line of the real document comes first, followed by a line starting with
 `Описание:`/`Description:` — an annotation describing how that line should
 look and what it must contain.
 
-**temp/.** Temporary storage for files needed during work (scripts, intermediate artifacts, anything not part of the app). All temporary files go here — never write them elsewhere. `temp/` is cleaned periodically, never while an agent is working on app functionality; the user may clear it manually or ask the model to.
+**temp/.** Temporary storage for files needed during work (scripts, intermediate
+artifacts, anything not part of the app). All temporary files go here — never
+write them elsewhere. `temp/` is cleaned periodically, never while an agent
+is working on app functionality; the user may clear it manually or ask the
+model to.
 
 Type: **doc**.
 
-**Project structure.** This repository contains the Manifest framework itself. Connected projects are independent consumers, not sub-projects of this repository. Navigation map: `llms.txt`.
+**Project structure.** This repository contains the Manifest framework itself.
+Connected projects are independent consumers, not sub-projects of this
+repository. Navigation map: `llms.txt`.
 
 - Register connected consumers in `workflow/connected-projects.md`.
-- Add a project to `llms.txt` only when it is an actual component or directory of this repository.
+- Add a project to `llms.txt` only when it is an actual component or directory
+  of this repository.
+
+**Connected-project agent workflow.** When acting in a repository connected
+to Manifest, read `workflow/connected-agent-onboarding.en.md` before using
+Manifest, OpenSpec, or Todoing. The Russian edition
+(`workflow/connected-agent-onboarding.ru.md`) is authoritative. This is a
+temporary mandatory guide until Manifest generates and attaches separate
+context files by role and process. It does not override consumer-project
+instructions, user decisions, component switches, or normative contracts.
 
 **Plans.** Plan files live in `docs/plans/`. Plan files are stored
 compressed; the agent must perform context compression before storing
 or updating a plan, using an available context-compression skill or
 mechanism of its own choice, and the compression must preserve
 invariants, constraints, and technical values. Always read the Russian
-authoritative version (`.ru.md`). The English version (`.en.md`) is
-a translation and never takes priority. If no Russian version exists,
+authoritative version (`.ru.md`). The English version (`.en.md`) is a
+translation and never takes priority. If no Russian version exists,
 read the available version and create the Russian edition when the plan
 is next updated.
 
@@ -47,8 +62,10 @@ is next updated.
 * Releases: `releases.md`
 * Commits: `commit-rules.md`
 * OpenSpec tasks: `openspec-rules.md`
-* Access boundaries: `.llmignore` — read first; access ignored paths only with explicit permission.
-* Copy-paste output (prompts, commands, code, config) → fenced code block, not plain text.
+* Access boundaries: `.llmignore` — read first; access ignored paths only
+  with explicit permission.
+* Copy-paste output (prompts, commands, code, config) → fenced code block,
+  not plain text.
 * Line length: in final English documents, keep every line ≤ 100
   characters; Russian working drafts have no length limit.
 
