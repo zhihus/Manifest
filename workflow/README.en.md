@@ -353,6 +353,16 @@ separate Todoing tasks:
 - Do not dispatch implementation, acquire a lock, or move the task to `in_progress` before approval.
 - Manage dependencies with `task.dependency.add`, `task.dependency.remove`, and `task.dependency.list`. Before dispatch, verify that every prerequisite task has outcome `completed`. If a dependency is locked or its state cannot be verified, do not start work. Todoing stores dependency edges and prevents cycles; Manifest decides readiness.
 - `actor_id` is attribution, not authentication. The Orchestrator sends every request; for a Review, set the envelope actor ID to the stable identity of the Reviewer role/session.
+- Single active task: the Orchestrator MUST NOT start executing another task
+  while the current task is active (`in_progress`, `review`, or `verified`). A
+  task in `backlog` or `ready` and a task with outcome `completed` or
+  `cancelled` are not active. "Start executing" means acquiring the lock and
+  moving the task to `in_progress` (or later); creating a task in `backlog` or
+  moving it to `ready` is not starting execution and is allowed. The only
+  exception is an explicit user instruction. The rule applies regardless of the
+  initiator and method (user, agent, subagent, CLI, JSON API); `actor_id` is
+  attribution, not an exemption. On a block, report the active task and wait
+  for the user's decision.
 
 ### 6.2.1. Todoing-only mode (OpenSpec disabled)
 
