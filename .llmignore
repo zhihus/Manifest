@@ -6,6 +6,7 @@ docs/templates/
 !docs/architecture/*.ru.md
 !workflow/README.ru.md
 !workflow/connected-agent-onboarding.ru.md
+!workflow/connected-agent-integration-plan.ru.md
 temp/
 logs/
 target/
