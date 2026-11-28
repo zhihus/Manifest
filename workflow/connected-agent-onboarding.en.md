@@ -7,7 +7,7 @@
 > **Updated: 2026-11-28**
 
 # Description
-Temporary mandatory context until Manifest generates and attaches role/process-specific instructions.
+Temporary context until Manifest attaches generated role/process guidance.
 
 ## 1. Startup
 
