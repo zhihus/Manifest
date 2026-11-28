@@ -89,6 +89,16 @@ lock tokens.
   independent Review.
 - `verified → completed` requires final checks and required OpenSpec/Git actions.
 - Cancellation requires the user's decision. Archive does not replace status.
+- Single active task: the Orchestrator MUST NOT start executing another task
+  while the current task is active (`in_progress`, `review`, or `verified`). A
+  task in `backlog` or `ready` and a task with outcome `completed` or
+  `cancelled` are not active. "Start executing" means acquiring the lock and
+  moving the task to `in_progress` (or later); creating a task in `backlog` or
+  moving it to `ready` is not starting execution and is allowed. The only
+  exception is an explicit user instruction. The rule applies regardless of the
+  initiator and method (user, agent, subagent, CLI, JSON API); `actor_id` is
+  attribution, not an exemption. On a block, report the active task and wait
+  for the user's decision.
 
 Detailed API, lock/heartbeat/fencing/recovery, Review records, final commit, and
 partial-failure procedures: §§6.2–6.6 of `workflow/README.en.md` and
