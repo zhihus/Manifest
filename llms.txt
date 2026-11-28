@@ -24,14 +24,20 @@ Entry point: `AGENTS.md`
   `contract-spec-v4.ru.md`, `contract-spec-v5.ru.md`), and the
   Todoing task lifecycle clarification
   (`todoing-task-lifecycle-clarification.ru.md`) and connected-project
-  structure proposal (`project-structure-design.ru.md`), and approved connected-project
-  structure (`connected-project-structure.ru.md`). Russian editions
-  are authoritative (`*.ru.md`); English versions (`*.en.md`) are
-  translations.
+  structure proposal (`project-structure-design.ru.md`), and approved
+  connected-project structure (`connected-project-structure.ru.md`).
+  Russian editions are authoritative (`*.ru.md`); English versions
+  (`*.en.md`) are translations.
   Historical decision records; do not delete.
 * `docs/plans/` — plan files (stored compressed; `.ru.md` is authoritative).
 * `workflow/` — OpenSpec user–agent interaction process
   (roles, 7 steps, gates). Entry: `workflow/README.en.md`.
+  Temporary mandatory agent guide for connected consumers:
+  `workflow/connected-agent-onboarding.ru.md` (authoritative RU) and
+  `workflow/connected-agent-onboarding.en.md` (EN translation). It defines
+  startup checks, component modes, OpenSpec ↔ Todoing mapping, agent
+  responsibilities, lifecycle, and recovery until per-context-file generation
+  is implemented.
   Naming rules for files and directories:
   `workflow/naming-rules.en.md`. Structure of Markdown documents
   (metadata block, status list, section numbering):
