@@ -24,6 +24,7 @@ Todoing вызывается через `todoing --json api`; бинарник �
 ## 2. Режимы
 
 - **Todoing + OpenSpec:** coordinated mode; одна Todoing task на одну OpenSpec change.
+- Для нового подключения OpenSpec включается по умолчанию. Существующий `enabled: false` не считать осознанным отказом пользователя: при onboarding включить switch по схеме и пересчитать checksum. Не отключать OpenSpec без явного решения пользователя.
 - **Только Todoing:** задачи без OpenSpec и без фиктивных `openspec.change`.
 - **Только OpenSpec:** спецификации без Todoing API/store.
 - **Оба выключены:** не вызывать компоненты.
